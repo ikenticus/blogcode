@@ -1,0 +1,46 @@
+- action: add_template
+  description: Result Threshold retrieving Output Summary
+  targetPythonClass: Products.ZenModel.Device
+  templateName: Result2Output
+  templatePath: /Server/Linux/TestCase
+  DataSources:
+  - DataPoints:
+    - dpName: remote_command
+      isrow: true
+      rrdtype: GAUGE
+    cycletime: 300
+    dsName: remote_command
+    enabled: true
+    eventClass: /Cmd/Fail
+    oid: .1.3.6.1.4.1.8072.1.3.2.3.1.4.12.114.101.109.111.116.101.95.99.111.109.109.97.110.100
+    parser: Auto
+    severity: 3
+    sourcetype: BasicDataSource.SNMP
+  Thresholds:
+  - dsnames:
+    - remote_command_remote_command
+    enabled: true
+    escalateCount: 0
+    eventClass: /Perf/Snmp
+    maxval: '0'
+    minval: ''
+    severity: 3
+    thresholdName: remote_failure_output
+  GraphDefs: []
+
+
+- action: add_transforms
+  eventClass: /Perf/Snmp
+  eventTransforms: "alert = re.search('threshold of (\\w+)_failure_output', evt.message)\n\
+    if alert:\n\
+    \    ds = evt.eventKey.split('|')[0]\n\
+    \    for t in device.getRRDTemplates():\n\
+    \         for s in t.getRRDDataSources():\n\
+    \             if ds == '%s_%s' % (s.id, s.id):\n\
+    \                 from subprocess import *\n\
+    \                 outoid = s.oid.replace('8072.1.3.2.3.1.4','8072.1.3.2.3.1.2')\n\
+    \                 cmd = 'snmpget -Ov -%s -c%s %s %s' % (device.zSnmpVer, device.zSnmpCommunity, device.manageIp, outoid)\n\
+    \                 proc= Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)\n\
+    \                 evt.summary = proc.stdout.readlines()[0].replace('STRING: ','')\n\
+    \                 break\n\n"
+
