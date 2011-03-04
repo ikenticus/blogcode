@@ -53,10 +53,13 @@
     \                         device.manageIp, outoid)\n\
     \                 proc= Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)\n\
     \                 evt.summary = proc.stdout.readlines()[0].replace('STRING: ','')\n\
-    \                 evt.component = alert.groups()[0]\n\
     \                 break\n\
+    \    evt.component = alert.groups()[0]\n\
     if 'CRIT' in evt.summary: evt.severity = 5\n\
     elif 'ERR' in evt.summary: evt.severity = 4\n\
     elif 'WARN' in evt.summary: evt.severity = 3\n\
+    elif 'INFO' in evt.summary: evt.severity = 2\n\
+    elif 'DEBUG' in evt.summary: evt.severity = 1\n\
+    elif 'OK' in evt.summary: evt.severity = 0\n\
     \n"
 
