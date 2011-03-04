@@ -23,6 +23,8 @@ nsExtOids = {
     '3.1.4.12' : 'nsExtendResult',
     '4.1.2.12' : 'nsExtendOutLine',
 }
+# the .12 is actually incorrect, that number increments as objects are added to the OID table
+# this script won't work properly unless you have a definite list of snmpd.conf ^extend lines
 
 
 def convert(cmd):

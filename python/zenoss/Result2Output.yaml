@@ -39,8 +39,22 @@
     \             if ds == '%s_%s' % (s.id, s.id):\n\
     \                 from subprocess import *\n\
     \                 outoid = s.oid.replace('8072.1.3.2.3.1.4','8072.1.3.2.3.1.2')\n\
-    \                 cmd = 'snmpget -Ov -%s -c%s %s %s' % (device.zSnmpVer, device.zSnmpCommunity, device.manageIp, outoid)\n\
+    \                 if device.zSnmpVer == 'v3':\n\
+    \                     cmd = 'snmpget -Ov -%s -u %s -a %s -A %s -x %s -X %s -l authPriv %s %s' % (\n\
+    \                         device.zSnmpVer, device.zSnmpSecurityName,\n\
+    \                         device.zSnmpAuthType, device.zSnmpAuthPassword,\n\
+    \                         device.zSnmpPrivType, device.zSnmpPrivPassword,\n\
+    \                         device.manageIp, outoid)\n\
+    \                 else:\n\
+    \                     cmd = 'snmpget -Ov -%s -c%s %s %s' % (\n\
+    \                         device.zSnmpVer, device.zSnmpCommunity,\n\
+    \                         device.manageIp, outoid)\n\
     \                 proc= Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)\n\
     \                 evt.summary = proc.stdout.readlines()[0].replace('STRING: ','')\n\
-    \                 break\n\n"
+    \                 evt.component = alert.groups()[0]\n\
+    \                 break\n\
+    if 'CRIT' in evt.summary: evt.severity = 5\n\
+    elif 'ERR' in evt.summary: evt.severity = 4\n\
+    elif 'WARN' in evt.summary: evt.severity = 3\n\
+    \n"
 
