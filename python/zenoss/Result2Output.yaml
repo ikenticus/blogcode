@@ -31,14 +31,16 @@
 
 - action: add_transforms
   eventClass: /Perf/Snmp
-  eventTransforms: "alert = re.search('threshold of (\\w+)_failure_output', evt.message)\n\
+  eventTransforms: "import re\n\
+    alert = re.search('threshold of (\\w+)_failure_output', evt.message)\n\
     if alert:\n\
     \    ds = evt.eventKey.split('|')[0]\n\
     \    for t in device.getRRDTemplates():\n\
     \         for s in t.getRRDDataSources():\n\
     \             if ds == '%s_%s' % (s.id, s.id):\n\
     \                 from subprocess import *\n\
-    \                 outoid = s.oid.replace('8072.1.3.2.3.1.4','8072.1.3.2.3.1.2')\n\
+    \                 #outoid = s.oid.replace('8072.1.3.2.3.1.4','8072.1.3.2.3.1.2')\n\
+    \                 outoid = re.sub('8072.1.3.2.3.1.\d+','8072.1.3.2.3.1.2', s.oid)\n\
     \                 if device.zSnmpVer == 'v3':\n\
     \                     cmd = 'snmpget -Ov -%s -u %s -a %s -A %s -x %s -X %s -l authPriv %s %s' % (\n\
     \                         device.zSnmpVer, device.zSnmpSecurityName,\n\
