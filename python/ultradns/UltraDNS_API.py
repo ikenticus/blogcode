@@ -67,9 +67,10 @@ class UltraDNS:
             doc = apidoc.getPage(p).extractText()
             mCall = re.search(r'<methodCall>.+</methodCall>', doc)
             mResp = re.search(r'<methodResponse>.+</methodResponse>', doc)
+            section = None
             if mCall:
                 xml = mCall.group()
-                method = re.search(r'<methodName>(\w+)</methodName>', xml)
+                method = re.search(r'<methodName>(UDNS_\w+)</methodName>', xml)
                 if not method:
                     continue
                 section = method.group(1)
@@ -84,9 +85,9 @@ class UltraDNS:
                     order.append(key)
                 if order:
                     self.config.set(section, 'order', ','.join(order))
-            if re.search(r'<fault>', doc):
-                self.config.set(section, 'fault', True)
-            if mResp:
+            if section and re.search(r'<fault>', doc):
+                    self.config.set(section, 'fault', True)
+            if section and mResp:
                 xml = mResp.group()
                 record = re.search(r'<array>\s*<data>\s*<value>\s*<([_\w]+)>', xml)
                 if record:
@@ -104,7 +105,11 @@ class UltraDNS:
             if cached:
                 ans = cached
             else:
-                ans = raw_input('Would you like to use cached copy? [Y/n]: ')
+                try:
+                    ans = raw_input('Would you like to use cached copy? [Y/n]: ')
+                except KeyboardInterrupt, e:
+                    print '\n%s aborted by user' % self.plug
+                    sys.exit(1)
             if ans.lower() != 'n':
                 # reading XML from cached file
                 print 'Loading Cached XML Response'
@@ -184,7 +189,11 @@ class UltraDNS:
                     else:
                         ans = old
                 else:
-                    ans = raw_input('  Setting %s[%s]: ' % (setting, old))
+                    try:
+                        ans = raw_input('  Setting %s[%s]: ' % (setting, old))
+                    except KeyboardInterrupt, e:
+                        print '\n%s aborted by user' % self.plug
+                        sys.exit(1)
                 if not ans:
                     ans = old
             xml += '<param><value><%s>%s%s</%s></value></param>' \
@@ -231,9 +240,12 @@ class UltraDNS:
                 if m[1] == 'None':
                     return results
                 for r in results:
-                    if m[1] in r[m[0]]:
-                         matches.append(r)
-                print matches
+                    if m[0] in r and m[1] in r[m[0]]:
+                        matches.append(r)
+                if matches:
+                    print matches
+                else:
+                    print 'No matches found'
             else:
                 print results
         elif 'fault' in self.config.options(name):
@@ -259,8 +271,12 @@ class UltraDNS:
                     default = self.methods.index(m)
             ans = ''
             while ans =='':
-                ans = raw_input('Which method do you want to execute [%s]: ' \
-                    % str(default))
+                try:
+                    ans = raw_input('Which method do you want to execute [%s]: ' \
+                        % str(default))
+                except KeyboardInterrupt, e:
+                    print '\n%s aborted by user' % self.plug
+                    sys.exit(1)
                 if not ans:
                     ans = default
             m = self.methods[int(ans)]
