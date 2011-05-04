@@ -3,7 +3,7 @@ UltraDNS API Script
 
 Author:     ikenticus
 Created:    2011-04-29
-Updated:    2011-05-03
+Updated:    2011-05-04
 Summary:    Interactive modular class for querying UltraDNS XML-RPC
 """
 
@@ -74,6 +74,8 @@ class UltraDNS:
                 if not method:
                     continue
                 section = method.group(1)
+                if re.search(r'[Cc]onnect', section):
+                    continue    # exclude connection-related methods
                 if section not in self.config._sections:
                     self.config.add_section(section)
                 patt = re.compile(r'<value><([^\s]+)>([^\s]+)</([^\s]+)></value>')
