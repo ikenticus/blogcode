@@ -25,6 +25,7 @@ pdfurl = 'https://www.ultradns.net/api/NUS_API_XML.pdf'
 class UltraDNS:
     def __init__(self, cfname, pdfname, debug=False):
         self.root = None
+        self.debug = debug
         self.cfname = cfname
         self.config = ConfigParser.ConfigParser()
         self.config.read(cfname)
@@ -100,7 +101,7 @@ class UltraDNS:
         self.config.write(file)
         file.close()
 
-    def check_xml(self, method_name, params=None, cached=None):
+    def check_xml(self, method_name, params=None, cached=None, newauth=None):
         cache = self.workdir + method_name
         if 'Get' in method_name and os.path.exists(self.workdir + method_name):
             print 'Previously downloaded XML found for %s' % method_name
@@ -124,9 +125,9 @@ class UltraDNS:
         xml = '<methodCall><methodName>%s</methodName>' % method_name
         xml += '<params>%s</params></methodCall>' \
             % self.query_param(method_name, params)
-        self.root = ET.XML(self.send_xml(method_name, xml))
+        self.root = ET.XML(self.send_xml(method_name, xml, newauth=newauth))
 
-    def send_xml(self, method_name, method_xml):
+    def send_xml(self, method_name, method_xml, newauth=None):
         xml_head = '<?xml version="1.0"?><transaction>'
         xml_foot = '<methodCall><methodName>UDNS_Disconnect</methodName>'
         xml_foot += '</methodCall></transaction>'
@@ -134,12 +135,17 @@ class UltraDNS:
         xml_login = '<methodCall><methodName>UDNS_OpenConnection</methodName>'
         xml_login += '<params>'
         for c in ['sponsor', 'username', 'password']:
+            val = self.config.get('auth', c)
+            if newauth and  c in newauth:
+                val = newauth[c]
             xml_login += '<param><value><string>%s</string></value></param>'\
-                % self.config.get('auth', c)
+                % val
         xml_login += '<param><value><float>2.0</float></value></param>'
         xml_login += '</params></methodCall>'
 
         xml = xml_head + xml_login + method_xml + xml_foot
+        if self.debug:
+            print xml
         conn = SSL.Context(SSL.TLSv1_METHOD)
         sock = SSL.Connection(conn,
             socket.socket(socket.AF_INET, socket.SOCK_STREAM))
@@ -177,7 +183,7 @@ class UltraDNS:
         if not params:
             print '%s requires the following settings:' % name
         for q in self.config.get(name, 'order').split(','):
-            tag, setting = q.split('+')
+            tag, setting = q.lower().split('+')
             dot = ''
             if setting.rstrip('.') != setting:
                 setting = setting.rstrip('.')
@@ -226,7 +232,18 @@ class UltraDNS:
                      dict[key] = x.getchildren()[0].text
         return dict
 
+    def interate_results(self):
+        for p in self.root.getiterator():
+            try:
+                print '%s: %s' % (p.tag, p.text)
+            except TypeError:
+                pass
+
     def parse_xml(self, name, match=None):
+        if not match:
+            print 'No match specified, iterating the results'
+            self.interate_results()
+            return
         if not self.root:
             print 'No XML to parse'
             return
@@ -257,13 +274,10 @@ class UltraDNS:
                 print self.loop_child(self.root.getchildren()[3], 'param')[0].text
         else:
             print 'Unable to parse, iterating the results'
-            for p in self.root.getiterator():
-                try:
-                    print '%s: %s' % (p.tag, p.text)
-                except TypeError:
-                    pass
+            self.interate_results()
 
-    def choose_method(self, method=None, match=None, params=None, cached=None):
+    def choose_method(self, method=None, match=None,
+        cached=None, params=None, newauth=None):
         default = ''
         if not method:
             print 'Currently available methods:'
@@ -284,7 +298,7 @@ class UltraDNS:
             m = self.methods[int(ans)]
         else:
             m = method
-        self.check_xml(m, params=params, cached=cached)
+        self.check_xml(m, params=params, cached=cached, newauth=newauth)
         self.parse_xml(m, match=match)
 
 
@@ -294,7 +308,19 @@ if __name__ == "__main__":
     cfpath = os.path.dirname(sys.argv[0])
     if not cfpath:
         cfpath = os.getcwd()
-    u = UltraDNS(cfname, cfpath+'/'+pdfurl.split('/')[-1])
+
+    # input answer from command line
+    from optparse import OptionParser
+    parser = OptionParser()
+    parser.add_option("-d", "--debug",  help="enable debug mode",
+        action="store_true")
+    parser.add_option("-M", "--method", help="specify which method to use")
+    parser.add_option("-p", "--params", help="specify params for method")
+    parser.add_option("-c", "--cached", help="specify using cache (y/n)")
+    parser.add_option("-m", "--match",  help="specify match for method")
+    parser.add_option("-a", "--auth",   help="specify override auth params")
+    (opts, args) = parser.parse_args()
+    u = UltraDNS(cfname, cfpath+'/'+pdfurl.split('/')[-1], debug=opts.debug)
 
     # interactive mode
     #u.choose_method()
@@ -303,14 +329,9 @@ if __name__ == "__main__":
     #u.choose_method(method='UDNS_GetCNAMERecordsOfZone', cached='n',
     #    match='alias:code', params={'zonename': 'google.com'})
 
-    # input answer from command line
-    from optparse import OptionParser
-    parser = OptionParser()
-    parser.add_option("-M", "--method", help="specify which method to use")
-    parser.add_option("-p", "--params", help="specify params for method")
-    parser.add_option("-c", "--cached", help="specify using cache (y/n)")
-    parser.add_option("-m", "--match",  help="specify match for method")
-    (opts, args) = parser.parse_args()
+    #parser.print_help()
     exec 'params = %s' % opts.params
-    u.choose_method(method=opts.method, cached=opts.cached, match=opts.match, params=params)
+    exec 'newauth = %s' % opts.auth
+    u.choose_method(method=opts.method, cached=opts.cached, match=opts.match,
+            params=params, newauth=newauth)
 
