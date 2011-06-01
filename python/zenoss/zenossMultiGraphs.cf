@@ -1,0 +1,12 @@
+[common]
+include = laLoadInt1,laLoadInt5,laLoadInt15,ssCpuUser,ssIORawReceived,ssIORawSent
+
+[interfaces]
+include = ifInOctets,ifOutOctets
+collection = primary=bond0|eth1
+
+[filesystems]
+exclude = boot,export,mnt,tmp
+
+[processes]
+include = cpu,mem

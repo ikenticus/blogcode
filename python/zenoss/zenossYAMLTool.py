@@ -2,7 +2,7 @@
 #
 # Author: ikenticus
 # Created: April 2010
-# Version: 11.03
+# Updated: May 2011
 #
 # After discovering that deleting ZenPacks will remove all
 # associated devices with no method of recovery except for
@@ -61,7 +61,7 @@ Usage: %s -s
 Currently supported import actions:
 %s
 Extract example(s) from export methods above
-    """ % (os.path.basename(sys.argv[0]), acts) 
+    """ % (os.path.basename(sys.argv[0]), acts)
     sys.exit(code)
 
 
@@ -76,7 +76,7 @@ def indent(level, index):
     insert = ' ' * (level * spaces)
     return insert + right
 
-        
+
 def matchDataSource(tpl,ds):
     datasrc = None
     for d in tpl.getRRDDataSources():
@@ -96,14 +96,14 @@ def matchOrganizerTemplate(org,tpl):
 
 
 def test_device(name):
-    dev = dmd.Devices.findDevice(name)    
+    dev = dmd.Devices.findDevice(name)
     if not dev: return False
-    else: 	return True
+    else: return True
 
 
 def test_user(user):
     for u in dmd.ZenUsers.getUsers():
-	if str(user) == str(u):
+        if str(user) == str(u):
             return u
 
 
@@ -143,6 +143,19 @@ def test_window(obj,win):
             return w
 
 
+def list_processhash():
+    import md5
+    plist = []
+    for ps in dmd.Processes.getSubOSProcessClassesSorted():
+        for pi in ps.instances():
+            pdict = {}
+            for pp in ['procName', 'parameters']:
+                pdict[pp] = getattr(pi, pp)
+            pdict['md5'] = md5.md5(getattr(pi, pp)).hexdigest()
+            plist.append(pdict)
+    return plist
+
+
 def export_alerts(actMatch):
     alerts = None
     for g in dmd.ZenUsers.getAllGroupSettings():
@@ -152,7 +165,7 @@ def export_alerts(actMatch):
             owner = 'group'
             break
     for u in dmd.ZenUsers.getUsers():
-	if str(actMatch) == str(u):
+        if str(actMatch) == str(u):
             #print "User: %s" % u
             alerts = u.getActionRules()
             owner = 'user'
@@ -163,8 +176,8 @@ def export_alerts(actMatch):
     for a in alerts:
         dict = export_alert(a, owner, actMatch)
         try: list.append(dict)
-        except: list = [ dict ] 
-    print yaml.dump(list, default_flow_style=False)
+        except: list = [ dict ]
+    return list
 
 
 def export_alert(alert, type, owner):
@@ -186,7 +199,7 @@ def export_alert(alert, type, owner):
                 attr = getattr(aw, aa['id'])
                 if attr: dict[aa['id']] = attr
         try: list.append(dict)
-        except: list = [ dict ] 
+        except: list = [ dict ]
     block['alertWindows'] = list
     return block
 
@@ -195,15 +208,15 @@ def export_users(usrMatch):
     for user in usrMatch.split(','):
         dict = export_user(user)
         try: list.append(dict)
-        except: list = [ dict ] 
-    print yaml.dump(list, default_flow_style=False)
+        except: list = [ dict ]
+    return list
 
 
 def export_user(user):
     block = {'action': 'add_user'}
     uid = None
     for u in dmd.ZenUsers.getUsers():
-	if str(user) == str(u):
+        if str(user) == str(u):
             uid = u
             break
     block['userName'] = str(uid)
@@ -238,19 +251,20 @@ def export_reports(rptMatch):
         for r in rc.reports():
             if r.id == rptMatch.split('/')[-1]:
                 if re.match('/Graph Reports', ro):
-                    list = export_graphreport(r,ro)
+                    dict = export_graphreport(r,ro)
                 elif re.match('/Multi-Graph Reports', ro):
-                    list = export_multireport(r,ro)
+                    dict = export_multireport(r,ro)
                 else:
                     print "Not a support report class: %s" % ro
                     return
-        if not list:
+        if not dict:
             print 'No report named %s found for %s' % (rptMatch.split('/')[-1], ro)
             return
+        list = [ dict ]
     else:
         print "No reports found for: %s" % rptMatch
         return
-    print yaml.dump(list, default_flow_style=False)
+    return list
 
 
 def export_graphreport(rpt,org):
@@ -331,11 +345,11 @@ def export_eventcommands(cmdMatch):
         if re.match(cmdMatch, c['id']):
             dict = export_eventcommand(c)
             try: list.append(dict)
-            except: list = [ dict ] 
+            except: list = [ dict ]
     if not list:
         print "+ ERROR exporting command(s) matching %s" % cmdMatch
         return
-    print yaml.dump(list, default_flow_style=False)
+    return list
 
 
 def export_eventcommand(cmd):
@@ -351,14 +365,14 @@ def export_eventmappings(evtMatch):
         if e.getEventClass() == evtMatch:
             dict = export_eventmapping(e)
             try: list.append(dict)
-            except: list = [ dict ] 
-    print yaml.dump(list, default_flow_style=False)
+            except: list = [ dict ]
+    return list
 
 
 def export_eventmapping(evt):
     block = {'action': 'add_eventmapping'}
     block['eventName'] = evt.id
-    block['eventPath'] = evt.getEventClass() 
+    block['eventPath'] = evt.getEventClass()
     for ea in evt._properties:
         attr = getattr(evt,ea['id'])
         if attr: block[ea['id']] = attr
@@ -369,7 +383,7 @@ def export_transforms(evtClass):
     block = {'action': 'add_transforms'}
     block['eventClass'] = evtClass
     block['eventTransforms'] = dmd.Events.getOrganizer(evtClass).transform
-    print yaml.dump([block], default_flow_style=False)
+    return [block]
 
 
 def export_osprocesses(opsMatch):
@@ -379,8 +393,8 @@ def export_osprocesses(opsMatch):
         for o in oc.getSubOSProcessClassesSorted():
             dict = export_osprocess(o, oo)
             try: list.append(dict)
-            except: list = [ dict ] 
-    print yaml.dump(list, default_flow_style=False)
+            except: list = [ dict ]
+    return list
 
 
 def export_osprocess(ops, opsPath):
@@ -389,7 +403,7 @@ def export_osprocess(ops, opsPath):
     block['psPath'] = opsPath
     for op in ops._properties:
         attr = getattr(ops,op['id'])
-	if op['id'] == 'name': continue
+        if op['id'] == 'name': continue
         if attr: block[op['id']] = attr
     return block
 
@@ -404,12 +418,11 @@ def export_windows(objMatch):
     for mw in foundWindows:
         dict = export_window(mw, objMatch)
         try: list.append(dict)
-        except: list = [ dict ] 
+        except: list = [ dict ]
     if not list:
         print "Unable to determine device/organizer based on input: %s" % objMatch
         return
-    print yaml.dump(list, default_flow_style=False)
-
+    return list
 
 
 def export_window(win, winPath):
@@ -419,31 +432,32 @@ def export_window(win, winPath):
     block['enabled'] = win.enabled
     for wp in win._properties:
         attr = getattr(win,wp['id'])
-	if wp['id'] == 'name': continue
+        if wp['id'] == 'name': continue
         if attr: block[wp['id']] = attr
     return block
 
 
-def export_devices(devMatch):
-    dev = dmd.Devices.findDevice(devMatch.split('/')[-1])    
+def export_devices(devMatch, ps=True, net=True, disk=True):
+    dev = dmd.Devices.findDevice(devMatch.split('/')[-1])
     if dev:
-        list = export_device(dev)
+        return [ export_device(dev, net, disk) ]
     else:
         for d in dmd.Devices.deviceSearch():
             dev = dmd.Devices.findDevice(d.id)
-            dpath = dev.getDeviceClassPath() 
-            if dpath.startswith(devMatch):
-                dict = export_device(dev)
+            dpath = dev.getDeviceClassPath()
+            #if dpath.startswith(devMatch):
+            if dpath == devMatch:
+                dict = export_device(dev, ps, net, disk)
                 try: list.append(dict)
-                except: list = [ dict ] 
-    print yaml.dump(list, default_flow_style=False)
+                except: list = [ dict ]
+    return list
 
 
-def export_device(dev, net=True):
+def export_device(dev, ps=False, net=False, disk=False):
     block = {'action': 'add_device'}
     block['deviceName'] = dev.id
     block['deviceHWTag'] = dev.getHWTag()
-    block['devicePath'] = dev.getDeviceClassPath() 
+    block['devicePath'] = dev.getDeviceClassPath()
     block['manageIp'] = dev.getManageIp()
     if dev.getLocationName():
         block['locationPath'] = dev.getLocationName()
@@ -451,12 +465,17 @@ def export_device(dev, net=True):
         block['systemPaths'] = dev.getSystemNames()
     if dev.getDeviceGroupNames():
         block['groupPaths'] = dev.getDeviceGroupNames()
-    if net:
-        block['devinterfaces'] = []
-        for dc in dev.getDeviceComponents():
-            for dca in dc._properties:
-                if dca['id'] == 'interfaceName':
-                    block['devinterfaces'].append(dc.id)
+    if ps: block['processes'] = []
+    if net: block['interfaces'] = []
+    if disk: block['filesystems'] = []
+    for dc in dev.getDeviceComponents():
+        for dca in dc._properties:
+            if ps and dca['id'] == 'procName':
+                block['processes'].append(dc.id)
+            if net and dca['id'] == 'interfaceName':
+                block['interfaces'].append(dc.id)
+            if disk and dca['id'] == 'storageDevice':
+                block['filesystems'].append(dc.id)
     return block
 
 
@@ -484,7 +503,8 @@ def export_templates(objMatch):
     for tpl in foundTemplates:
         if singleTemplate:
             if tpl.id != singleTemplate: continue
-            list = export_template(tpl)
+            list = [ export_template(tpl) ]
+            break
         else:
             # only dump the 'bound' templates
             if not tpl.id in obj.zDeviceTemplates: continue
@@ -494,7 +514,7 @@ def export_templates(objMatch):
     if not list:
         print "Unable to determine device/organizer based on input: %s" % objMatch
         return
-    print yaml.dump(list, default_flow_style=False)
+    return list
 
 
 def export_template(tpl):
@@ -568,10 +588,10 @@ def export_template(tpl):
 def list_devices():
     for d in dmd.Devices.deviceSearch():
         dev = dmd.Devices.findDevice(d.id)
-	item = '%s/%s' % (dev.getDeviceClassPath(), dev.id)
+        item = '%s/%s' % (dev.getDeviceClassPath(), dev.id)
         try: list.append(item)
-        except: list = [ item ] 
-    print yaml.dump(sorted(list), default_flow_style=False)
+        except: list = [ item ]
+    return list
 
 
 def list_org(type):
@@ -631,22 +651,18 @@ def purge_empty_orgs():
     return pruned
 
 
-def import_yaml(file):
-    f = open(file)
-    yml = yaml.load(f)
-    f.close()
-
-    for block in yml:
+def import_yaml(data):
+    for block in data:
         action = block['action']
         del block['action']
-    
+
         if action == 'del_device':
             dname = block['deviceName']
             dev = dmd.Devices.findDevice(dname)
             print "+ DELETING device %s" % dname
             dev.deleteDevice()
             commit()
-    
+
         elif action == 'ren_device':
             dname = block['deviceName']
             dev = dmd.Devices.findDevice(dname)
@@ -814,7 +830,7 @@ def import_yaml(file):
                                 print " - Adding Collection Item Type %s" % itemType
                                 rc.manage_addCollectionItem(itemType, [ri['deviceId']], [ri['compPath']],
                                     devClass, systems, groups, locations, ri['recurse'])
-                                commit()
+                        commit()
                     elif key == 'GraphDefs':
                         for gd in block[key]:
                             gdo = rpt.manage_addGraphDefinition(gd['gdName'])
@@ -843,6 +859,7 @@ def import_yaml(file):
                                         for gpa in gp.keys():
                                             if gpa != 'gpName':
                                                 setattr(gpo,gpa,gp[gpa])
+                        commit()
                     elif key == 'GraphGroups':
                         for gg in block[key]:
                             print " - Adding Graph Group %s" % gg['ggName']
@@ -851,6 +868,7 @@ def import_yaml(file):
                             for gk in gg:
                                 if type(gg[gk]) is not types.StringType:
                                     setattr(grp, gk, gg[gk])
+                        commit()
 
         elif action == 'add_graphreport':
             rpath = block['reportPath']
@@ -1183,46 +1201,49 @@ def main (args):
     import getopt
     try:
         opts, args = getopt.getopt(args, "Aa:d:c:e:hi:lo:pr:t:u:w:x:",
-            [ '--help', '--device', '--event', '--template', '--osprocess', '--import',
-              '--user', '--alert', '--report', '--command', '--purge', '--list',
-              '--transform', '--window' ])
+            [ '--help', '--device', '--event', '--template', '--osprocess',
+              '--import', '--user', '--alert', '--report', '--command',
+              '--purge', '--list', '--transform', '--window' ])
     except getopt.error:
         usage(3)
 
     if not opts:
         usage(3)
 
+    list = None
     for opt, val in opts:
         if opt in ('-h', '--help'):
             usage(3)
         if opt in ('-i', '--import'):
-            import_yaml(val)
+            import_yaml(yaml.load(open(val)))
         if opt in ('-a', '--alert'):
-            export_alerts(val)
+            list = export_alerts(val)
         if opt in ('-c', '--command'):
-            export_eventcommands(val)
+            list = export_eventcommands(val)
         if opt in ('-d', '--device'):
-            export_devices(val)
+            list = export_devices(val)
         if opt in ('-e', '--event'):
-            export_eventmappings(val)
+            list = export_eventmappings(val)
         if opt in ('-o', '--osprocess'):
-            export_osprocesses(val)
+            list = export_osprocesses(val)
         if opt in ('-r', '--report'):
-            export_reports(val)
+            list = export_reports(val)
         if opt in ('-t', '--template'):
-            export_templates(val)
+            list = export_templates(val)
         if opt in ('-u', '--user'):
-            export_users(val)
+            list = export_users(val)
         if opt in ('-x', '--transform'):
-            export_transforms(val)
+            list = export_transforms(val)
         if opt in ('-w', '--window'):
-            export_windows(val)
+            list = export_windows(val)
         if opt in ('-p', '--purge'):
             purge_empty_orgs()
             sys.exit(0)
         if opt in ('-l', '--list'):
-            list_devices()
+            list = list_devices()
             sys.exit(0)
+    if list:
+        print yaml.dump(sorted(list), default_flow_style=False)
 
 
 if __name__ == "__main__":
