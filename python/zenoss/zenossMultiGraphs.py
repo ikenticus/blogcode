@@ -8,21 +8,14 @@
 import os
 import re
 import sys
-sys.path.append("$ZENHOME/lib/python")
-sys.path.append("$ZENHOME/lib/python2.4/site-packages")
-sys.path.append("/usr/lib64/python2.4/site-packages")
-sys.path.append(os.path.dirname(sys.argv[0]))
-
-import yaml
 import ConfigParser
 import zenossYAMLTool as z
+from pprint import pprint
 
 # retrieve conf file using current script name
 cfname = sys.argv[0].replace('.py', '.cf')
 conf = ConfigParser.ConfigParser()
 conf.read(cfname)
-
-from pprint import pprint
 
 class NextGraph(Exception): pass
 
@@ -215,7 +208,6 @@ def build_report(dclass):
 
     #pprint(report)
     z.import_yaml([report])
-    #print yaml.dump([report], default_flow_style=False)
 
 def main (args):
     single = None
