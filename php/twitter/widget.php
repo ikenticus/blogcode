@@ -77,7 +77,7 @@ if ($update) {
 } else {
     $file = fopen($filename, 'r');
     if ($debug) print "READ: $filename\n";
-    $data = fread($file);
+    $data = fread($file, filesize($filename));
 }
 fclose($file);
 print $data;
