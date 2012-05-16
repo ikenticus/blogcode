@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:pas="http://sitelifestage.usatoday.com/2009/pluckApplicationServer" xmlns:og="http://opengraphprotocol.org/schema/">
+<head>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/base/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+<title>timthumb image alignment</title>
+<style>
+.image-box {
+    position: absolute;
+    left: 100px;
+    top: 100px;
+    width: 200px;
+    height: 150px;
+    border: 1px solid blue;
+    overflow: hidden;
+}
+#image-box {
+    z-index: 10;
+}
+#image-over {
+    z-index: 20;
+}
+.image-align:hover {
+    background-color: yellow;
+}
+.button {
+    -moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+    -webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+    box-shadow:inset 0px 1px 0px 0px #ffffff;
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
+    background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf');
+    background-color:#ededed;
+    -moz-border-radius:6px;
+    -webkit-border-radius:6px;
+    border-radius:6px;
+    border:1px solid #dcdcdc;
+    display:inline-block;
+    color:#777777;
+    font-family: Arial;
+    font-size:15px;
+    font-weight:bold;
+    padding:6px 24px;
+    text-decoration:none;
+    text-shadow:1px 1px 0px #ffffff;
+}
+.button:hover {
+</style>
+<script>
+function calc_icons_pos(z, coin, max) {
+    if ((z == 0) || (z == 1)) {
+        return coin[z]+':0;';
+    } else {
+        return coin[0]+':'+parseInt(max*z-5)+'px;';
+    }
+}
+
+var icons = {
+    "tl": { "x": 0  , "y": 0  , "icon": "arrowthick-1-nw" },
+    "t" : { "x": .5 , "y": 0  , "icon": "arrowthick-1-n" },
+    "tr": { "x": 1  , "y": 0  , "icon": "arrowthick-1-ne" },
+    "l" : { "x": 0  , "y": .5 , "icon": "arrowthick-1-w" },
+    "c" : { "x": .5 , "y": .5 , "icon": "arrow-4-diag" },
+    "r" : { "x": 1  , "y": .5 , "icon": "arrowthick-1-e" },
+    "bl": { "x": 0  , "y": 1  , "icon": "arrowthick-1-sw" },
+    "b" : { "x": .5 , "y": 1  , "icon": "arrowthick-1-s" },
+    "br": { "x": 1  , "y": 1  , "icon": "arrowthick-1-se" },
+}
+function draw_icons(id) {
+    for (var i in icons) {
+        var x = calc_icons_pos(icons[i]['x'],['left','right'],$(id).width());
+        var y = calc_icons_pos(icons[i]['y'],['top','bottom'],$(id).height());
+        $(id).append('<span class="image-align ui-icon ui-icon-'
+            +icons[i]['icon']+'" id="align-'+i+'" '+
+            'style="position:absolute;'+x+y+'"></span>');
+    }
+    $('.image-align').click(realign_image);
+}
+
+function realign_image() {
+    var align = $(this).attr('id').replace(/^align-/, '');
+    if (urlParams['tt']) {
+        var src = $('#image-box').find('img').
+            attr('src').replace(/\&a=\w+/, '');
+        $('#image-box').find('img').attr('src', src+'&a='+align);
+    } else {
+        var dx = 2 * icons[align]['x'] - 1;
+        var dy = 2 * icons[align]['y'] - 1;
+        var sx = $('#image-box').find('img').width()-$('#image-box').width();
+        var sy = $('#image-box').find('img').height()-$('#image-box').height();
+        if ((dx+dy) == 0) { //center
+            var x = sx / 2;
+            var y = sy / 2;
+        } else {
+            var x = $('#image-box').scrollLeft() + (dx
+                * $('input#image-step').val());
+            var y = $('#image-box').scrollTop() + (dy
+                * $('input#image-step').val());
+            if (x < 0) x = 0;
+            if (y < 0) y = 0;
+            if (x > sx) x = sx;
+            if (y > sy) y = sy;
+        }
+        $('#image-box').scrollLeft(parseInt(x));
+        $('#image-box').scrollTop(parseInt(y));
+    }
+}
+
+function update_image() {
+    var w = $('input#image-width').val();
+    var h = $('input#image-height').val();
+    if (urlParams['tt']) {
+        var img = '<img src="timthumb.php?src='+$('input#image-url').val()
+            +'&w='+w+'&h='+h+'" border=0>';
+    } else {
+        var img = '<img src="'+$('input#image-url').val()+'" border=0>';
+    }
+    $('#image-box').html(img);
+    $('#image-box').width(w);
+    $('#image-box').height(h);
+    $('#image-over').empty();
+    $('#image-over').width(w);
+    $('#image-over').height(h);
+    draw_icons('#image-over');
+}
+
+var urlParams = {};
+(function () {
+    var e,
+        a = /\+/g,  // Regex for replacing addition symbol with a space
+        r = /([^&=]+)=?([^&]*)/g,
+        d = function (s) { return decodeURIComponent(s.replace(a, " ")); },
+        q = window.location.search.substring(1);
+
+    while (e = r.exec(q))
+       urlParams[d(e[1])] = d(e[2]);
+})();
+
+$(document).ready(function() {
+    $('#image-update').click(update_image);
+});
+</script>
+</head>
+<body>
+
+<a class="button" href="#" id="image-update">Update Box</a><input
+type=textbox id="image-width" size="5" value="200">x<input
+type=textbox id="image-height" size="5" value="150">
+<label>&nbsp;&nbsp;&nbsp;Step:</label><input
+type=textbox id="image-step" size="3" value="10">
+<br>
+<label>URL:</label><input textbox id="image-url" size="50">
+<div class="image-box" id="image-box"></div>
+<div class="image-box" id="image-over"></div>
+
+</body>
+</html>
+
