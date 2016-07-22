@@ -39,3 +39,8 @@ console.log('setting output.page -> 20120727.4 to {}:\n', output);
 dotObject(output.page, '20120728', [4, 5, 6]);
 console.log('setting output.page -> 20120728 to [list]:\n', output);
 
+output.test = {};
+dotObject(output, 'test.a', 1);
+dotObject(output, 'test.b', 1);
+console.log('setting output.test -> {a, b}:\n', output);
+

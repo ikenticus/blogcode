@@ -60,3 +60,7 @@ print 'setting output -> page.20120727.4 to {}:\n', output
 dot_object(output, 'page.20120728', [4, 5, 6])
 print 'setting output -> page.20120728 to [list]:\n', output
 
+output['test'] = {};
+dot_object(output, 'test.a', 1);
+dot_object(output, 'test.b', 1);
+print 'setting output.test -> {a, b}:\n', output
