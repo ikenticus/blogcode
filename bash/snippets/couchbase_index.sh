@@ -22,7 +22,7 @@ create_index() {
          -d "statement=CREATE INDEX ${indexName} ON ${BUCKET}(${indexKeys})&creds=[{\"user\":\"local:$USER\", \"pass\":\"$PASS\"}];"
 }
 
-select_index() {
+display_index() {
     indexName=$1
     curl -v http://$HOST:$PORT/query/service \
          -d "statement=SELECT * FROM system:indexes WHERE name=\"${indexName}\"&creds=[{\"user\":\"local:$USER\", \"pass\":\"$PASS\"}];"
@@ -39,8 +39,8 @@ drop_index() {
 action=$1
 shift
 case $action in
+    drop) drop_index $@;;
     create) create_index $@;;
-    select) select_index $@;;
-    drop)   drop_index $@;;
+    display) display_index $@;;
 esac
 
