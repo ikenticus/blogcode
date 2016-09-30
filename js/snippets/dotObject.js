@@ -13,7 +13,8 @@ var dotObject = function (obj, dot, value) {
     if (typeof dot == 'string') {
         return dotObject(obj, dot.split('.'), value);
     } else if (dot.length == 1 && value !== undefined) {
-        return obj[dot[0]] = value;
+        obj[dot[0]] = value;
+        return obj;
     } else if (dot.length == 0) {
         return obj;
     } else {
