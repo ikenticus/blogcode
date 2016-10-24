@@ -1,0 +1,5 @@
+var mq = {
+    host: 'localhost',
+    user: 'rabbit',
+    pass: 'bunny'
+};
