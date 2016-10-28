@@ -1,0 +1,551 @@
+{
+    "subcategory": "usat",
+    "season": "2016",
+    "type": "mappings",
+    "subtype": "sdi",
+    "teams": {
+        "AAMU": {
+            "ALL": {
+                "abbr": "ALAM",
+                "school": "Alabama A&M",
+                "mascot": "Bulldogs"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2568" },
+            "NCAAW": { "id": "/sport/basketball/team:664764" },
+            "NCAAF": { "id": "/sport/football/team:352" }
+        },
+        "ASU": {
+            "ALL": {
+                "abbr": "AZST",
+                "school": "Arizona State",
+                "mascot": "Sun Devils"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2429" },
+            "NCAAW": { "id": "/sport/basketball/team:664744" },
+            "NCAAF": { "id": "/sport/football/team:112" }
+        },
+        "BRWN": {
+            "ALL": {
+                "abbr": "BROW",
+                "school": "Brown",
+                "mascot": "Bears"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2313" },
+            "NCAAW": { "id": "/sport/basketball/team:664674" }
+        },
+        "CCSU": {
+            "ALL": {
+                "abbr": "CCON",
+                "school": "Central Conn. St."
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2179", "mascot": "Blue Devils" },
+            "NCAAW": { "id": "/sport/basketball/team:664676", "mascot": "Lady Blue Devils" }
+        },
+        "CHAR": {
+            "ALL": {
+                "abbr": "CHA",
+                "school": "Charlotte",
+                "mascot": "49ers"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2253" },
+            "NCAAW": { "id": "/sport/basketball/team:664555" },
+            "NCAAF": {  "id": "/sport/football/team:889" }
+        },
+        "COFC": {
+            "ALL": {
+                "abbr": "CHAR",
+                "school": "Charleston",
+                "mascot": "Cougars"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2241" },
+            "NCAAW": { "id": "/sport/basketball/team:664844" }
+        },
+        "CONN": {
+            "ALL": {
+                "abbr": "UCON",
+                "school": "Connecticut",
+                "mascot": "Huskies"
+            },
+            "NCAAW": { "id": "/sport/basketball/team:664618" },
+            "NCAAF": { "id": "/sport/football/team:144" }
+        },
+        "COOK": {
+            "ALL": {
+                "abbr": "BETH",
+                "school": "Bethune-Cookman",
+                "mascot": "Wildcats"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2543" },
+            "NCAAW": { "id": "/sport/basketball/team:664667" }
+        },
+        "COR": {
+            "ALL": {
+                "abbr": "CORN",
+                "school": "Cornell",
+                "mascot": "Big Red"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2250" },
+            "NCAAW": { "id": "/sport/basketball/team:664703" }
+        },
+        "CP": {
+            "ALL": {
+                "abbr": "CAPO",
+                "school": "Cal Poly SLO",
+                "mascot": "Mustangs"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2240" },
+            "NCAAW": { "id": "/sport/basketball/team:664851" }
+        },
+        "CRE": {
+            "NCAAB": {
+                "id": "/sport/basketball/team:2495",
+                "abbr": "CREI",
+                "school": "Creighton",
+                "mascot": "Bluejays"
+            }
+        },
+        "CWM": {
+            "ALL": {
+                "abbr": "WM",
+                "school": "William & Mary",
+                "mascot": "Tribe"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2320" },
+            "NCAAW": { "id": "/sport/basketball/team:664582" }
+        },
+        "DAY": {
+            "ALL": {
+                "abbr": "DAYT",
+                "school": "Dayton",
+                "mascot": "Flyers"
+            },           
+            "NCAAB": { "id": "/sport/basketball/team:2498" },
+            "NCAAW": { "id": "/sport/basketball/team:664557" }
+        },
+        "DRKE": {
+            "ALL": {
+                "abbr": "DRAK",
+                "school": "Drake",
+                "mascot": "Bulldogs"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2297" },
+            "NCAAW": { "id": "/sport/basketball/team:664699" }
+        },
+        "DSU": {
+            "ALL": {
+                "abbr": "DEST",
+                "school": "Delaware State",
+                "mascot": "Hornets"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2268" },
+            "NCAAW": { "id": "/sport/basketball/team:664673" }
+        },
+        "EIU": {
+            "ALL": {
+                "abbr": "EILL",
+                "school": "Eastern Illinois",
+                "mascot": "Panthers"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2345" },
+            "NCAAW": { "id": "/sport/basketball/team:664722" }
+        },
+        "GRC": {
+            "ALL": {
+                "abbr": "GCU",
+                "school": "Grand Canyon"
+            },
+            "NCAAB": {
+                "id": "/sport/basketball/team:664438",
+                "mascot": "Antelopes"
+            },
+            "NCAAW": {
+                "id": "/sport/basketball/team:664967",
+                "mascot": "Lady 'Lopes"
+            }
+        },
+        "GSU": {
+            "ALL": {
+                "abbr": "GAST",
+                "school": "Georgia St",
+                "mascot": "Panthers"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2477" },
+            "NCAAF": { "id": "/sport/football/team:447" }
+        },
+        "GW": {
+            "ALL": {
+                "abbr": "GWU",
+                "school": "George Washington",
+                "mascot": "Colonials"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2222" },
+            "NCAAW": { "id": "/sport/basketball/team:664566" }
+        },
+        "HC": {
+            "ALL": {
+                "abbr": "HOLY",
+                "school": "Holy Cross",
+                "mascot": "Crusaders"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2325" },
+            "NCAAW": { "id": "/sport/basketball/team:664776" }
+        },
+        "IDHO": {
+            "ALL": {
+                "abbr": "IDAH",
+                "school": "Idaho",
+                "mascot": "Vandals"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2343" },
+            "NCAAW": { "id": "/sport/basketball/team:664831" },
+            "NCAAF": { "id": "/sport/football/team:80" }
+        },
+        "IND": {
+            "ALL": {
+                "abbr": "IU",
+                "school": "Indiana",
+                "mascot": "Hoosiers"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2488" },
+            "NCAAW": { "id": "/sport/basketball/team:664875" },
+            "NCAAF": { "id": "/sport/football/team:107" }
+        },
+        "INDPU": {
+            "ALL": {
+                "abbr": "IUPU",
+                "school": "Indiana - Purdue",
+                "mascot": "Jaguars"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2245" },
+            "NCAAW": { "id": "/sport/basketball/team:664648" }
+        },
+        "JAC": {
+            "ALL": {
+                "abbr": "JAX",
+                "school": "Jacksonville",
+                "mascot": "Dolphins"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2355" },
+            "NCAAW": { "id": "/sport/basketball/team:664662" }
+        },
+        "JVST": {
+            "ALL": {
+                "abbr": "JKST",
+                "school": "Jacksonville St."
+            },
+            "NCAAB": {
+                "id": "/sport/basketball/team:2491",
+                "mascot": "Gamecocks"
+            },
+            "NCAAW": {
+                "id": "/sport/basketball/team:664727",
+                "mascot": "Lady Gamecocks"
+            }
+        },
+        "L-IL": {
+            "ALL": {
+                "abbr": "LUC",
+                "school": "Loyola-Chicago",
+                "mascot": "Ramblers"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2407" },
+            "NCAAW": { "id": "/sport/basketball/team:664568" }
+        },
+        "L-MD": {
+            "ALL": {
+                "abbr": "LMD",
+                "school": "Loyola-Maryland",
+                "mascot": "Greyhounds"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2410" },
+            "NCAAW": { "id": "/sport/basketball/team:664594" }
+        },
+        "LEH": {
+            "ALL": {
+                "abbr": "LEHI",
+                "school": "Lehigh",
+                "mascot": "Mountain Hawks"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2273" },
+            "NCAAW": { "id": "/sport/basketball/team:664780" }
+        },
+        "M-OH": {
+            "ALL": {
+                "abbr": "MUH",
+                "school": "Miami (OH)",
+                "mascot": "Red Hawks"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2413" },
+            "NCAAW": { "id": "/sport/basketball/team:664620" },
+            "NCAAF": { "id": "/sport/football/team:121" }
+        },
+        "MASS": {
+            "ALL": {
+                "abbr": "UMAS",
+                "school": "Massachusetts"
+            },
+            "NCAAB": {
+                "id": "/sport/basketball/team:2236",
+                "mascot": "Minutemen"
+            },
+            "NCAAW": {
+                "id": "/sport/basketball/team:664576",
+                "mascot": "Minutewomen"
+            },
+            "NCAAF": {
+                "id": "/sport/football/team:207",
+                "mascot": "Minutemen"
+            }
+        },
+        "MRST": {
+            "ALL": {
+                "abbr": "MARI",
+                "school": "Marist",
+                "mascot": "Red Foxes"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2255" },
+            "NCAAW": { "id": "/sport/basketball/team:664599" }
+        },
+        "MSM": {
+            "ALL": {
+                "abbr": "MSMC",
+                "school": "Mount St. Mary's",
+                "mascot": "Mountaineers"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2415" },
+            "NCAAW": { "id": "/sport/basketball/team:664694" }
+        },
+        "MTU": {
+            "ALL": {
+                "abbr": "MTSU",
+                "school": "Middle Tennessee St."
+            },
+            "NCAAB": {
+                "id": "/sport/basketball/team:2482",
+                "mascot": "Blue Raiders"
+            },
+            "NCAAW": {
+                "id": "/sport/basketball/team:664790",
+                "mascot": "Lady Raiders"
+            },
+            "NCAAF": {
+                "id": "/sport/football/team:143",
+                "mascot": "Blue Raiders"
+            }
+        },
+        "NDSU": {
+            "ALL": {
+                "abbr": "NDST",
+                "school": "North Dakota State",
+                "mascot": "Bison"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2650" },
+            "NCAAW": { "id": "/sport/basketball/team:664606" }
+        },
+        "OKLA": {
+            "ALL": {
+                "abbr": "OU",
+                "school": "Oklahoma",
+                "mascot": "Sooners"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2178" },
+            "NCAAW": { "id": "/sport/basketball/team:664585" },
+            "NCAAF": { "id": "/sport/football/team:139" }
+        },
+        "PRE": {
+            "ALL": {
+                "abbr": "PRES",
+                "school": "Presbyterian",
+                "mascot": "Blue Hose"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2748" },
+            "NCAAW": { "id": "/sport/basketball/team:664928" }
+        },
+        "SAV": {
+            "NCAAB": {
+                "id": "/sport/basketball/team:2350",
+                "abbr": "SAVS",
+                "school": "Savannah State",
+                "mascot": "Tigers"
+            }
+        },
+        "SDAK": {
+            "ALL": {
+                "abbr": "SD",
+                "school": "South Dakota",
+                "mascot": "Coyotes"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:665236" },
+            "NCAAW": { "id": "/sport/basketball/team:665293" }
+        },
+        "SF": {
+            "ALL": {
+                "abbr": "SFO",
+                "school": "San Francisco"
+            },
+            "NCAAB": {
+                "id": "/sport/basketball/team:2299",
+                "mascot": "Dons"
+            },
+            "NCAAW": {
+                "id": "/sport/basketball/team:664823",
+                "mascot": "Lady Dons"
+            }
+        },
+        "SFNY": {
+            "ALL": {
+                "abbr": "SFC",
+                "school": "St. Francis-NY",
+                "mascot": "Terriers"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2272" },
+            "NCAAW": { "id": "/sport/basketball/team:664711" }
+        },
+        "SMC": {
+            "ALL": {
+                "abbr": "SMCC",
+                "school": "St. Mary's",
+                "mascot": "Gaels"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2304" },
+            "NCAAW": { "id": "/sport/basketball/team:664820" }
+        },
+        "SOCAR": {
+            "NCAAF": {
+                "id": "/sport/football/team:161",
+                "abbr": "SCAR",
+                "school": "South Carolina",
+                "mascot": "Gamecocks"
+            }
+        },
+        "SOMIS": {
+            "NCAAF": {
+                "id": "/sport/football/team:58",
+                "abbr": "USM",
+                "school": "Southern Mississippi",
+                "mascot": "Golden Eagles"
+            }
+        },
+        "STON": {
+            "ALL": {
+                "abbr": "SBK",
+                "school": "Stony Brook",
+                "mascot": "Seawolves"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2443" },
+            "NCAAW": { "id": "/sport/basketball/team:664550" }
+        },
+        "TNST": {
+            "ALL": {
+                "abbr": "TNS",
+                "school": "Tennessee St.",
+                "mascot": "Tigers"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2351" },
+            "NCAAW": { "id": "/sport/basketball/team:664740" }
+        },
+        "TNTC": {
+            "ALL": {
+                "abbr": "TNT",
+                "school": "Tennessee Tech"
+            },
+            "NCAAB": {
+                "id": "/sport/basketball/team:2310",
+                "mascot": "Golden Eagles"
+            },
+            "NCAAW": {
+                "id": "/sport/basketball/team:664742",
+                "mascot": "Golden Eaglettes"
+            }
+        },
+        "UCONN": {
+            "NCAAB": {
+                "id": "/sport/basketball/team:2525",
+                "abbr": "UCON",
+                "school": "Connecticut",
+                "mascot": "Huskies"
+            }
+        },
+        "UMASS": {
+            "ALL": {
+                "abbr": "UMAS",
+                "school": "Massachusetts Lowell",
+                "mascot": "River Hawks"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:665710" },
+            "NCAAW": { "id": "/sport/basketball/team:665724" }
+        },
+        "UTM": {
+            "ALL": {
+                "abbr": "TENM",
+                "school": "Tenn-Martin",
+                "mascot": "Skyhawks"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2203" },
+            "NCAAW": { "id": "/sport/basketball/team:664743" }
+        },
+        "UTRGV": {
+            "ALL": {
+                "abbr": "TRGV",
+                "school": "Texas Rio Grande Valley",
+                "mascot": "Vaqueros"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2476" },
+            "NCAAW": { "id": "/sport/basketball/team:664661" }
+        },
+        "UVM": {
+            "ALL": {
+                "abbr": "VMT",
+                "school": "Vermont",
+                "mascot": "Catamounts"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2314" },
+            "NCAAW": { "id": "/sport/basketball/team:664552" }
+        },
+        "WEB": {
+            "ALL": {
+                "abbr": "WBSU",
+                "school": "Weber St.",
+                "mascot": "Wildcats"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2318" },
+            "NCAAW": { "id": "/sport/basketball/team:664862" }
+        },
+        "WIN": {
+            "ALL": {
+                "abbr": "WINT",
+                "school": "Winthrop",
+                "mascot": "Eagles"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2365" },
+            "NCAAW": { "id": "/sport/basketball/team:664873" }
+        },
+        "WIU": {
+            "ALL": {
+                "abbr": "WILL",
+                "school": "Western Illinois",
+                "mascot": "Leathernecks"
+            },
+            "NCAAB": { "id": "/sport/basketball/team:2502" },
+            "NCAAW": { "id": "/sport/basketball/team:664664" }
+        },
+        "WKU": {
+            "ALL": {
+                "abbr": "WKY",
+                "school": "Western Kentucky"
+            },
+            "NCAAB": {
+                "id": "/sport/basketball/team:2229",
+                "mascot": "Hilltoppers"
+            },
+            "NCAAW": {
+                "id": "/sport/basketball/team:664792",
+                "mascot": "Lady Toppers"
+            },
+            "NCAAF": {
+                "id": "/sport/football/team:189",
+                "mascot": "Hilltoppers"
+            }
+        }
+    }
+}

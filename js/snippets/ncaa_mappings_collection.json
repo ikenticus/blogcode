@@ -1,0 +1,228 @@
+{
+    "subcategory": "usat",
+    "season": "2016",
+    "type": "mappings",
+    "subtype": "sdi",
+    "teams": [
+        {
+            "sdi": "AAMU",
+            "usat": "ALAM"
+        },
+        {
+            "sdi": "ASU",
+            "usat": "AZST"
+        },
+        {
+            "sdi": "BRWN",
+            "usat": "BROW"
+        },
+        {
+            "sdi": "CCSU",
+            "usat": "CCON"
+        },
+        {
+            "sdi": "CHAR",
+            "usat": "CHA"
+        },
+        {
+            "sdi": "COFC",
+            "usat": "CHAR"
+        },
+        {
+            "sdi": "CONN",
+            "usat": "UCON"
+        },
+        {
+            "sdi": "COOK",
+            "usat": "BETH"
+        },
+        {
+            "sdi": "COR",
+            "usat": "CORN"
+        },
+        {
+            "sdi": "CP",
+            "usat": "CAPO"
+        },
+        {
+            "sdi": "CRE",
+            "usat": "CREI"
+        },
+        {
+            "sdi": "CWM",
+            "usat": "WM"
+        },
+        {
+            "sdi": "DAY",
+            "usat": "DAYT"
+        },
+        {
+            "sdi": "DRKE",
+            "usat": "DRAK"
+        },
+        {
+            "sdi": "DSU",
+            "usat": "DEST"
+        },
+        {
+            "sdi": "EIU",
+            "usat": "EILL"
+        },
+        {
+            "sdi": "GRC",
+            "usat": "GCU"
+        },
+        {
+            "sdi": "GSU",
+            "usat": "GAST"
+        },
+        {
+            "sdi": "GW",
+            "usat": "GWU"
+        },
+        {
+            "sdi": "HC",
+            "usat": "HOLY"
+        },
+        {
+            "sdi": "IDHO",
+            "usat": "IDAH"
+        },
+        {
+            "sdi": "IND",
+            "usat": "IU"
+        },
+        {
+            "sdi": "INDPU",
+            "usat": "IUPU"
+        },
+        {
+            "sdi": "JAC",
+            "usat": "JAX"
+        },
+        {
+            "sdi": "JVST",
+            "usat": "JKST"
+        },
+        {
+            "sdi": "L-IL",
+            "usat": "LUC"
+        },
+        {
+            "sdi": "L-MD",
+            "usat": "LMD"
+        },
+        {
+            "sdi": "LEH",
+            "usat": "LEHI"
+        },
+        {
+            "sdi": "M-OH",
+            "usat": "MUH"
+        },
+        {
+            "sdi": "MASS",
+            "usat": "UMAS"
+        },
+        {
+            "sdi": "MRST",
+            "usat": "MARI"
+        },
+        {
+            "sdi": "MSM",
+            "usat": "MSMC"
+        },
+        {
+            "sdi": "MTU",
+            "usat": "MTSU"
+        },
+        {
+            "sdi": "NDSU",
+            "usat": "NDST"
+        },
+        {
+            "sdi": "OKLA",
+            "usat": "OU"
+        },
+        {
+            "sdi": "PRE",
+            "usat": "PRES"
+        },
+        {
+            "sdi": "SAV",
+            "usat": "SAVS"
+        },
+        {
+            "sdi": "SDAK",
+            "usat": "SD"
+        },
+        {
+            "sdi": "SF",
+            "usat": "SFO"
+        },
+        {
+            "sdi": "SFNY",
+            "usat": "SFC"
+        },
+        {
+            "sdi": "SMC",
+            "usat": "SMCC"
+        },
+        {
+            "sdi": "SOCAR",
+            "usat": "SCAR"
+        },
+        {
+            "sdi": "SOMIS",
+            "usat": "USM"
+        },
+        {
+            "sdi": "STON",
+            "usat": "SBK"
+        },
+        {
+            "sdi": "TNST",
+            "usat": "TNS"
+        },
+        {
+            "sdi": "TNTC",
+            "usat": "TNT"
+        },
+        {
+            "sdi": "UCONN",
+            "usat": "UCON"
+        },
+        {
+            "sdi": "UMASS",
+            "usat": "UMAS"
+        },
+        {
+            "sdi": "UTM",
+            "usat": "TENM"
+        },
+        {
+            "sdi": "UTRGV",
+            "usat": "TRGV"
+        },
+        {
+            "sdi": "UVM",
+            "usat": "VMT"
+        },
+        {
+            "sdi": "WEB",
+            "usat": "WBSU"
+        },
+        {
+            "sdi": "WIN",
+            "usat": "WINT"
+        },
+        {
+            "sdi": "WIU",
+            "usat": "WILL"
+        },
+        {
+            "sdi": "WKU",
+            "usat": "WKY"
+        }
+    ]
+}
