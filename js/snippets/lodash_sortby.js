@@ -63,3 +63,26 @@ var order = _.orderBy(polls, [
                 (p) => { return parseInt(p.record.split('-')[1]); },
             ], ['desc', 'desc', 'asc']);
 console.log(order);
+
+
+var eventStatusOrder = [
+    'mid-event',
+    'intermission',
+    'weather-delay',
+    'post-event',
+    'pre-event',
+    'suspended',
+    'postponed',
+    'canceled'
+];
+var events = [
+    { event_status: 'post-event', id: 1 },
+    { event_status: 'canceled', id: 2 },
+    { event_status: 'pre-event', id: 3 },
+    { event_status: 'mid-event', id: 4 },
+];
+console.log(_.orderBy(events, [(e) => { return e.event_status }], ['asc']));
+console.log(_.orderBy(events, (e) => { return e.event_status }, 'asc'));
+console.log(_.orderBy(events, (e) => { return eventStatusOrder.indexOf(e.event_status) }, 'asc'));
+
+
