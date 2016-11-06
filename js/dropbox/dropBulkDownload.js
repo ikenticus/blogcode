@@ -13,10 +13,15 @@ var downloadFile = function (info, callback){
         if (err) {
             console.log(err);
         } else {
-            console.log('Downloading', info.uri, '=>', info.filename);
-            request(info.uri)
-                .pipe(fs.createWriteStream(info.filename))
-                .on('close', callback);            
+            if (fs.existsSync(info.filename)) {
+                console.log('Skipping', info.filename, 'download, already exists!');
+                callback();
+            } else {
+                console.log('Downloading', info.uri);
+                request(info.uri)
+                    .pipe(fs.createWriteStream(info.filename))
+                    .on('close', callback);
+            }
         }
     });
 };
