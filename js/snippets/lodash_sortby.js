@@ -86,3 +86,42 @@ console.log(_.orderBy(events, (e) => { return e.event_status }, 'asc'));
 console.log(_.orderBy(events, (e) => { return eventStatusOrder.indexOf(e.event_status) }, 'asc'));
 
 
+var filters = [
+  { id: 'cit', display: 'CIT' },
+  { id: 'ncaa', display: 'NCAA' },
+  { id: 'ncaa', display: 'NCAA' },
+  { id: 'ncaa', display: 'NCAA' },
+  { id: 'ncaa', display: 'NCAA' },
+  { id: 'nit', display: 'NIT' },
+  { id: 'nit', display: 'NIT' },
+  { id: 'cbi', display: 'CBI' },
+  { id: 'nit', display: 'NIT' },
+  { id: 'cit', display: 'CIT' },
+  { id: 'ncaa', display: 'NCAA' },
+  { id: 'ncaa', display: 'NCAA' },
+  { id: 'ncaa', display: 'NCAA' },
+  { id: 'cit', display: 'CIT' },
+  { id: 'vegas-16', display: 'Vegas 16' },
+  { id: 'nit', display: 'NIT' },
+  { id: 'cbi', display: 'CBI' },
+  { id: 'nit', display: 'NIT' },
+  { id: 'cbi', display: 'CBI' },
+  { id: 'ncaa', display: 'NCAA' },
+  { id: 'ncaa', display: 'NCAA' }
+];
+console.log('\n\n', filters);
+console.log(_.countBy(filters, 'display'));
+console.log(_.toPairs(_.countBy(filters, 'display')));
+console.log(_.orderBy(_.toPairs(_.countBy(filters, 'display')), [1, 0], ['desc', 'asc']));
+console.log(
+    _.map(_.orderBy(_.toPairs(_.countBy(filters, 'display')), [1, 0], ['desc', 'asc']), (f) => { return f[0]; })
+);
+
+console.log('\n', _.map(filters, 'display'));
+console.log(_.countBy(_.map(filters, 'display')));
+console.log(_.toPairs(_.countBy(_.map(filters, 'display'))));
+console.log(_.orderBy(_.toPairs(_.countBy(_.map(filters, 'display'))), [1, 0], ['desc', 'asc']));
+console.log(
+    _.map(_.orderBy(_.toPairs(_.countBy(_.map(filters, 'display'))), [1, 0], ['desc', 'asc']), (f) => { return f[0]; })
+);
+
