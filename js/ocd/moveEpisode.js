@@ -23,13 +23,13 @@ if (process.argv.length < 3) {
 class Episodes {
     static processBase (data) {
         let max = data[0].split('\\');
-        return max.slice(0, max.length - 1).join('\\');
+        return max.slice(0, max.length - 1).join('\\') + '\\';
     }
 
     static removeBase (data, base) {
         let clean = [];
         data.forEach((d) => {
-            if (d.split('\\').length > base.split('\\').length + 1)
+            if (d.split('\\').length > base.split('\\').length)
                 clean.push(d.replace(base, ''));
         });
         return clean;
@@ -42,7 +42,8 @@ class Episodes {
                    .replace(/\.iNT.*$/i, '')
                    .replace(/\.DixX.*$/i, '')
                    .replace(/\.XviD.*$/i, '')
-                   .replace(/\.DVDrip.*$/i, '');
+                   .replace(/\.DVDrip.*$/i, '')
+                   .replace(/\.PROPER.*$/i, '');
     }
 
     static globalClean (name) {
@@ -54,24 +55,33 @@ class Episodes {
         return name;
     }
 
+    static checkMapping (name, json) {
+        if (_.endsWith(name, ' - ')) {
+            let key = _.last(name.replace(/ - $/, '').split('\\'));
+            //console.log('need to fix', name, 'with', json[key]);
+            name += json[key];
+        }
+        return name;
+    }
 
-    static buildClean (data) {
+    static buildClean (data, json) {
         let clean = {};
         data.forEach((d) => {
             let parts = d.split('\\');
+            let dirname = parts.slice(0, parts.length - 1).join('\\') + '\\';
             let filename = _.last(parts);
             let ext = _.last(filename.split('.'));
             let name = this.removeSuffix(filename, ext);
-            let fixed = parts.slice(0, parts.length - 1).join('\\') + '\\';
             if (name.search(/[Ss]\d+[Ee]\d+-*[Ee]\d+/) > -1) {
-                fixed += name.replace(/^.*[Ss]0*(\d+)[Ee](\d+)-*[Ee](\d+)\.*/, '$1$2-$3 - ');
+                name = name.replace(/^.*[Ss]0*(\d+)[Ee](\d+)-*[Ee](\d+)\.*/, '$1$2-$3 - ');
             } else if (name.search(/[Ss]\d+[Ee]\d+/) > -1) {
-                fixed += name.replace(/^.*[Ss]0*(\d+)[Ee](\d+)\.*/, '$1$2 - ');
+                name = name.replace(/^.*[Ss]0*(\d+)[Ee](\d+)\.*/, '$1$2 - ');
             } else if (name.search(/\d+x\d+/) > -1) {
-                fixed += name.replace(/^.*[^\d](\d+)x(\d+)\.*/, '$1$2 - ');
+                name = name.replace(/^.*[^\d](\d+)x(\d+)\.*/, '$1$2 - ');
             }
-            fixed = this.globalClean(fixed);
-            clean[d] = fixed + '.' + ext.toLowerCase();
+            name = this.globalClean(name);
+            if (json) name = this.checkMapping(name, json);
+            clean[d] = dirname + name + '.' + ext.toLowerCase();
         });
         return clean;
     }
@@ -81,129 +91,19 @@ class Episodes {
 let filename = process.argv[2];
 fs.readFile(filename, 'utf8', (err, raw) => {
     if (err) throw err;
-    let data = raw.split('\r\n');
+    let data = raw.split(/[\r\n]/);
     let base = Episodes.processBase(data);
         data = Episodes.removeBase(data, base);
-    console.log(Episodes.buildClean(data))
+
+    let output = {};
+    fs.readFile(filename.replace(/\.txt$/, '.json'), (err, raw) => {
+        if (err) {
+            output = Episodes.buildClean(data);
+        } else {
+            output = Episodes.buildClean(data, JSON.parse(raw));
+        }
+        _.forEach(output, (o, k) => {
+            console.log(format('move "{}" "{}"', k, o));
+        });
+    });
 });
-
-/*
-var feed;
-var missingList = [];
-
-var reprocess = function (docId) {
-    request.get({
-        json: true,
-        url: config.post + '/feed/process/' + docId
-    }, function(error, response, body) {
-        if (!error)
-            console.log('Process', config.post, response.request.path,
-                error ? error : body.message ? body.message : 'SUCCESS');
-    });
-};
-
-var subsport;
-var upsertUrl = function (id) {
-    var boxscore = format('boxscore_{}_{}.xml', subsport, id);
-    var boxstats = format('season_stats_{}_{}.xml', subsport, id);
-    if (feed) {
-        var season = feed.season;
-        if (['MLB', 'MLS', 'WNBA'].indexOf(feed.subsport) < 0)
-            season = format('{}-{}', season, parseInt(season) + 1);
-        boxscore = format('/sport/v2/{}/{}/boxscores/{}/boxscore_{}_{}.xml',
-                        feed.sport, feed.subsport, season, feed.subsport.toLowerCase(), id);
-        boxstats = format('/sport/v2/{}/{}/season-stats/{}/season_stats_{}_{}.xml',
-                        feed.sport, feed.subsport, season, feed.subsport.toLowerCase(), id);
-    }
-    if (missingList.indexOf(boxscore) < 0) missingList.push(boxscore);
-    if (missingList.indexOf(boxstats) < 0) missingList.push(boxstats);
-};
-
-var data;
-var buildEvents = function (url, display) {
-    // build cs-sports-ingestor crawl list for all events that are not complete
-    var firstMissing = false;
-    request.get({
-        json: true,
-        url: config.publish + '/' + url
-    }, (err, res, body) => {
-        if (!err) {
-            if (body) {
-                if (data && display) {
-                    // reprocess last event_key in last event_date
-                    reprocess(format('sdi_{}_{}_season-stats_{}', data.sport, data.subsport,
-                        _.last(_.last(_.last(body.event_dates).events).event_key.split(':'))).toLowerCase());
-                }
-
-                _.forEach(body.event_dates, (d) => {
-                    _.forEach(d.events, (e) => {
-                        //console.log(d.event_date, e.event_key, e.event_status);
-                        if (['pre-event', 'mid-event'].indexOf(e.event_status) > -1) {
-                            upsertUrl(_.last(e.event_key.split(':')));
-                            if (display && !firstMissing) firstMissing = e.event_key;
-                        }
-                    });
-                });
-            } else {
-                console.log('Published url not found:', url);
-            }
-            // indicate which item is the first of the last document
-            if (display && firstMissing)
-                console.log('Document not found starts with', firstMissing);
-
-            if (display && !_.isEmpty(missingList))
-                console.log(format('\n{}{}\n', cmdCrawl, missingList.join('\n' + cmdCrawl)));
-        }
-    });
-}
-
-var nextList = [];
-var checkScores = function (url) {
-    request.get({
-        json: true,
-        url: config.post + '/doc/show/' + url.replace(/\//g, '_').toLowerCase()
-    }, (err, res, body) => {
-        if (!err) {
-            if (body) {
-                data = _.clone(body);
-                feed = _.cloneDeep(body);
-                // reprocess first event_key in first event_date
-                var first = body.data.event_dates[0];
-                reprocess(format('sdi_{}_{}_season-stats_{}', body.sport, body.subsport,
-                                _.last(first.events[0].event_key.split(':'))).toLowerCase());
-
-                // determine from first if we should iterate next
-                if (first.event_date < moment().format('YYYY-MM-DD')) {
-                    buildEvents(url);
-                    if (body.data.next) {
-                        nextList = _.map(body.data.next, (n) => { return n.feed_endpoint; });
-                        var next = nextList[0].slice(nextList[0].indexOf('SportsNative'));
-                        nextList = nextList.slice(1);
-                        console.log('Loading next event_date', next);
-                        checkScores(next);
-                    }
-                } else {
-                    buildEvents(url, true);
-                }
-            } else {
-                console.log('Document not found:', url);
-                if (!_.isEmpty(nextList) && url.indexOf(moment().format('YYYY/MM/DD')) < 0) {
-                    buildEvents(url);
-                    var next = nextList[0].slice(nextList[0].indexOf('SportsNative'));
-                    console.log('Loading subsequent event_date', next);
-                    nextList = nextList.slice(1);
-                    checkScores(next);
-                } else {
-                    buildEvents(url, true, true);
-                }
-            }
-        }
-    });    
-};
-
-// MAIN
-var urlPath = process.argv[2].replace(/^\//g, '');
-subsport = urlPath.split('/')[2];
-checkScores(urlPath);
-*/
-
