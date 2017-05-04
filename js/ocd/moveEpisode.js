@@ -48,7 +48,7 @@ class Episodes {
 
     static globalClean (name) {
         // replace all dots and underscores with spaces
-        name = name.replace(/[\.].(\w+)/g, ' $1').replace(/_/g, ' ');
+        name = name.replace(/[\._]/g, ' ');
         let parts = name.split(' - '); // startcase if first character is lowercase
         if (parts.length > 1 && parts[1].charCodeAt(0) > 64)
             name = _.map(parts, (p) => { return _.startCase(p); }).join(' - ');
@@ -59,7 +59,7 @@ class Episodes {
         if (_.endsWith(name, ' - ')) {
             let key = _.last(name.replace(/ - $/, '').split('\\'));
             //console.log('need to fix', name, 'with', json[key]);
-            name += json[key];
+            if (json[key]) name += json[key];
         }
         return name;
     }
