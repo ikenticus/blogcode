@@ -28,7 +28,7 @@ fs.readFile(filename, 'utf8', (err, raw) => {
     let season = 0;
     data.forEach((d) => {
         if (_.startsWith(d, 'Season')) season = parseInt(d.replace(/^Season (\d+).*$/, '$1'));
-        let clean = d.replace(/\[\w\]/, '')
+        let clean = d.replace(/\[[^\]]+\]/, '')
         if (clean.search(/^\d+\s+(\d+)\s+"([^"]+)".*$/) > -1) {
             if (season > 0) {
                 let ep = clean.replace(/^\d+\s+(\d+)\s+"([^"]+)".*$/, '$1|$2').split('|');
