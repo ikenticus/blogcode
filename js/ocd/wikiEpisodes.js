@@ -49,5 +49,11 @@ fs.readFile(filename, 'utf8', (err, raw) => {
         }
     });
     console.log(output);
-    fs.writeFile(filename.replace(/\.txt$/, '.json'), JSON.stringify(output, null, 4));
+    if (process.argv[3]) {
+        fs.writeFile(filename.replace(/\.txt$/, '_list.txt'),
+            _.map(output, (o, k) => { return format('{} - {}', k, o); }).join('\n'));
+    } else {
+        fs.writeFile(filename.replace(/\.txt$/, '.json'),
+            JSON.stringify(output, null, 4));
+    }
 });

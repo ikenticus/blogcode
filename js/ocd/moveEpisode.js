@@ -42,6 +42,10 @@ class Episodes {
                    .replace(/\.iNT.*$/i, '')
                    .replace(/\.DixX.*$/i, '')
                    .replace(/\.XviD.*$/i, '')
+                   .replace(/\.x26[45].*$/i, '')
+                   .replace(/\.720p.*$/i, '')
+                   .replace(/\.1080p.*$/i, '')
+                   .replace(/\.HDTV.*$/i, '')
                    .replace(/\.DVDrip.*$/i, '')
                    .replace(/\.PROPER.*$/i, '');
     }
@@ -81,7 +85,7 @@ class Episodes {
             }
             name = this.globalClean(name);
             if (json) name = this.checkMapping(name, json);
-            clean[d] = dirname + name + '.' + ext.toLowerCase();
+            clean[d] = dirname + name.replace(/ -  - /g, ' - ') + '.' + ext.toLowerCase();
         });
         return clean;
     }
