@@ -1,0 +1,25 @@
+MSAccess < 2000 cannot access stored procedures directly
+Therefore, the technique is to updatea temp table and
+have the temp table trigger the stored procedure
+
+In this example, the Routines will contain an update to _tmpUpdatePoll table
+The dbo.tmpUpdatePoll table has the Trigger_FinalPolls_Update script
+All output is placed into the SMG_Export_XML table which is either:
+1. POST to API in order to drop into FTP site
+2. Saved into a UNC path (linked to FTP site)
+Then the respective APIs are called which read from the FTP site
+
+table dbo.SMG_Export_XML
+id      int
+polls   varchar(max)
+ballots varchar(max)
+
+table dbo.SMG_School_Map
+OldSchoolCode   varchar
+NewSchoolCode   varchar
+SchoolName      varchar
+NCAAF           varchar
+NCAAB           varchar
+NCAAWB          varchar
+CWS             varchar
+

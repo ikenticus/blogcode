@@ -1,0 +1,111 @@
+
+'Load Polls
+Global Const Poll_Loader_DEV = "http://sportsdata-dev.usatodaysports.com/Tools.svc/GenericXMLLoader/polls"
+Global Const Poll_Loader_QAS = "http://10.187.140.23/SportsData/Tools.svc/GenericXMLLoader/polls"
+Global Const Poll_Loader_MOC = "http://10.189.4.131/SportsData/Tools.svc/GenericXMLLoader/polls"
+Global Const Poll_Loader_PHX = "http://10.186.4.103/SportsData/Tools.svc/GenericXMLLoader/polls"
+Global Const Poll_Loader_FTP = "http://2765-7956-scalr.production.gannettdigital.com/ftp/drop/usat/polls.xml"
+'Global Const Poll_Loader_FTP = "http://2766-7964-scalr.production.gannettdigital.com/ftp/drop/usat/polls.xml"
+
+'Load Ballots
+Global Const Ballot_Loader_DEV = "http://23.21.95.146:50624/Tools.svc/GenericXMLLoader/ballots"
+Global Const Ballot_Loader_QAS = "http://10.187.140.23/SportsData/Tools.svc/GenericXMLLoader/ballots"
+Global Const Ballot_Loader_MOC = "http://10.189.4.131/SportsData/Tools.svc/GenericXMLLoader/ballots"
+Global Const Ballot_Loader_PHX = "http://10.186.4.103/SportsData/Tools.svc/GenericXMLLoader/ballots"
+Global Const Ballot_Loader_FTP = "http://2765-7956-scalr.production.gannettdigital.com/ftp/drop/usat/ballots.xml"
+'Global Const Ballot_Loader_FTP = "http://2766-7964-scalr.production.gannettdigital.com/ftp/drop/usat/ballots.xml"
+
+
+
+' 03/17/2014 ikenticus: attempting to replace slow export below with sproc function
+Private Sub cmdExportPollData_Click()
+Dim strXML As String
+Dim db As Database
+Dim recPollData As Recordset
+Dim sql As String
+Dim tmpstr As String
+Dim strPollID As String
+
+    If lstPollData.ListIndex = -1 Then
+        MsgBox "Please select a poll.", vbInformation
+        Exit Sub
+    End If
+    
+    'Get poll data ... get over the string manipulation.  Inefficient but it's only one line.
+    tmpstr = lstPollData.ItemData(lstPollData.ListIndex)
+    tmpstr = Trim(Left(tmpstr, InStr(tmpstr, "Publish") - 1))
+    
+    Set db = CurrentDb
+
+
+    ' Obtain Poll ID
+    SysCmd acSysCmdSetStatus, "Obtaining Poll ID..."
+    sql = "SELECT PollID AS poll_id FROM dbo_Idx"
+    sql = sql & " WHERE PollDate = #" & Left(tmpstr, InStr(tmpstr, ":") - 1) & "#"
+    sql = sql & " AND Sport = '" & Mid(tmpstr, InStr(tmpstr, ":") + 2) & "'"
+
+    Set recPollData = db.OpenRecordset(sql)
+    If recPollData.RecordCount > 0 Then
+        strPollID = recPollData.Fields(0)
+    Else
+        MsgBox "Poll ID was not found.", vbExclamation
+        Exit Sub
+    End If
+     
+ 
+    ' Generate XML
+    SysCmd acSysCmdSetStatus, "Updating XML for " & strPollID & "..."
+    sql = "INSERT INTO dbo_tmpUpdatePoll (poll_id) VALUES (" & strPollID & ")"
+    DoCmd.SetWarnings (False)
+    DoCmd.RunSQL sql
+    DoCmd.SetWarnings (True)
+
+
+    ' Retrieve Polls/Ballots XML
+    SysCmd acSysCmdSetStatus, "Retrieving XML for " & strPollID & "..."
+    sql = "SELECT id, polls, ballots FROM dbo_SMG_Export_XML WHERE id = " & strPollID
+    Set recPollData = db.OpenRecordset(sql)
+    If recPollData.RecordCount > 0 Then
+        
+        ' 2017/09/05 ikenticus: replacing VOCFTP UNC write with MOPVEit FTP POST
+        Dim objstrXML As New MSXML2.ServerXMLHTTP
+        
+        SysCmd acSysCmdSetStatus, "Posting Polls to FTP..."
+        With objstrXML
+            .setTimeouts 0, 60000, 30000, 150000
+            .Open "POST", Poll_Loader_FTP, False
+            .setRequestHeader "Content-Type", "application/x-www-form-urlencoded"
+            .send (recPollData.Fields("polls").Value)
+        End With
+
+        SysCmd acSysCmdSetStatus, "Posting Ballots to FTP..."
+        With objstrXML
+            .setTimeouts 0, 60000, 30000, 150000
+            .Open "POST", Ballot_Loader_FTP, False
+            .setRequestHeader "Content-Type", "application/x-www-form-urlencoded"
+            .send (recPollData.Fields("ballots").Value)
+        End With
+        
+        'Dim objFSO As Object
+        'Dim objTextStream As Object
+        'Set objFSO = CreateObject("Scripting.FileSystemObject")
+        
+        'SysCmd acSysCmdSetStatus, "Creating Polls XML..."
+        'Set objTextStream = objFSO.CreateTextFile("\\vocftp\sportsrelaunch\polls.xml", True)
+        'objTextStream.WriteLine recPollData.Fields("polls").Value
+        'objTextStream.Close
+
+        'SysCmd acSysCmdSetStatus, "Creating Ballots XML..."
+        'Set objTextStream = objFSO.CreateTextFile("\\vocftp\sportsrelaunch\ballots.xml", True)
+        'objTextStream.WriteLine recPollData.Fields("ballots").Value
+        'objTextStream.Close
+        
+        'Set objTextStream = Nothing
+        'Set objFSO = Nothing
+        
+        Call Load_VoteData
+    Else
+        MsgBox "Unable to output polls/ballots.", vbExclamation
+        Exit Sub
+    End If
+End Sub

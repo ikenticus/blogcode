@@ -1,0 +1,498 @@
+ALTER PROCEDURE [dbo].[SMG_Update_Export_XML]
+    @poll_id INT
+AS
+-- =============================================
+-- Author:      ikenticus
+-- Create date: 03/17/2014
+-- Description: Combining SMGGetFinalPollsById_XML and SMGGetWeeklyBallotsById_XML
+--              03/31/2014 - ikenticus - RTRIM/CAST OtherVotes to remove excess spacing
+--              09/02/2014 - ikenticus - using LIKE instead of \u2019, which causing backup problems
+--              07/03/2015 - ikenticus - using NewSchoolCode abbr instead of TSN/XTS team_key
+-- =============================================
+BEGIN
+    SET NOCOUNT ON;
+    SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+
+    DECLARE @polls_xml XML
+    DECLARE @ballots_xml XML
+
+
+--- POLLS
+
+    IF @poll_id IS NULL
+    BEGIN
+        RETURN
+    END
+
+    -- Update the final polls before exporting
+    EXEC SMGUpdateFinalPollsById @poll_id
+
+    -- Declare some useful variables
+    DECLARE @poll_date DATETIME, @sport VARCHAR(100)
+    SELECT @poll_date = PollDate, @sport = Sport FROM Idx WHERE PollID = @poll_id
+
+    SET @polls_xml = (
+        SELECT (
+            SELECT
+                'Coaches Poll' AS '@type',
+                (CASE
+                    WHEN @sport LIKE 'Men%Basketball' THEN 'NCAAB'
+                    WHEN @sport LIKE 'Women%Basketball' THEN 'NCAAW'
+                    WHEN @sport = 'Football' THEN 'NCAAF'
+                    WHEN @sport = 'Baseball' THEN 'CWS'
+                    END) AS '@sport',
+                CAST(DATEPART(MM, PollDate) AS VARCHAR(2)) + '/' +
+                    CAST(DATEPART(DD, PollDate) AS VARCHAR(2)) + '/' +
+                    CAST(DATEPART(YYYY, PollDate) AS VARCHAR(4)) AS '@week',
+                Publish_Date AS '@publish_date',
+                (
+                    SELECT DroppedOut AS DroppedOutSchools, ListOfVoters, MiscNotes,
+                           RTRIM(CAST(OtherVotes AS VARCHAR(1024))) AS OthersReceivingVotes
+                      FROM dbo.Idx
+                     WHERE PollID = @poll_id
+                       FOR XML PATH('Info'), TYPE
+                ),
+                (
+                    SELECT
+                    (
+                        SELECT f.[Rank], s.NewSchoolCode AS School, f.LastWeeksRank AS LastWeekRank,
+                               CAST(f.VotingPoints AS INT) AS Points,
+                               CAST(f.NumberOfFirstVotes AS INT) AS FirstPlaceVotes,
+                               t.ThisWeek AS Chatter, t.WinsLossesTies AS Record
+                          FROM dbo.tblFinalPolls AS f
+                         INNER JOIN dbo.tblTeamInfo AS t ON t.PollID = @poll_id AND t.School = f.SchoolID
+                         INNER JOIN SMG_School_Map AS s ON f.SchoolID = s.OldSchoolCode
+                         WHERE f.PollID = @poll_id AND f.Rank <= 25
+                         ORDER BY f.[Rank]
+                           FOR XML PATH('SchoolData'), TYPE
+                    )
+                    FOR XML PATH('Schools'), TYPE
+                )
+            FROM dbo.Idx
+            WHERE PollID = @poll_id
+            FOR XML PATH('Poll'), TYPE
+        )
+        FOR XML PATH(''), ROOT('Polls')
+    )
+
+
+--- BALLOTS
+
+    DECLARE @poll_weeks TABLE (
+        PollID INT,
+        PollDate VARCHAR(100)
+    )
+
+    INSERT INTO @poll_weeks (PollId, PollDate)
+    SELECT PollID, CONVERT(VARCHAR(10), PollDate, 120) AS PollDate
+      FROM [dbo].[Idx]
+     WHERE PollID = @poll_id
+     ORDER BY PollDate ASC
+
+
+    DECLARE @point_weeks TABLE (
+        CoachID INT,
+        PollID INT,
+        PollDate VARCHAR(100),
+        SchoolCode VARCHAR(100),
+        Rank INT,
+        Points INT,
+        FirstPlace INT
+    )
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School1 AS SchoolCode,
+        1 AS Rank,
+        25 AS Points,
+        1 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School2 AS SchoolCode,
+        2 AS Rank,
+        24 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School3 AS SchoolCode,
+        3 AS Rank,
+        23 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School4 AS SchoolCode,
+        4 AS Rank,
+        22 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School5 AS SchoolCode,
+        5 AS Rank,
+        21 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School6 AS SchoolCode,
+        6 AS Rank,
+        20 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School7 AS SchoolCode,
+        7 AS Rank,
+        19 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School8 AS SchoolCode,
+        8 AS Rank,
+        18 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School9 AS SchoolCode,
+        9 AS Rank,
+        17 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School10 AS SchoolCode,
+        10 AS Rank,
+        16 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School11 AS SchoolCode,
+        11 AS Rank,
+        15 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School12 AS SchoolCode,
+        12 AS Rank,
+        14 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School13 AS SchoolCode,
+        13 AS Rank,
+        13 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School14 AS SchoolCode,
+        14 AS Rank,
+        12 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School15 AS SchoolCode,
+        15 AS Rank,
+        11 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School16 AS SchoolCode,
+        16 AS Rank,
+        10 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School17 AS SchoolCode,
+        17 AS Rank,
+        9 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School18 AS SchoolCode,
+        18 AS Rank,
+        8 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School19 AS SchoolCode,
+        19 AS Rank,
+        7 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School20 AS SchoolCode,
+        20 AS Rank,
+        6 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School21 AS SchoolCode,
+        21 AS Rank,
+        5 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School22 AS SchoolCode,
+        22 AS Rank,
+        4 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School23 AS SchoolCode,
+        23 AS Rank,
+        3 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School24 AS SchoolCode,
+        24 AS Rank,
+        2 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+    INSERT INTO @point_weeks
+        (PollDate, PollID, CoachID,
+        SchoolCode, Rank, Points, FirstPlace)
+    SELECT
+        w.PollDate, w.PollID, v.CoachID,
+        School25 AS SchoolCode,
+        25 AS Rank,
+        1 AS Points,
+        0 As FirstPlace
+    FROM [dbo].[tblVotes] AS v
+    INNER JOIN @poll_weeks AS w
+        ON w.PollID = v.PollID
+
+
+    -- Build a master coaches table
+    DECLARE @coaches TABLE (
+        last_name VARCHAR(100),
+        first_name VARCHAR(100),
+        SchoolCode VARCHAR(100),
+        CoachID INT
+    )
+    INSERT INTO @coaches SELECT [Last Name], [First Name], SchoolCode, CoachID FROM tblCoaches
+    --INSERT INTO @coaches SELECT [Last Name], [First Name], SchoolCode, CoachID FROM tblPastCoaches
+
+    -- Tally up all the votes
+    DECLARE @votes TABLE (
+        last_name VARCHAR(100),
+        first_name VARCHAR(100),
+        coach_team_key VARCHAR(100),
+        vote_team_key VARCHAR(100),
+        ranking INT
+    )
+    INSERT INTO @votes (last_name, first_name, coach_team_key, vote_team_key, ranking)
+    SELECT c.last_name, c.first_name, cs.NewSchoolCode, ps.NewSchoolCode, p.[Rank]
+      FROM @point_weeks AS p
+     INNER JOIN SMG_School_Map AS ps ON p.SchoolCode = ps.OldSchoolCode
+     INNER JOIN @coaches AS c ON c.CoachID = p.CoachID
+     INNER JOIN SMG_School_Map AS cs ON c.SchoolCode = cs.OldSchoolCode
+
+    SET @ballots_xml = (
+        SELECT
+        (
+            SELECT
+                'Coaches Poll' AS '@type',
+                (CASE
+                    WHEN @sport LIKE 'Men%Basketball' THEN 'NCAAB'
+                    WHEN @sport LIKE 'Women%Basketball' THEN 'NCAAWB'
+                    WHEN @sport = 'Football' THEN 'NCAAF'
+                    WHEN @sport = 'Baseball' THEN 'CWS'
+                    END) AS '@sport',
+                CAST(DATEPART(MM, PollDate) AS VARCHAR(2)) + '/' +
+                    CAST(DATEPART(DD, PollDate) AS VARCHAR(2)) + '/' +
+                    CAST(DATEPART(YYYY, PollDate) AS VARCHAR(4)) AS '@week',
+                Publish_Date AS '@publish_date'
+            FROM dbo.Idx
+            WHERE PollID = @poll_id
+            FOR XML PATH('Poll'), TYPE
+        ),
+        (
+            SELECT last_name, first_name, coach_team_key, vote_team_key, ranking FROM @votes
+            FOR XML RAW('ballot'), TYPE
+        )
+        FOR XML PATH(''), ROOT('ballots')
+    )
+
+
+--- OUTPUT/UPDATE
+
+    DECLARE @test_id INT
+    SELECT @test_id = id FROM dbo.SMG_Export_XML WHERE id = @poll_id
+
+    IF (@test_id IS NULL)
+    BEGIN
+        INSERT INTO dbo.SMG_Export_XML (id, polls, ballots)
+        SELECT @poll_id, CAST(@polls_xml AS VARCHAR(MAX)), CAST(@ballots_xml AS VARCHAR(MAX))
+    END
+    ELSE
+    BEGIN
+        UPDATE dbo.SMG_Export_XML
+           SET polls = CAST(@polls_xml AS VARCHAR(MAX)), ballots = CAST(@ballots_xml AS VARCHAR(MAX))
+         WHERE id = @poll_id
+    END
+
+END

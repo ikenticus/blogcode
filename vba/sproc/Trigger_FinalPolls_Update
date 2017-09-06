@@ -1,0 +1,19 @@
+-- =============================================
+-- Author:      ikenticus
+-- Create date: 10/08/2013
+-- Description: trigger FinalPolls update
+-- Update:      03/17/2014 - ikenticus: trigger Polls/Ballots export instead
+-- =============================================
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @poll_id INT = NULL
+    
+    SELECT @poll_id = poll_id FROM inserted
+
+    IF (@poll_id IS NOT NULL)
+    BEGIN
+        --EXEC dbo.SMGUpdateFinalPollsById @poll_id
+        EXEC dbo.SMG_Update_Export_XML @poll_id
+    END
+END 
