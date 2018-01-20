@@ -18,6 +18,7 @@ import (
  
 var myKeys = map[string]string{}
 var scalrDate = fmt.Sprintf(time.Now().UTC().Format(time.RFC3339));
+var scalrSearch = ""
 
 const scalrPath = "https://scalr.gannettdigital.com"
 const vaultPath = "secret/paas-api/paas-api-ci/production"
@@ -94,7 +95,13 @@ func scalrAPIOut (apiPath string, apiKey string, params ...string) {
 
     for _, val := range output["data"].([]interface{}) {
         data := val.(map[string]interface{})
-        fmt.Println(data["id"], ":", data[apiKey])
+        if scalrSearch == "" {
+            fmt.Println(data["id"], ":", data[apiKey])
+        } else {
+            if strings.Contains(data[apiKey].(string), scalrSearch) {
+                fmt.Println(data["id"], ":", data[apiKey])
+            }
+        }
     }
 
     //fmt.Println(output["pagination"])
@@ -111,7 +118,18 @@ func scalrEnv() {
     scalrAPIOut(pathEnv, "name")
 }
 
+func searchCheck (userId string) string {
+    if strings.Contains(userId, "=") {
+        val := strings.Split(userId, "=")
+        scalrSearch = val[1]
+        return val[0]
+    } else {
+        return userId
+    }
+}
+
 func scalrFarm (envId string) {
+    envId = searchCheck(envId)
     var pathFarm = fmt.Sprintf("/api/v1beta0/user/%s/farms/", envId)
     scalrAPIOut(pathFarm, "name")
 }
@@ -127,7 +145,7 @@ func scalrRole (envId string, roleId string) {
 }
 
 func usage() {
-    fmt.Printf("Usage: %s <ENVID> <FARMID> <ROLEID>\n\n", path.Base(os.Args[0]))
+    fmt.Printf("Usage: %s <ENVID> <FARMID> <ROLEID>\n  Add: =SEARCH on last param to filter\n\n", path.Base(os.Args[0]))
 }
 
 func main() {
