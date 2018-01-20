@@ -22,7 +22,6 @@ var scalrSearch = ""
 
 const scalrPath = "https://scalr.gannettdigital.com"
 const vaultPath = "secret/paas-api/paas-api-ci/production"
-//const vaultPath = "secret/cs-sports/jenkins/deploy"
  
 func init() {
     vaultConfig := vaultApi.DefaultConfig()
@@ -38,8 +37,6 @@ func init() {
     }
     myKeys["scalr-key-id"] = dbConfig.Data["scalraccess"].(string)
     myKeys["scalr-secret"] = dbConfig.Data["scalrsecret"].(string)
-    //myKeys["scalr-key-id"] = dbConfig.Data["scalr-key"].(string)
-    //myKeys["scalr-secret"] = dbConfig.Data["scalr-secret"].(string)
     return
 }
  
@@ -79,7 +76,7 @@ func scalrAPICall (path string, params string) string {
     return string(htmlData)
 }
 
-func scalrAPIOut (apiPath string, apiKey string, params ...string) {
+func scalrAPIOut (apiKey string, apiPath string, params ...string) {
     apiQuery := ""
     if len(params) > 0 {
         apiQuery = params[0]
@@ -109,13 +106,8 @@ func scalrAPIOut (apiPath string, apiKey string, params ...string) {
     if page["next"] != nil {
         next := strings.Split(page["next"].(string), "?")[1]
         //fmt.Println(page["last"], ":", page["next"], "=>", next)
-        scalrAPIOut(apiPath, apiKey, next)
+        scalrAPIOut(apiKey, apiPath, next)
     }
-}
-
-func scalrEnv() {
-    var pathEnv = "/api/v1beta0/account/1/environments";
-    scalrAPIOut(pathEnv, "name")
 }
 
 func searchCheck (userId string) string {
@@ -128,23 +120,7 @@ func searchCheck (userId string) string {
     }
 }
 
-func scalrFarm (envId string) {
-    envId = searchCheck(envId)
-    var pathFarm = fmt.Sprintf("/api/v1beta0/user/%s/farms/", envId)
-    scalrAPIOut(pathFarm, "name")
-}
-
-func scalrFarmRole (envId string, farmId string) {
-    var pathFarmRole = fmt.Sprintf("/api/v1beta0/user/%s/farms/%s/farm-roles/", envId, farmId)
-    scalrAPIOut(pathFarmRole, "alias")
-}
-
-func scalrRole (envId string, roleId string) {
-    var pathFarmRole = fmt.Sprintf("/api/v1beta0/user/%s/farm-roles/%s/servers/", envId, roleId)
-    scalrAPIOut(pathFarmRole, "privateIp")
-}
-
-func usage() {
+func showUsage() {
     fmt.Printf("Usage: %s <ENVID> <FARMID> <ROLEID>\n  Add: =SEARCH on last param to filter\n\n", path.Base(os.Args[0]))
 }
 
@@ -154,18 +130,18 @@ func main() {
     //fmt.Printf("Scalr %v / %v\n", myKeys["scalr-key-id"], myKeys["scalr-secret"])
 
     //fmt.Println(len(os.Args[1:]), os.Args[1:])
-    if len(os.Args[1:]) < 1 {
-        usage()
-        scalrEnv()
-    } else if len(os.Args[1:]) < 2 {
-        usage()
-        scalrFarm(os.Args[1])
-    } else if len(os.Args[1:]) < 3 {
-        usage()
-        scalrFarmRole(os.Args[1], os.Args[2])
-    } else if len(os.Args[1:]) < 4 {
-        usage()
-        scalrRole(os.Args[1], os.Args[3])
+    showUsage()
+    switch len(os.Args[1:]) {
+        case 3:
+            scalrAPIOut("privateIp", fmt.Sprintf("/api/v1beta0/user/%s/farm-roles/%s/servers/", os.Args[1], os.Args[3]))
+        case 2:
+            farmId := searchCheck(os.Args[2])
+            scalrAPIOut("alias", fmt.Sprintf("/api/v1beta0/user/%s/farms/%s/farm-roles/", os.Args[1], farmId))
+        case 1:
+            envId := searchCheck(os.Args[1])
+            scalrAPIOut("name", fmt.Sprintf("/api/v1beta0/user/%s/farms/", envId))
+        default:
+            scalrAPIOut("name", "/api/v1beta0/account/1/environments")
     }
     return
 }
