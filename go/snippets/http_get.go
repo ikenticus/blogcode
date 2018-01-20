@@ -2,7 +2,9 @@ package main
 
 import (
     "fmt"
+    "io"
     "net/http"
+    "os"
     "strings"
 )
 
@@ -13,6 +15,7 @@ func get(name string) {
     fmt.Printf("-----\n%s\nError: %v\n", name, err)
     fmt.Println(resp)
     fmt.Println(resp.Body)
+    //io.Copy(os.Stdout, resp.Body)
 
     //var data status.Data
     //json.Unmarshal(body, &data)
