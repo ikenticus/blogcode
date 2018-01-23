@@ -1,5 +1,5 @@
 package main
- 
+
 import (
     "crypto/hmac"
     "crypto/sha256"
@@ -12,17 +12,19 @@ import (
     "path"
     "strings"
     "time"
- 
+
     vaultApi "github.com/hashicorp/vault/api"
 )
- 
+
 var myKeys = map[string]string{}
 var scalrDate = fmt.Sprintf(time.Now().UTC().Format(time.RFC3339));
 var scalrSearch = ""
 
-const scalrPath = "https://scalr.gannettdigital.com"
-const vaultPath = "secret/paas-api/paas-api-ci/production"
- 
+const (
+    scalrPath = "https://scalr.gannettdigital.com"
+    vaultPath = "secret/paas-api/paas-api-ci/production"
+)
+
 func init() {
     vaultConfig := vaultApi.DefaultConfig()
     vaultClient, err := vaultApi.NewClient(vaultConfig)
@@ -39,7 +41,7 @@ func init() {
     myKeys["scalr-secret"] = dbConfig.Data["scalrsecret"].(string)
     return
 }
- 
+
 func scalrCanonicalRequest (method string, date string, path string, params string, body string) string {
     return strings.Join([]string{method, date, path, params, body}, "\n")
 }
@@ -72,7 +74,7 @@ func scalrAPICall (path string, params string) string {
  		fmt.Println(err)
  		os.Exit(1)
  	}
- 	//fmt.Println(os.Stdout, string(htmlData)) 
+    //fmt.Println(os.Stdout, string(htmlData))
     return string(htmlData)
 }
 
@@ -90,12 +92,14 @@ func scalrAPIOut (apiKey string, apiPath string, params ...string) {
         panic(err)
     }
 
+    var results []float64
     for _, val := range output["data"].([]interface{}) {
         data := val.(map[string]interface{})
         if scalrSearch == "" {
             fmt.Println(data["id"], ":", data[apiKey])
         } else {
             if strings.Contains(data[apiKey].(string), scalrSearch) {
+                results = append(results, data["id"].(float64))
                 fmt.Println(data["id"], ":", data[apiKey])
             }
         }
@@ -107,6 +111,16 @@ func scalrAPIOut (apiKey string, apiPath string, params ...string) {
         next := strings.Split(page["next"].(string), "?")[1]
         //fmt.Println(page["last"], ":", page["next"], "=>", next)
         scalrAPIOut(apiKey, apiPath, next)
+    } else {
+        if len(results) == 1 {
+            args := os.Args[1:]
+            args[len(args)-1] = strings.Split(args[len(args)-1], "=")[0]
+            args = append(args, fmt.Sprintf("%v", results[0]))
+            //fmt.Printf("Args: %v\n", args)
+            fmt.Println()
+            scalrSearch = ""
+            processArgs(args)
+        }
     }
 }
 
@@ -120,6 +134,22 @@ func searchCheck (userId string) string {
     }
 }
 
+func processArgs (args []string) {
+    switch len(args) {
+        case 3:
+            scalrAPIOut("privateIp", fmt.Sprintf("/api/v1beta0/user/%s/farm-roles/%s/servers/", args[0], args[2]))
+        case 2:
+            farmId := searchCheck(args[1])
+            scalrAPIOut("alias", fmt.Sprintf("/api/v1beta0/user/%s/farms/%s/farm-roles/", args[0], farmId))
+        case 1:
+            envId := searchCheck(args[0])
+            scalrAPIOut("name", fmt.Sprintf("/api/v1beta0/user/%s/farms/", envId))
+        default:
+            scalrAPIOut("name", "/api/v1beta0/account/1/environments")
+    }
+    return
+}
+
 func showUsage() {
     fmt.Printf("Usage: %s <ENVID> <FARMID> <ROLEID>\n  Add: =SEARCH on last param to filter\n\n", path.Base(os.Args[0]))
 }
@@ -131,17 +161,6 @@ func main() {
 
     //fmt.Println(len(os.Args[1:]), os.Args[1:])
     showUsage()
-    switch len(os.Args[1:]) {
-        case 3:
-            scalrAPIOut("privateIp", fmt.Sprintf("/api/v1beta0/user/%s/farm-roles/%s/servers/", os.Args[1], os.Args[3]))
-        case 2:
-            farmId := searchCheck(os.Args[2])
-            scalrAPIOut("alias", fmt.Sprintf("/api/v1beta0/user/%s/farms/%s/farm-roles/", os.Args[1], farmId))
-        case 1:
-            envId := searchCheck(os.Args[1])
-            scalrAPIOut("name", fmt.Sprintf("/api/v1beta0/user/%s/farms/", envId))
-        default:
-            scalrAPIOut("name", "/api/v1beta0/account/1/environments")
-    }
+    processArgs(os.Args[1:])
     return
 }
