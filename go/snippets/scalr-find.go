@@ -16,9 +16,11 @@ import (
     vaultApi "github.com/hashicorp/vault/api"
 )
 
-var myKeys = map[string]string{}
-var scalrDate = fmt.Sprintf(time.Now().UTC().Format(time.RFC3339));
-var scalrSearch = ""
+var (
+    myKeys = map[string]string{}
+    scalrDate = fmt.Sprintf(time.Now().UTC().Format(time.RFC3339));
+    scalrSearch = ""
+)
 
 const (
     scalrPath = "https://scalr.gannettdigital.com"
