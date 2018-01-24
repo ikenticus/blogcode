@@ -236,7 +236,6 @@ func main() {
             processWiki(*optName)
         } else {
             parseWiki(*optName, *optWiki)
-            *optList = true
         }
         if *optList {
             buildMove(*optName)
