@@ -24,8 +24,7 @@ var (
 )
 
 const (
-    scalrPath = "https://scalr.gannettdigital.com"
-    vaultPath = "secret/paas-api/paas-api-ci/production"
+    wikiPath = "https://scalr.gannettdigital.com"
 )
 
 func cleanWiki (show string) {
@@ -78,18 +77,52 @@ func cleanWiki (show string) {
             }
         }
     }
-
-    fmt.Println("Episodes:", episodes)
+    //fmt.Println("Episodes:", episodes)
     output, _ := json.MarshalIndent(episodes, "", "    ")
     ioutil.WriteFile(show + ".json", output, 0644)
 }
 
+func buildMove (show string) {
+    fmt.Println("Building", show)
+    data, err := ioutil.ReadFile(show + ".list")
+    if err != nil {
+        panic(err)
+    }
+
+    var moves []string
+    var lines []string
+    lines = strings.Split(string(data), "\r\n")
+    for _, line := range lines {
+        pos := strings.LastIndex(line, "Season ")
+        off := len(line) - pos
+        if strings.Contains(line, "\\Season ") && off > 10 {
+            //fmt.Printf("%v : %s\n", index, line[pos:])
+
+            var num int = 0
+            type2 := regexp.MustCompile("^.*[Ss]([0-9]+)[Ee]([0-9]+).*$")
+            type3 := regexp.MustCompile("^.*([0-9]+)x([0-9]+).*$")
+            if type2.MatchString(line) {
+                num, _ = strconv.Atoi(type2.ReplaceAllString(line, "$1$2"))
+            } else if type3.MatchString(line) {
+                num, _ = strconv.Atoi(type3.ReplaceAllString(line, "$1$2"))
+            }
+            if num > 0 {
+                season := strings.Split(line[pos:], "\\")[0]
+                dots := strings.Split(line[pos:], ".")
+                ext := dots[len(dots)-1]
+                moves = append(moves, fmt.Sprintf("move \"%s\" \"%s\\%d - %s.%s\"", line[pos:], season, num, episodes[num], ext))
+            }
+        }
+    }
+    ioutil.WriteFile(show + ".cmd", []byte(strings.Join(moves, "\r\n") + "\r\npause\r\n"), 0644)
+}
+
 func main() {
-    optHelp := getopt.BoolLong("help", 0, "Help")
+    optHelp := getopt.BoolLong("help", 'h', "Help")
     optName := getopt.StringLong("name", 'n', "", "TV Show name")
     optWiki := getopt.StringLong("wiki", 'w', "", "Wiki Page Name")
-    optFile := getopt.BoolLong("file", 0, "Process Files in Dir")
-    optList := getopt.BoolLong("list", 0, "Process File List")
+    optFile := getopt.BoolLong("file", 'f', "Process Files in Dir")
+    optList := getopt.BoolLong("list", 'l', "Process File List")
     getopt.Parse()
 
     if *optHelp || len(os.Args) < 2 {
@@ -101,6 +134,9 @@ func main() {
     if len(*optName) > 0 {
         if len(*optWiki) < 1 {
             cleanWiki(*optName)
+        }
+        if *optList {
+            buildMove(*optName)
         }
     }
 }
