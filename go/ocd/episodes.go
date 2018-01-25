@@ -1,26 +1,23 @@
 package main
 
 import (
-    /*
-    "crypto/hmac"
-    "crypto/sha256"
-    "encoding/base64"
-    "time"
-    */
     "encoding/json"
     "fmt"
     "io/ioutil"
     "net/http"
     "os"
     "regexp"
+    "sort"
     "strconv"
     "strings"
+    "time"
 
     "github.com/pborman/getopt"
 )
 
 var (
     episodes = map[int]string{}
+    schedule = map[int]string{}
 )
 
 const (
@@ -147,7 +144,7 @@ func buildList (show string) {
     ioutil.WriteFile(show + ".list", []byte(output), 0644)
 }
 
-func parseWiki (show string, uri string) {
+func parseWiki (show string, uri string, textOut bool) {
     fmt.Println("Parsing", uri)
 
     client := &http.Client{}
@@ -173,6 +170,7 @@ func parseWiki (show string, uri string) {
     e := regexp.MustCompile("^.*<td>([0-9]+)</td>.*$")
     t := regexp.MustCompile("^.*td class=\"summary\" style=\"text-align:left\">\"(.+)\".*</td.*$")
     h := regexp.MustCompile("<a href=\".+\">(.+)</a>")
+    d := regexp.MustCompile("^.*<td>([A-Za-z]+)&#160;([0-9]+),&#160;([0-9]+)<span.+bday dtstart.+$")
 
     var lines []string
     lines = strings.Split(string(data), "\n")
@@ -206,21 +204,46 @@ func parseWiki (show string, uri string) {
                     title = h.ReplaceAllString(title, "$1")
                 }
                 if len(title) > 0 && episode > 0 {
-                    //fmt.Printf("%d: %s\n", 100 * season + episode, title)
-                    episodes[100 * season + episode] = cleanWiki(title)
+                    key := 100 * season + episode
+                    //fmt.Printf("%d: %s\n", key, title)
+                    episodes[key] = cleanWiki(title)
+                    schedule[key] = "TBA"
+                }
+            }
+            if d.MatchString(line) {
+                timestamp := d.ReplaceAllString(line, "$1 $2, $3")
+                //fmt.Printf("%s %s: %s on %s\n", season, episode, title, timestamp)
+                if len(title) > 0 && episode > 0 {
+                    key := 100 * season + episode
+                    raw, _ := time.Parse("January 2, 2006", timestamp)
+                    schedule[key] = fmt.Sprintf("%04d/%02d/%02d", raw.Year(), raw.Month(), raw.Day())
                 }
             }
         }
     }
-    //fmt.Println("Episodes:", episodes)
-    output, _ := json.MarshalIndent(episodes, "", "    ")
-    ioutil.WriteFile(show + ".json", output, 0644)
+    if (textOut) {
+        var text []string
+        keys := make([]int, 0)
+        for k, _ := range episodes {
+            keys = append(keys, k)
+        }
+        sort.Ints(keys)
+        for _, k := range keys {
+            text = append(text, fmt.Sprintf("%s\t%d - %s", schedule[k], k, episodes[k]))
+        }
+        ioutil.WriteFile(show + ".txt", []byte(strings.Join(text, crlf)), 0644)
+    } else {
+        //fmt.Println("Episodes:", episodes)
+        output, _ := json.MarshalIndent(episodes, "", "    ")
+        ioutil.WriteFile(show + ".json", output, 0644)
+    }
 }
 
 func main() {
     optHelp := getopt.BoolLong("help", 'h', "Help")
     optList := getopt.BoolLong("list", 'l', "Process File List")
     optRead := getopt.BoolLong("read", 'r', "Read Current Dir")
+    optTime := getopt.BoolLong("time", 't', "Output Time Text")
     optName := getopt.StringLong("name", 'n', "", "TV Show name (required)")
     optWiki := getopt.StringLong("wiki", 'w', "", "Wiki Page Name")
     getopt.Parse()
@@ -235,7 +258,7 @@ func main() {
         if len(*optWiki) < 1 {
             processWiki(*optName)
         } else {
-            parseWiki(*optName, *optWiki)
+            parseWiki(*optName, *optWiki, *optTime)
         }
         if *optList {
             buildMove(*optName)
