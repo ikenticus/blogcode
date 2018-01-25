@@ -231,7 +231,13 @@ func parseWiki (show string, uri string, textOut bool) {
         for _, k := range keys {
             text = append(text, fmt.Sprintf("%s\t%d - %s", schedule[k], k, episodes[k]))
         }
-        ioutil.WriteFile(show + ".txt", []byte(strings.Join(text, crlf)), 0644)
+        var timeline string
+        if len(text) > 0 {
+            timeline = strings.Join(text, crlf)
+        } else {
+            timeline = string(data)
+        }
+        ioutil.WriteFile(show + ".txt", []byte(timeline), 0644)
     } else {
         //fmt.Println("Episodes:", episodes)
         output, _ := json.MarshalIndent(episodes, "", "    ")
