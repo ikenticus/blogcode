@@ -1,17 +1,14 @@
 package main
 
 import (
-/*
-    "regexp"
-    "sort"
-    "strconv"
-    "strings"
-*/
     "encoding/json"
     "fmt"
     "io/ioutil"
     "net/http"
     "os"
+    "sort"
+    "strings"
+    "text/template"
     "time"
 
     "github.com/pborman/getopt"
@@ -72,9 +69,17 @@ type Team struct {
 
 type TeamMap map[string]Team
 
+type TeamEventMap struct {
+    Season  int
+    League  string
+    Teams   []string
+    Events  map[string][]Event
+}
+
 var (
     teamMap TeamMap
     eventMap EventMap
+    teamEventMap TeamEventMap
 )
 
 const (
@@ -155,7 +160,32 @@ func buildEvents (league string, year int) {
 // preseason Mar. 05 / Brewers, Tempe /  2:10
 // L.A. Angels Apr. 6 at Seattle,  4:10
 
+func callTemplates (season string) {
+    fmap := template.FuncMap{
+        //"formatAsDollars": formatAsDollars,
+        //"formatAsDate": formatAsDate,
+        //"urgentNote": urgentNote,
+    }
 
+    tplFile := season + ".tpl"
+    t := template.Must(template.New(tplFile).Funcs(fmap).ParseFiles(tplFile))
+    err := t.Execute(os.Stdout, teamEventMap)
+    if err != nil {
+        panic(err)
+    }
+}
+
+func sortData (league string, year int) {
+    teams := make([]string, 0)
+    for _, t := range teamMap {
+        teams = append(teams, t.Name)
+    }
+    sort.Strings(teams)
+    teamEventMap.League = strings.ToUpper(league)
+    teamEventMap.Season = year
+    teamEventMap.Teams = teams
+    teamEventMap.Events = eventMap
+}
 
 func main() {
     thisYear := time.Now().Year()
@@ -175,5 +205,11 @@ func main() {
 
     buildEvents(*optAbbr, *optYear)
     //fmt.Println(eventMap)
-    output, _ := json.MarshalIndent(eventMap, "", "    "); fmt.Println(string(output))
+    //output, _ := json.MarshalIndent(eventMap, "", "    "); fmt.Println(string(output))
+
+    sortData(*optAbbr, *optYear)
+    //fmt.Println(teamEventMap)
+    //output, _ := json.MarshalIndent(teamEventMap, "", "    "); fmt.Println(string(output))
+
+    callTemplates("pre")
 }
