@@ -10,15 +10,15 @@ import (
 )
 
 type node struct {
-    Attr     []xml.Attr
     XMLName  xml.Name
-    Children []node `xml:",any"`
-    Text     string `xml:",chardata"`
+    Text     string     `xml:",chardata"`
+    Attrs    []xml.Attr `xml:",any,attr"`   // since go1.8
+    Children []node     `xml:",any"`
 }
 
 func main() {
     source := os.Args[1]
-    fmt.Println("source", source)
+    //fmt.Println("source", source)
     input, _ := ioutil.ReadFile(source)
 
     var output []byte
@@ -34,6 +34,7 @@ func main() {
     }
 
     if len(output) > 0 {
-        os.Stdout.Write([]byte(output))
+        //os.Stdout.Write([]byte(output))
+        fmt.Println(string(output))
     }
 }
