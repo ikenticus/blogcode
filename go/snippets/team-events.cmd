@@ -1,2 +1,2 @@
-team-events mlb 2018
+team-events -a mlb -y 2018
 pause

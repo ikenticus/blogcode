@@ -25,7 +25,12 @@
                                 {{- if eq .SubSeason "regular" }}
                                     <w:p wsp:rsidR="00B56B10" wsp:rsidRDefault="00B56B10" wsp:rsidP="00B56B10">
                                         <w:r>
-                                            <w:t>{{ .StartDate | formatDate }} {{ if eq .Alignment "away" }}at {{ end }}{{ .VsCity }}, {{ .StartDate | formatTime }}</w:t>
+                                            <w:t>{{ .StartDate | formatDate }} {{ if eq .Alignment "away" }}at {{ end -}}
+                                                {{- if eq .VsCity "Chicago" }}Chic. {{ .VsName }}
+                                                {{- else if eq .VsCity "Los Angeles" }}L.A. {{ .VsName }}
+                                                {{- else if eq .VsCity "New York" }}N.Y. {{ .VsName }}
+                                                {{- else }}{{ .VsCity }}
+                                                {{- end }}, {{ .StartDate | formatTime }}</w:t>
                                         </w:r>
                                     </w:p>
                                 {{- end}}
