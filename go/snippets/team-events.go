@@ -3,6 +3,7 @@ package main
 import (
     "encoding/json"
     "fmt"
+    "html"
     "io/ioutil"
     "net/http"
     "os"
@@ -160,18 +161,42 @@ func buildEvents (league string, year int) {
 // preseason Mar. 05 / Brewers, Tempe /  2:10
 // L.A. Angels Apr. 6 at Seattle,  4:10
 
-func callTemplates (season string) {
+func formatDate(t time.Time) string {
+    return t.Format("Jan. 2")
+}
+
+func formatHtml(s string) string {
+    return html.EscapeString(s)
+}
+
+func formatTime(t time.Time) string {
+    return t.Format("3:04")
+}
+
+func callTemplates (season string, league string, year int) {
     fmap := template.FuncMap{
+        "formatDate": formatDate,
+        "formatHtml": formatHtml,
+        "formatTime": formatTime,
         //"formatAsDollars": formatAsDollars,
         //"formatAsDate": formatAsDate,
         //"urgentNote": urgentNote,
     }
 
+    output := fmt.Sprintf("%s_%d_%s.doc", strings.ToUpper(league), year, season)
+    f, ferr := os.Create(output)
+    if ferr != nil {
+        fmt.Println("create file: ", ferr)
+        return
+    }
+
     xmlFile := season + ".xml"
     t := template.Must(template.New(xmlFile).Funcs(fmap).ParseFiles(xmlFile))
-    err := t.Execute(os.Stdout, teamEventMap)
+    err := t.Execute(f, teamEventMap)
     if err != nil {
         panic(err)
+    } else {
+        fmt.Println("Generated", output)
     }
 }
 
@@ -211,5 +236,6 @@ func main() {
     //fmt.Println(teamEventMap)
     //output, _ := json.MarshalIndent(teamEventMap, "", "    "); fmt.Println(string(output))
 
-    callTemplates("pre")
+    callTemplates("pre", *optAbbr, *optYear)
+    callTemplates("regular", *optAbbr, *optYear)
 }

@@ -10,7 +10,7 @@
 	</w:bgPict>
     <w:body>
         <wx:sect>
-            {{if .Teams -}}
+            {{- if .Teams }}
                 {{- range $name := .Teams }}
                     <w:p wsp:rsidR="00B56B10" wsp:rsidRDefault="00B56B10" wsp:rsidP="00B56B10">
                         <w:r>
@@ -19,12 +19,18 @@
                     </w:p>
                     <w:p wsp:rsidR="00B56B10" wsp:rsidRDefault="00B56B10" wsp:rsidP="00B56B10"/>
 
-                    {{- range .Events[$name] }}
-                        <w:p wsp:rsidR="00B56B10" wsp:rsidRDefault="00B56B10" wsp:rsidP="00B56B10">
-                            <w:r>
-                                <w:t>{{ .StartDate }} / {{ printf "%20s" .VsName }}, {{ .VenueName }} / {{ .StartDate }}</w:t>
-                            </w:r>
-                        </w:p>
+                    {{- range $team, $games := $.Events }}
+                        {{- if eq $name $team }}
+                            {{- range $games }}
+                                {{- if eq .SubSeason "pre" }}
+                                    <w:p wsp:rsidR="00B56B10" wsp:rsidRDefault="00B56B10" wsp:rsidP="00B56B10">
+                                        <w:r>
+                                            <w:t>{{ .StartDate | formatDate }} / {{ .VsName }}, {{ .VenueName | formatHtml }} / {{ .StartDate | formatTime }}</w:t>
+                                        </w:r>
+                                    </w:p>
+                                {{- end}}                                
+                            {{- end}}
+                        {{- end}}
                     {{- end}}
 
                     <w:p wsp:rsidR="00B56B10" wsp:rsidRDefault="00B56B10">
