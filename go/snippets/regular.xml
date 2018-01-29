@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?mso-application progid="Word.Document"?>
+<w:wordDocument xmlns:aml="http://schemas.microsoft.com/aml/2001/core" xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:dt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.microsoft.com/office/word/2003/wordml" xmlns:wx="http://schemas.microsoft.com/office/word/2003/auxHint" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" xmlns:wsp="http://schemas.microsoft.com/office/word/2003/wordml/sp2" xmlns:sl="http://schemas.microsoft.com/schemaLibrary/2003/core" w:macrosPresent="no" w:embeddedObjPresent="no" w:ocxPresent="no" xml:space="preserve">
+	<w:ignoreSubtree w:val="http://schemas.microsoft.com/office/word/2003/wordml/sp2"/>
+	<w:fonts>
+		<w:defaultFonts w:ascii="Arial" w:fareast="Arial" w:h-ansi="Arial" w:cs="Arial"/>
+	</w:fonts>
+	<w:bgPict>
+		<w:background w:bgcolor="white"/>
+	</w:bgPict>
+    <w:body>
+        <wx:sect>
+            {{if .Teams -}}
+                {{- range $name := .Teams }}
+                    <w:p wsp:rsidR="00B56B10" wsp:rsidRDefault="00B56B10" wsp:rsidP="00B56B10">
+                        <w:r>
+                            <w:t>{{ $name }}</w:t>
+                        </w:r>
+                    </w:p>
+                    <w:p wsp:rsidR="00B56B10" wsp:rsidRDefault="00B56B10" wsp:rsidP="00B56B10"/>
+
+                    {{- range .Events[$name] }}
+                        <w:p wsp:rsidR="00B56B10" wsp:rsidRDefault="00B56B10" wsp:rsidP="00B56B10">
+                            <w:r>
+                                <w:t>{{ .StartDate }} {{ if .Alignment == "away" }}at {{ end }}{{ .VsCity }}, {{ .StartDate }}</w:t>
+                            </w:r>
+                        </w:p>
+                    {{- end}}
+
+                    <w:p wsp:rsidR="00B56B10" wsp:rsidRDefault="00B56B10">
+                        <w:r>
+                            <w:br w:type="page"/>
+                        </w:r>
+                    </w:p>
+                {{- end}}
+            {{- else}}
+                <w:p wsp:rsidR="00B56B10" wsp:rsidRDefault="00B56B10" wsp:rsidP="00B56B10">
+                    <w:r>
+                        <w:t>There were no teams available for {{ .Season }} {{ .League }} Preseason.</w:t>
+                    </w:r>
+                </w:p>
+            {{- end}}
+            <w:p wsp:rsidR="00B56B10" wsp:rsidRDefault="00B56B10"/>
+            <w:sectPr wsp:rsidR="00B56B10" wsp:rsidSect="006F67DA">
+                <w:pgSz w:w="12240" w:h="15840"/>
+                <w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="720" w:footer="720" w:gutter="0"/>
+                <w:cols w:space="720"/>
+                <w:docGrid w:line-pitch="360"/>
+            </w:sectPr>
+        </wx:sect>
+    </w:body>
+</w:wordDocument>

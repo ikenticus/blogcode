@@ -167,8 +167,8 @@ func callTemplates (season string) {
         //"urgentNote": urgentNote,
     }
 
-    tplFile := season + ".tpl"
-    t := template.Must(template.New(tplFile).Funcs(fmap).ParseFiles(tplFile))
+    xmlFile := season + ".xml"
+    t := template.Must(template.New(xmlFile).Funcs(fmap).ParseFiles(xmlFile))
     err := t.Execute(os.Stdout, teamEventMap)
     if err != nil {
         panic(err)
