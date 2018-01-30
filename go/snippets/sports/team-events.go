@@ -111,7 +111,6 @@ func buildTeams (league string, year int) {
 
     var teams TeamsAPI
     json.Unmarshal([]byte(data), &teams)
-    //fmt.Println(teams.Page)
 
     teamMap = make(TeamMap)
     for _, t := range teams.Page {
@@ -153,15 +152,12 @@ func buildEvents (league string, year int) {
 
     var events EventsAPI
     json.Unmarshal([]byte(data), &events)
-    //fmt.Println(events.Page)
 
     for _, e := range events.Page {
         appendEvent(e, e.AwayKey)
         appendEvent(e, e.HomeKey)
     }
 }
-// preseason Mar. 05 / Brewers, Tempe /  2:10
-// L.A. Angels Apr. 6 at Seattle,  4:10
 
 func formatDate(t time.Time) string {
     return t.Format("Jan. 2")
@@ -227,7 +223,6 @@ func main() {
     buildTeams(*optAbbr, *optYear)
     buildEvents(*optAbbr, *optYear)
     sortData(*optAbbr, *optYear)
-    //fmt.Println(Map); output, _ := json.MarshalIndent(Map, "", "    "); fmt.Println(string(output))
 
     callTemplates("pre", *optAbbr, *optYear)
     callTemplates("regular", *optAbbr, *optYear)
