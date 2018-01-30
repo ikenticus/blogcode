@@ -180,9 +180,6 @@ func callTemplates (season string, league string, year int) {
         "formatDate": formatDate,
         "formatHtml": formatHtml,
         "formatTime": formatTime,
-        //"formatAsDollars": formatAsDollars,
-        //"formatAsDate": formatAsDate,
-        //"urgentNote": urgentNote,
     }
 
     output := fmt.Sprintf("%s_%d_%s.doc", strings.ToUpper(league), year, season)
@@ -228,16 +225,9 @@ func main() {
     }
 
     buildTeams(*optAbbr, *optYear)
-    //fmt.Println(teamMap)
-    //output, _ := json.MarshalIndent(teamMap, "", "    "); fmt.Println(string(output))
-
     buildEvents(*optAbbr, *optYear)
-    //fmt.Println(eventMap)
-    //output, _ := json.MarshalIndent(eventMap, "", "    "); fmt.Println(string(output))
-
     sortData(*optAbbr, *optYear)
-    //fmt.Println(teamEventMap)
-    //output, _ := json.MarshalIndent(teamEventMap, "", "    "); fmt.Println(string(output))
+    //fmt.Println(Map); output, _ := json.MarshalIndent(Map, "", "    "); fmt.Println(string(output))
 
     callTemplates("pre", *optAbbr, *optYear)
     callTemplates("regular", *optAbbr, *optYear)
