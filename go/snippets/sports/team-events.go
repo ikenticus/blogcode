@@ -7,6 +7,7 @@ import (
     "io/ioutil"
     "net/http"
     "os"
+    "path"
     "sort"
     "strings"
     "text/template"
@@ -78,6 +79,7 @@ type TeamEventMap struct {
 }
 
 var (
+    baseName string
     teamMap TeamMap
     eventMap EventMap
     teamEventMap TeamEventMap
@@ -190,7 +192,7 @@ func callTemplates (season string, league string, year int) {
         return
     }
 
-    xmlFile := season + ".xml"
+    xmlFile := fmt.Sprintf("%s-%s.xml", baseName, season)
     t := template.Must(template.New(xmlFile).Funcs(fmap).ParseFiles(xmlFile))
     err := t.Execute(f, teamEventMap)
     if err != nil {
@@ -213,6 +215,7 @@ func sortData (league string, year int) {
 }
 
 func main() {
+    baseName = path.Base(os.Args[0])
     thisYear := time.Now().Year()
     optHelp := getopt.BoolLong("help", 'h', "Help")
     optAbbr := getopt.StringLong("abbr", 'a', "mlb", "League Abbr")
