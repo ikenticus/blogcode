@@ -169,6 +169,7 @@ func parseWiki (show string, uri string, textOut bool) {
     n := regexp.MustCompile("^.*th scope=\"row\" id=\"ep([0-9]+)\".*$")
     e := regexp.MustCompile("^.*<td>([0-9]+)</td>.*$")
     t := regexp.MustCompile("^.*td class=\"summary\" style=\"text-align:left\">\"(.+)\".*</td.*$")
+    v := regexp.MustCompile("^.*td class=\"summary\" style=\"text-align:left\">.*title=\"(.+)\".+vs.+title=\"(.+)\".+</td.*$")
     h := regexp.MustCompile("<a href=\".+\">(.+)</a>")
     d := regexp.MustCompile("^.*<td>([A-Za-z]+)&#160;([0-9]+),&#160;([0-9]+)<span.+bday dtstart.+$")
     a := regexp.MustCompile("^.*<td>([0-9]+)&#160;([A-Za-z]+)&#160;([0-9]+)<span.+bday dtstart.+$")
@@ -199,10 +200,14 @@ func parseWiki (show string, uri string, textOut bool) {
                 eis = false
             }
 
-            if t.MatchString(line) {
-                title = t.ReplaceAllString(line, "$1")
-                if h.MatchString(title) {
-                    title = h.ReplaceAllString(title, "$1")
+            if t.MatchString(line) || v.MatchString(line) {
+                if t.MatchString(line) {
+                    title = t.ReplaceAllString(line, "$1")
+                    if h.MatchString(title) {
+                        title = h.ReplaceAllString(title, "$1")
+                    }
+                } else if v.MatchString(line) {
+                    title = v.ReplaceAllString(line, "$1 vs $2")
                 }
                 if len(title) > 0 && episode > 0 {
                     key := 100 * season + episode
