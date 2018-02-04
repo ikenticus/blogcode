@@ -60,10 +60,10 @@ func processWiki (show string) {
     var lines []string
     lines = strings.Split(string(data), sep)
     for _, line := range lines {
-        if strings.HasPrefix(line, "Season ") {
+        if strings.HasPrefix(line, "Season ") || strings.HasPrefix(line, "Series ") {
             //fmt.Printf("%d : %s\n", index, line)
-            r := regexp.MustCompile("^Season ([0-9]+).*$")
-            season, _ = strconv.Atoi(r.ReplaceAllString(line, "$1"))
+            r := regexp.MustCompile("^(Season|Series) ([0-9]+).*$")
+            season, _ = strconv.Atoi(r.ReplaceAllString(line, "$2"))
             //fmt.Println("Season:", 100 * season)
         }
 
@@ -165,12 +165,13 @@ func parseWiki (show string, uri string, textOut bool) {
     var active bool = false
     var eis bool = false
 
-    s := regexp.MustCompile("^.*class=\"mw-headline\" id=\"Season_([0-9]+).*$")
+    s := regexp.MustCompile("^.*class=\"mw-headline\" id=\"(Season|Series)_([0-9]+).*$")
     n := regexp.MustCompile("^.*th scope=\"row\" id=\"ep([0-9]+)\".*$")
     e := regexp.MustCompile("^.*<td>([0-9]+)</td>.*$")
     t := regexp.MustCompile("^.*td class=\"summary\" style=\"text-align:left\">\"(.+)\".*</td.*$")
     h := regexp.MustCompile("<a href=\".+\">(.+)</a>")
     d := regexp.MustCompile("^.*<td>([A-Za-z]+)&#160;([0-9]+),&#160;([0-9]+)<span.+bday dtstart.+$")
+    a := regexp.MustCompile("^.*<td>([0-9]+)&#160;([A-Za-z]+)&#160;([0-9]+)<span.+bday dtstart.+$")
 
     var lines []string
     lines = strings.Split(string(data), "\n")
@@ -187,7 +188,7 @@ func parseWiki (show string, uri string, textOut bool) {
                 season = 0 // zero Season during Movie headers
             }
             if s.MatchString(line) {
-                season, _ = strconv.Atoi(s.ReplaceAllString(line, "$1"))
+                season, _ = strconv.Atoi(s.ReplaceAllString(line, "$2"))
             }
             if n.MatchString(line) {
                 episode, _ = strconv.Atoi(n.ReplaceAllString(line, "$1"))
@@ -210,8 +211,13 @@ func parseWiki (show string, uri string, textOut bool) {
                     schedule[key] = "TBA"
                 }
             }
-            if d.MatchString(line) {
-                timestamp := d.ReplaceAllString(line, "$1 $2, $3")
+            if a.MatchString(line) || d.MatchString(line) {
+                var timestamp string
+                if d.MatchString(line) {
+                    timestamp = d.ReplaceAllString(line, "$1 $2, $3")
+                } else if a.MatchString(line) {
+                    timestamp = a.ReplaceAllString(line, "$2 $1, $3")
+                }
                 //fmt.Printf("%s %s: %s on %s\n", season, episode, title, timestamp)
                 if len(title) > 0 && episode > 0 {
                     key := 100 * season + episode
