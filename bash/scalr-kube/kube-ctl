@@ -8,9 +8,44 @@ export COLUMNS=250
 
 names=$(kubectl get pods -o jsonpath="{..app_name}" | tr [[:space:]] "\n" | sort -u)
 help() {
-    echo -e "\nUsage: ${0##*/} <partial-app-name> <pod_num|-> <cmds>\n"
-    echo -e "Apps:\n$names\n"
-    exit 1
+    echo -e "\nUsage: ${0##*/} <partial-app-name> [<pod-num>] [<cmds>]\n"
+    cat << EOF
+Apps:
+$names
+use     Show usage of nodes
+use #   Dump usage of number in node list (- for all)
+
+Pod Num:
+-       All pods running app
+#       Select number in pod list matching app
+get<?>  Get <?> for all pods running app (empty for help)
+desc<?> Describe <?> for all pods running app (empty for help)
+reset   Reset the resources (pass options in <cmds> or help)
+use     Dump usage of pods running app
+wide<?> Get <?> for all pods running app (wide display for supported <?> calls)
+
+Commands:
+info    Show pod(s) and app container info
+json	Get pod(s) app configuration in JSON
+logs    Dump pod(s) app logs
+nginx   Dump pod(s) nginx-lite logs
+replace Replace pod(s) with same configuration
+res     Get pod(s) container resources
+tail    Tail pod(s) appe logs 100 lines
+tailf   Tail pod(s) app logs 25 lines and follow
+yaml	Get pod(s) app configuration in YAML
+*       Exec shell commands on pod(s) app container
+
+Shell Commands:
+df      Human Disk Free
+ls      Long List Feed Downloads
+ps      Full Wide Process List
+ss      Curl Service Status
+sh      Enter Bash Shell
+*       Any non-lazy commands not listed above
+
+EOF
+    exit 0
 }
 
 app=$1; shift
