@@ -1,0 +1,67 @@
+#!/bin/bash
+# 
+# Multi-SSH to Farm/Role
+#
+
+help() {
+    echo -e "\nUsage: ${0##*/} <partial-app-name> [<role>|master]\n"
+    exit 1
+}
+
+app=$1
+if [ -z "$app" ]; then
+    help
+fi
+role=${2:-master}
+
+names="
+    olympics-dev=5,4061
+    olympics-stg=4,4179
+    olympics-east=3,4207
+    olympics-west=3,4208
+    sports-dev=5,2763
+    sports-stg=4,2764
+    sports-east=3,2765
+    sports-west=3,2766
+    tools=11,4381
+"
+
+context=$(echo $names | tr [[:space:]] "\n" | grep $app)
+test=$(echo $context)
+if [ -z "${test//* */}" ]; then
+    IFS=-
+    set -- $app
+    unset IFS
+    context=$(echo $names | tr [[:space:]] "\n" | egrep ".*${1}.*-.*${2}.*")
+    if [ -z "$context" ]; then
+        echo Invalid app: $context
+        help
+    fi
+fi
+
+IFS=\=
+set -- $context
+ids=$2
+
+IFS=,
+set -- $ids
+farm=$2
+
+if [ "$role" == "master" ]; then
+    # assuming kubernetes-master
+    master=$(scalr-find ${ids}=master | tail -1 | awk '{ print $NF }' | tr "[]" " ")
+    #master=$(scalr-find ${ids}=master | tail -2 | head -1 | awk '{ print $NF }' | tr "[]" " ")
+    unset IFS
+
+    echo COPY: scalr-scp $farm $master to 
+    scalr-scp $farm $master to ~/repos/tasks/scripts/kube-ctl kc
+    scalr-ssh $farm $master chmod +x kc
+    scalr-ssh $farm $master
+else
+    hosts=$(scalr-find ${ids}=$role | grep " : \[" | awk '{ print $NF }' | tr "[]" " ")
+    unset IFS
+    for host in $hosts; do
+        scalr-ssh $farm $host
+    done
+fi
+

@@ -1,0 +1,120 @@
+#!/bin/bash
+#
+# Kubernetes Control shortcut commands
+#
+
+export TERM=vt100
+export COLUMNS=250
+
+names=$(kubectl get pods -o jsonpath="{..app_name}" | tr [[:space:]] "\n" | sort -u)
+help() {
+    echo -e "\nUsage: ${0##*/} <partial-app-name> <pod_num|-> <cmds>\n"
+    echo -e "Apps:\n$names\n"
+    exit 1
+}
+
+app=$1; shift
+if [ -z "$app" ]; then
+    help
+fi
+
+num=$1; shift
+cmds=$@
+
+lazy() {
+    local cmds=$@
+    case $cmds in
+        df) echo "df -h" ;;
+        ls) echo "ls -la /tmp/feed/download*" ;;
+        ps) echo "ps -efww" ;;
+	ss) echo "curl localhost:8080/service_status" ;;
+        sh) echo "/bin/bash" ;;
+        *) echo $cmds ;;
+    esac
+}
+
+reset() {
+    local app=$1; shift
+    local opt=$@
+    if [ "$opt" == "help" ]; then
+        echo "Reset options: --requests=cpu=100m,memory=256Mi --limits=cpu=200m,memory=512Mi"
+    else
+        local dep=$(kubectl get deployment --selector=app_name=$app | tail -1 | awk '{ print $1 }')
+        kubectl set resources deployment $dep -c $app $opt
+    fi
+    exit 0
+}
+
+run() {
+    local pod=$1
+    local app=${2%-queue}
+    echo -e "\n> Pod: $pod, Container: $app"
+    cmds=$(lazy $cmds)
+    case $cmds in
+        info) echo kubectl $pod -c $app ;;
+        json) kubectl get pod $pod -o json ;;
+        logs) kubectl logs $pod -c $app ;;
+        nginx) kubectl logs $pod -c nginx-lite ;;
+        replace) kubectl get pod $pod -o yaml | kubectl replace --force -f - ;;
+        res) kubectl get pod $pod -o yaml | grep -B1 -A6 resources ;;
+        tail) kubectl logs $pod -c $app --tail=100 ;;
+        tailf) kubectl logs $pod -c $app --tail=25 -f ;;
+        yaml) kubectl get pod $pod -o yaml ;;
+        *) kubectl exec -it $pod -c $app -- $cmds
+    esac
+}
+
+use() {
+    local num=$1
+    if [ -z "$num" ]; then
+        kubectl top node
+    else
+        nodes=$(kubectl get nodes | grep -v NAME | awk '{ print $1 }')
+        if [ "$num" != "-" ]; then
+            node=$(echo $nodes | tr [[:space:]] "\n" | head -$num | tail -1)
+        fi
+        kubectl describe node $node
+    fi
+    exit 0
+}
+
+# check for non-pod commands first and exit
+case $app in
+   use) use $num $cmds ;;
+esac
+
+context=$(echo $names | tr [[:space:]] "\n" | grep $app | head -1)
+test=$(echo $context)
+if [ -z "${test//* */}" ]; then
+    IFS=-
+    set -- $app
+    unset IFS
+    context=$(echo $names | tr [[:space:]] "\n" | egrep ".*${1}.*-.*${2}.*")
+    if [ -z "$context" ]; then
+        echo Invalid app: $app
+	echo Choose from: $names
+        help
+    fi
+fi
+
+if [ -z "$cmds" ]; then
+    case $num in
+        get*) kubectl get ${num#get} --selector=app_name=$context ;;
+        desc*) kubectl describe ${num#desc} --selector=app_name=$context ;;
+        use) kubectl top pod --selector=app_name=$context ;;
+        wide*) kubectl get ${num#wide} -o wide --selector=app_name=$context ;;
+        *) kubectl get pods --selector=app_name=$context ;;
+    esac
+else
+    pods=$(kubectl get pods --selector=app_name=$context | grep Running | awk '{ print $1 }')
+    if [ "$num" != "-" ]; then
+    	case $num in
+            reset) reset $context $cmds ;;
+            [0-9]*) echo NUM; pods=$(echo $pods | tr [[:space:]] "\n" | head -$num | tail -1) ;;
+            *) echo "$num is not a valid pod number!" ; exit 1 ;;
+        esac 
+    fi
+    for p in $pods; do
+        run $p $context
+    done
+fi

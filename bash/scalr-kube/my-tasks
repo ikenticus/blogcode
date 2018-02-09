@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# Backup my tasks to share volumn
+#
+
+share=/Volumes/share
+df -k $share
+if [ $? -gt 0 ]; then
+    echo -e "\n$share not mounted, in Finder:"
+    echo -e "Go -> Connect to Server: smb://192.168.1.2/share\n"
+    exit 1
+fi
+cp -rpv ~/repos/tasks/* /Volumes/share/repos/tasks/

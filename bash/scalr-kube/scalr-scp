@@ -1,0 +1,20 @@
+#!/bin/bash
+if [ $# -lt 4 ]; then
+    echo "Usage: ${0##*/} <FARMID> <HOSTIP> <TO|-> <FROM> <DEST>"
+    exit 1
+fi
+pem=$(ls ~/.ssh/FARM-${1}*)
+host=$2
+what=$3
+from=$4
+dest=$5
+
+if [ $what == "to" ]; then # remote -> local
+    scp -o UserKnownHostsFile=/dev/null \
+        -o StrictHostKeyChecking=no \
+        -i $pem $from cloud-user@$host:$dest
+else # local -> remote
+    scp -o UserKnownHostsFile=/dev/null \
+        -o StrictHostKeyChecking=no \
+        -i $pem cloud-user@$host:$from $dest
+fi

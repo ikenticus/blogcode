@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# Refresh repo
+#
+
+branch=$1
+cd ~/repos
+for i in cs-oly* cs-sports*; do
+    echo -e " \n===== $i"
+    cd $i
+    [ "$(git rev-parse --abbrev-ref HEAD)" != "master" ] && git checkout master
+    [ $(git branch | wc -l) -gt 1 ] && git branch
+    git pull
+    [ ! -z "$branch" ] && [ ! -z "$(git branch | grep $branch)" ] && git branch -D $branch
+    cd ..
+done

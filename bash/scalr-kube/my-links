@@ -1,0 +1,8 @@
+#!/bin/bash
+
+scripts=~/repos/tasks/scripts
+cd /usr/local/bin
+for s in $(ls $scripts | grep -v "\."); do
+    echo $s
+    [ ! -f $s ] && ln -s $scripts/$s
+done

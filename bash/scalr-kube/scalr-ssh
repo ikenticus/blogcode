@@ -1,0 +1,11 @@
+#!/bin/bash
+if [ $# -lt 2 ]; then
+    echo "Usage: ${0##*/} <FARMID> <HOSTIP>"
+    exit 1
+fi
+pem=$(ls ~/.ssh/FARM-${1}*); shift
+host=$1; shift
+#echo ssh -i $pem cloud-user@$host
+ssh -o UserKnownHostsFile=/dev/null \
+    -o StrictHostKeyChecking=no \
+    -Y -i $pem cloud-user@$host $*
