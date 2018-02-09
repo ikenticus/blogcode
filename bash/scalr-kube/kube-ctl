@@ -110,7 +110,7 @@ else
     if [ "$num" != "-" ]; then
     	case $num in
             reset) reset $context $cmds ;;
-            [0-9]*) echo NUM; pods=$(echo $pods | tr [[:space:]] "\n" | head -$num | tail -1) ;;
+            [0-9]*) pods=$(echo $pods | tr [[:space:]] "\n" | head -$num | tail -1) ;;
             *) echo "$num is not a valid pod number!" ; exit 1 ;;
         esac 
     fi
