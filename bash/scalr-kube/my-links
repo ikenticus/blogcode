@@ -1,6 +1,14 @@
 #!/bin/bash
 
+origin=~/repos/blogcode/bash/scalr-kube
 scripts=~/repos/tasks/scripts
+
+cd $scripts
+for s in $(ls $origin); do
+    echo $s
+    [ ! -f $s ] && ln -s $origin/$s
+done
+
 cd /usr/local/bin
 for s in $(ls $scripts | grep -v "\."); do
     echo $s
