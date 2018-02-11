@@ -14,7 +14,10 @@ import (
     "github.com/pborman/getopt"
 )
 
-const apiPath = "http://%s/svc/Games_v2.svc/json/%s?languageCode=2&competitionSetId=%d&season=%s"
+const (
+    apiPath = "http://%s/svc/Games_v2.svc/json/%s?languageCode=2&competitionSetId=%d&season=%s"
+    execPath = "/exec/crawl/infostrada?paths=Games_v2.svc/json/%s&filters=languageCode=2,competitionSetId=%d,season=%s,nocId=%d\n"
+)
 
 var (
     baseName string
@@ -29,6 +32,7 @@ var (
     }
 )
 
+// curl methods[all] | gojson -name=NOCList
 type NOCList []struct {
     NOCID    int    `json:"n_NOCID"`
     NOCGeoID int    `json:"n_NOCGeoID"`
@@ -36,6 +40,7 @@ type NOCList []struct {
     NOCShort string `json:"c_NOCShort"`
 }
 
+// curl methods[win] | gojson -name=MedalTable
 type MedalTable struct {
     MedalTableInfo struct {
         AsOfDate        string      `json:"c_AsOfDate"`
@@ -113,6 +118,12 @@ func printList (domain string, out string) {
         for _, n := range nocIds {
             fmt.Printf(apiPath + "&nocId=%d\n", domain, method, gtype, season, n)
         }
+    case "exec":
+        for _, n := range nocIds {
+            fmt.Printf(execPath, method, gtype, season, n)
+        }
+    case "read":
+
     default:
         fmt.Printf("NOCS: %v\n", nocIds)
     }
