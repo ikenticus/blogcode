@@ -6,6 +6,7 @@
 export TERM=vt100
 export COLUMNS=250
 
+jobs=$(kubectl get jobs | grep -v NAME | awk '{ print $1 }')
 names=$(kubectl get pods -o jsonpath="{..app_name}" | tr [[:space:]] "\n" | sort -u)
 help() {
     echo -e "\nUsage: ${0##*/} <partial-app-name> [<pod-num>] [<cmds>]\n"
@@ -14,6 +15,9 @@ Apps:
 $names
 use     Show usage of nodes
 use #   Dump usage of number in node list (- for all)
+
+Jobs:
+$jobs
 
 Pod Num:
 -       All pods running app
@@ -158,12 +162,18 @@ if [ -z "${test//* */}" ]; then
     unset IFS
     context=$(echo $names | tr [[:space:]] "\n" | egrep ".*${1}.*-.*${2}.*")
     if [ -z "$context" ]; then
-        echo Invalid app: $app
-	echo Choose from: $names
-        help
+        context=$(echo $jobs | tr [[:space:]] "\n" | egrep ".*${app}.*")
+        if [ -z "$context" ]; then
+            echo Invalid app: $app
+            echo Choose from: $names
+            help
+        else
+            isJOB=1
+        fi
     fi
 fi
 
+echo HERE
 if [ -z "$cmds" ]; then
     case $num in
         get*) kubectl get ${num#get} --selector=app_name=$context ;;
@@ -175,7 +185,11 @@ if [ -z "$cmds" ]; then
         *) kubectl get pods --selector=app_name=$context ;;
     esac
 else
-    pods=$(kubectl get pods --selector=app_name=$context | grep Running | awk '{ print $1 }')
+    if [ -z "$isJOB" ]; then
+        pods=$(kubectl get pods --selector=app_name=$context | grep Running | awk '{ print $1 }')
+    else
+        pods=$(kubectl get pods --selector=job-name=$context | grep -v NAME | awk '{ print $1 }')
+    fi
     if [ "$num" != "-" ]; then
     	case $num in
             auto) auto $context $cmds ;;
