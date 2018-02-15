@@ -6,7 +6,7 @@
 export TERM=vt100
 export COLUMNS=250
 
-jobs=$(kubectl get jobs | grep -v NAME | awk '{ print $1 }')
+jobs=$(kubectl get jobs 2> /dev/null | grep -v NAME | awk '{ print $1 }')
 names=$(kubectl get pods -o jsonpath="{..app_name}" | tr [[:space:]] "\n" | sort -u)
 help() {
     echo -e "\nUsage: ${0##*/} <partial-app-name> [<pod-num>] [<cmds>]\n"
@@ -68,7 +68,7 @@ lazy() {
     local cmds=$@
     case $cmds in
         df) echo "df -h" ;;
-        ls) echo "ls -la /tmp/feed/download*" ;;
+        ls) echo "ls -laR /tmp/feed" ;;
         ps) echo "ps -efww" ;;
         ss) echo "curl localhost:8080/service_status" ;;
         sh) echo "/bin/bash" ;;
