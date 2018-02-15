@@ -173,7 +173,6 @@ if [ -z "${test//* */}" ]; then
     fi
 fi
 
-echo HERE
 if [ -z "$cmds" ]; then
     case $num in
         get*) kubectl get ${num#get} --selector=app_name=$context ;;
