@@ -85,7 +85,7 @@ type MedalTable struct {
 }
 
 func callAPI (url string) []byte {
-    fmt.Println("Parsing", url)
+    //fmt.Println("Parsing", url)
 
     client := &http.Client{}
     req, _ := http.NewRequest("GET", url, nil)

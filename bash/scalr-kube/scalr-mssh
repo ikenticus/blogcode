@@ -14,15 +14,22 @@ if [ -z "$app" ]; then
 fi
 role=${2:-master}
 
+# cs-sports-service
+#    olympics-dev=5,4061
+#    olympics-stg=4,4152
+#    olympics-east=3,4153
+#    olympics-west=3,4154
+#    sports-dev=5,2763
+#    sports-stg=4,2764
+#    sports-east=3,2765
+#    sports-west=3,2766
+
 names="
-    olympics-dev=5,4061
-    olympics-stg=4,4179
-    olympics-east=3,4207
-    olympics-west=3,4208
     sports-dev=5,2763
-    sports-stg=4,2764
-    sports-east=3,2765
-    sports-west=3,2766
+    olympics-dev=5,4061
+    poas-api-stg=4,4179
+    paas-api-east=3,4207
+    paas-api-west=3,4208
     tools=11,4381
 "
 
