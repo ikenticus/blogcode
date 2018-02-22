@@ -68,9 +68,12 @@ lazy() {
     local cmds=$@
     case $cmds in
         df) echo "df -h" ;;
-        ls) echo "ls -laR /tmp/feed" ;;
+        err) echo "ls -laR /tmp/feed/error" ;;
+        is) echo "ls -laR /tmp/feed/download.infostrada" ;;
+        ls) echo "ls -la /tmp/feed" ;;
         ps) echo "ps -efww" ;;
         ss) echo "curl localhost:8080/service_status" ;;
+        sdi) echo "ls -laR /tmp/feed/download.sdi" ;;
         sh) echo "/bin/bash" ;;
         *) echo $cmds ;;
     esac
@@ -160,9 +163,9 @@ if [ -z "${test//* */}" ]; then
     IFS=-
     set -- $app
     unset IFS
-    context=$(echo $names | tr [[:space:]] "\n" | egrep ".*${1}.*-.*${2}.*")
+    context=$(echo $names | tr [[:space:]] "\n" | egrep ".*${1}.*-.*${2}.*" | head -1)
     if [ -z "$context" ]; then
-        context=$(echo $jobs | tr [[:space:]] "\n" | egrep ".*${app}.*")
+        context=$(echo $jobs | tr [[:space:]] "\n" | egrep ".*${app}.*" | head -1)
         if [ -z "$context" ]; then
             echo Invalid app: $app
             echo Choose from: $names
@@ -172,6 +175,7 @@ if [ -z "${test//* */}" ]; then
         fi
     fi
 fi
+echo MATCHED: $context
 
 if [ -z "$cmds" ]; then
     case $num in

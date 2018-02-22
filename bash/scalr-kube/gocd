@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# Quick change directory to go/src directories
+# set alias gcd=". gocd"
+#
+
+repo=$1
+src=/Users/kklee/repos/go/src
+owners="
+    github.com/GannettDigital
+    github.com/ikenticus
+"
+
+for work in $owners; do
+    [ -d $src/$work/$repo ] && cd $src/$work/$repo
+done
