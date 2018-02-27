@@ -36,14 +36,23 @@ func main() {
                         } else {
                             start = true
                         }
-                        fmt.Println(n.Data, start)
+                        fmt.Println("Node:", n.Data, start)
+                        break
+                    }
+                }
+            } else if n.Data == "a" {
+                for _, a := range n.Attr {
+                    if a.Key == "href" {
+                        if n.FirstChild != nil {
+                            fmt.Printf("Link: %q => %q\n", strings.TrimSpace(n.FirstChild.Data), a.Val)
+                        }
                         break
                     }
                 }
             }
         case html.TextNode:
             if start {
-                fmt.Printf("%q\n", n.Data) 
+                fmt.Printf("Text: %q\n", n.Data) 
             }
         }
     	for c := n.FirstChild; c != nil; c = c.NextSibling {
