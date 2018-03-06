@@ -18,6 +18,7 @@ import (
 
 var (
     myKeys = map[string]string{}
+    results []float64
     scalrDate = fmt.Sprintf(time.Now().UTC().Format(time.RFC3339));
     scalrSearch = ""
 )
@@ -102,7 +103,6 @@ func scalrAPIOut (apiKey string, apiPath string, params ...string) {
         panic(err)
     }
 
-    var results []float64
     for _, val := range output["data"].([]interface{}) {
         data := val.(map[string]interface{})
         if scalrSearch == "" {
@@ -129,6 +129,7 @@ func scalrAPIOut (apiKey string, apiPath string, params ...string) {
             //fmt.Printf("Args: %v\n", args)
             fmt.Println()
             scalrSearch = ""
+            results = nil
             processArgs(args)
         }
     }
