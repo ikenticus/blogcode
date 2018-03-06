@@ -30,6 +30,8 @@ names="
     poas-api-stg=4,4179
     paas-api-east=3,4207
     paas-api-west=3,4208
+    sre-east=40,4566
+    sre-west=40,4564
     tools=11,4381
 "
 

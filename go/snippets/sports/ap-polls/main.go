@@ -18,14 +18,14 @@ import (
 const (
 	pollType  = "2"
 	pollName  = "Associated Press"
-	pollTeams = "http://sports-service.production.%s.com/page/v2/%s/teams/%d/"
+	pollTeams = "http://sports-service.production.%s/page/v2/%s/teams/%d/"
 )
 
 var (
 	teams TeamsAPI
 	polls = map[string]string{
 		//"ncaaf": "http://www.espn.com/college-football/rankings/_/week/%d/year/%d/seasontype/2",
-		"ncaab": "http://www.espn.com/mens-college-basketball/rankings/_/poll/1/year/%d/week/%d",
+		//"ncaab": "http://www.espn.com/mens-college-basketball/rankings/_/poll/1/year/%d/week/%d",
 		"ncaaw": "http://www.espn.com/womens-college-basketball/rankings/_/poll/1/year/%d/week/%d",
 	}
 )
@@ -138,10 +138,9 @@ func getPoll(name string, text string, year int, week int) {
 	//fmt.Println(doc)
 
 	sport := "basketball"
-	season := year
+	season := year - 1
 	seasonSpan := fmt.Sprintf("%s-%s", strconv.Itoa(season-1), strconv.Itoa(season))
 	if name == "ncaaf" {
-		season--
 		sport = "football"
 	}
 
@@ -238,8 +237,8 @@ func getPoll(name string, text string, year int, week int) {
 					short = dt.Format("01-02")
 					month, _ := strconv.Atoi(strings.Split(short, "-")[0])
 					pollYear := season
-					if month > 7 {
-						pollYear = season - 1
+					if month < 7 {
+						pollYear = season + 1
 					}
 					teampoll.Feed.LeagueContent.SeasonContent.PollContent.Poll.Date = fmt.Sprintf("%d-%s", pollYear, short)
 					teampoll.TypeID = strings.Replace(teampoll.Feed.LeagueContent.SeasonContent.PollContent.Poll.Date, "-", "", -1)
@@ -255,7 +254,7 @@ func getPoll(name string, text string, year int, week int) {
 						case 1:
 							teamrank.Rank = n.Data
 						case 2:
-							teamrank.Team.Name = n.Data
+							teamrank.Team.Name = remap(n.Data)
 							var teampage TeamPage
 							for t := range teams.Page {
 								data, _ := json.Marshal(teams.Page[t])
@@ -336,6 +335,16 @@ func page(id string, text string, year int, week int) string {
 		url = fmt.Sprintf(text, week, year)
 	}
 	return url
+}
+
+// fix known misnamed team names
+func remap(name string) string {
+	switch name {
+	case "UConn":
+		return "Connecticut"
+	default:
+		return name
+	}
 }
 
 func main() {

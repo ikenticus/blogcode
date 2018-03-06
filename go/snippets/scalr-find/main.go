@@ -24,7 +24,7 @@ var (
 
 const (
     scalrPath = "https://scalr.gannettdigital.com"
-    vaultPath = "secret/paas-api/paas-api-ci/production"
+    vaultPath = "secret/cs-sports/jenkins/deploy"
 )
 
 func init() {
@@ -39,8 +39,16 @@ func init() {
         fmt.Printf("An error occurred reading secret: %v\n", err)
         return
     }
-    myKeys["scalr-key-id"] = dbConfig.Data["scalraccess"].(string)
-    myKeys["scalr-secret"] = dbConfig.Data["scalrsecret"].(string)
+    if len(os.Getenv("SCALR_KEY")) > 0 {
+        myKeys["scalr-key-id"] = os.Getenv("SCALR_KEY")
+    } else {
+        myKeys["scalr-key-id"] = dbConfig.Data["scalr-key"].(string)
+    }
+    if len(os.Getenv("SCALR_SECRET")) > 0 {
+        myKeys["scalr-secret"] = os.Getenv("SCALR_SECRET")
+    } else {
+        myKeys["scalr-secret"] = dbConfig.Data["scalr-secret"].(string)
+    }
     return
 }
 
