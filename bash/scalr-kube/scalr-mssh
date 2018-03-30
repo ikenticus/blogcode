@@ -8,11 +8,13 @@ help() {
     exit 1
 }
 
-app=$1
+app=$1; shift
 if [ -z "$app" ]; then
     help
 fi
-role=${2:-master}
+role=${1:-master}
+[ "$1" == "master" ] && shift
+sshcmds=$*
 
 # cs-sports-service
 #    olympics-dev=5,4061
@@ -65,12 +67,12 @@ if [ "$role" == "master" ]; then
     echo COPY: scalr-scp $farm $master to 
     scalr-scp $farm $master to ~/repos/tasks/scripts/kube-ctl kc
     scalr-ssh $farm $master chmod +x kc
-    scalr-ssh $farm $master
+    scalr-ssh $farm $master $sshcmds
 else
     hosts=$(scalr-find ${ids}=$role | grep " : \[" | awk '{ print $NF }' | tr "[]" " ")
     unset IFS
     for host in $hosts; do
-        scalr-ssh $farm $host
+        scalr-ssh $farm $host $sshcmds
     done
 fi
 

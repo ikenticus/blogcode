@@ -38,6 +38,7 @@ json	Get pod(s) app configuration in JSON
 logs    Dump pod(s) app logs
 nginx   Dump pod(s) nginx-lite logs
 replace Replace pod(s) with same configuration
+reqlog  Dump pod(s) requestlogger logs
 res     Get pod(s) container resources
 tail    Tail pod(s) appe logs 100 lines
 tailf   Tail pod(s) app logs 25 lines and follow
@@ -130,6 +131,7 @@ run() {
         logs) kubectl logs $pod -c $app ;;
         nginx) kubectl logs $pod -c nginx-lite ;;
         replace) kubectl get pod $pod -o yaml | kubectl replace --force -f - ;;
+        reqlog) kubectl logs $pod -c requestlogger ;;
         res) kubectl get pod $pod -o yaml | grep -B1 -A6 resources ;;
         tail) kubectl logs $pod -c $app --tail=100 ;;
         tailf) kubectl logs $pod -c $app --tail=25 -f ;;

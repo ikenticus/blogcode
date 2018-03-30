@@ -3,7 +3,7 @@
 # Refresh repo
 #
 
-branch=$1
+branches=$@
 cd ~/repos
 for i in cs-oly* cs-sports*; do
     echo -e " \n===== $i"
@@ -11,6 +11,10 @@ for i in cs-oly* cs-sports*; do
     [ "$(git rev-parse --abbrev-ref HEAD)" != "master" ] && git checkout master
     [ $(git branch | wc -l) -gt 1 ] && git branch
     git pull
-    [ ! -z "$branch" ] && [ ! -z "$(git branch | grep $branch)" ] && git branch -D $branch
+    if [ ! -z "$branches" ]; then
+        for branch in $branches; do
+            [ ! -z "$(git branch | grep $branch)" ] && git branch -D $branch
+        done
+    fi
     cd ..
 done
