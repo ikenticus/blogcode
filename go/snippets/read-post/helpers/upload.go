@@ -29,7 +29,7 @@ func Post(config Config, file string) {
 		}
 
 		if strings.Contains(string(data), config.Text) {
-			fmt.Printf("Uploading %s file: %s\n", config.Text, path.Base(file))
+			fmt.Printf("Uploading %s file: %s to %s\n", config.Text, path.Base(file), api.Url)
 			url := api.Url + path.Base(file) + buildQuery(api.Query)
 			req, err := http.NewRequest("POST", url, bytes.NewReader(data))
 			if err != nil {
@@ -46,7 +46,7 @@ func Post(config Config, file string) {
 			if resp.StatusCode == 200 {
 				fmt.Printf("Successfully uploaded file: %s\n", path.Base(file))
 			} else {
-				fmt.Printf("%+v", resp)
+				fmt.Printf("Error uploading file: %s\n%+v\n", path.Base(file), resp)
 			}
 		} else {
 			fmt.Printf("Skipping non-%s file: %s\n", config.Text, path.Base(file))
