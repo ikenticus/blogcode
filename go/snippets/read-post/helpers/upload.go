@@ -36,11 +36,18 @@ func Post(config Config, file string) {
 				log.Fatal(err)
 			}
 
+			req.Header.Add("Content-Type", "text/plain")
+
 			resp, err := http.DefaultClient.Do(req)
 			if err != nil {
 				log.Fatal(err)
 			}
-			fmt.Println(resp)
+
+			if resp.StatusCode == 200 {
+				fmt.Printf("Successfully uploaded file: %s\n", path.Base(file))
+			} else {
+				fmt.Printf("%+v", resp)
+			}
 		} else {
 			fmt.Printf("Skipping non-%s file: %s\n", config.Text, path.Base(file))
 		}
