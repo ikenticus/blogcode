@@ -26,7 +26,12 @@ type Config struct {
 	Post []Request
 }
 
-const Seek = "Sagarin"
+const (
+	Seek   = "Sagarin"
+	ApiUrl = "https://api.gannett-cdn.com/sportssvc/post/sagarin/"
+	ApiKey = "api_key"
+	ApiVal = "57646bc6bca4811fea000001d1227c937acd4a17696f2718976d19a5"
+)
 
 func (q *Query) pair() string {
 	return fmt.Sprintf("%s=%s", q.Key, q.Val)
@@ -34,31 +39,20 @@ func (q *Query) pair() string {
 
 // use filepath.Base instead of path.Base to support Windows slashes
 //path.Base(main)
-func read(cfgfile string) Config {
+func readYaml(yamlFile string) Config {
 	var config Config
-	data, err := ioutil.ReadFile(cfgfile)
+	data, err := ioutil.ReadFile(yamlFile)
 	if err == nil {
 		err = yaml.Unmarshal(data, &config)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
-	fmt.Printf("Loaded configuration from: %s\n", cfgfile)
+	fmt.Printf("Loaded configuration from: %s\n", yamlFile)
 	return config
 }
 
-func Yaml(main string) Config {
-	var config Config
-
-	// use filepath.Base instead of path.Base to support Windows slashes
-	dir := filepath.Dir(main)
-	base := filepath.Base(main) + ".yaml"
-	if _, err := os.Stat(base); err == nil {
-		config = read(base)
-	} else if _, err := os.Stat(filepath.Join(dir, base)); err == nil {
-		config = read(filepath.Join(dir, base))
-	}
-
+func setDefaults(config Config) Config {
 	// default text to Seek
 	if config.Text == "" {
 		config.Text = Seek
@@ -94,13 +88,28 @@ func Yaml(main string) Config {
 	if len(config.Post) < 1 {
 		var query []Query
 		config.Post = append(config.Post, Request{
-			Url: "https://api.gannett-cdn.com/sportssvc/post/sagarin/",
+			Url: ApiUrl,
 			Query: append(query, Query{
-				Key: "api_key",
-				Val: "57646bc6bca4811fea000001d1227c937acd4a17696f2718976d19a5",
+				Key: ApiKey,
+				Val: ApiVal,
 			}),
 		})
 	}
 
 	return config
+}
+
+func Yaml(main string) Config {
+	var config Config
+
+	// use filepath.Base instead of path.Base to support Windows slashes
+	dir := filepath.Dir(main)
+	base := filepath.Base(main) + ".yaml"
+	if _, err := os.Stat(base); err == nil {
+		config = readYaml(base)
+	} else if _, err := os.Stat(filepath.Join(dir, base)); err == nil {
+		config = readYaml(filepath.Join(dir, base))
+	}
+
+	return setDefaults(config)
 }

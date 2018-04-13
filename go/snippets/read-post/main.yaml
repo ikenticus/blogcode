@@ -5,7 +5,7 @@ read:
 - test2
 
 post:
-- url: http://localhost:3000/ftp/load/sagarin/
+- url: http://localhost:8080/post/sagarin/
   query:
     - key: source
       val: Jeff
