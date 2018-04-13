@@ -1,0 +1,13 @@
+text: Sagarin
+
+read:
+- test1
+- test2
+
+post:
+- url: http://localhost:3000/ftp/load/sagarin/
+  query:
+    - key: source
+      val: Jeff
+    - key: api_key
+      val: 12345

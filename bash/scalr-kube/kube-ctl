@@ -40,7 +40,7 @@ nginx   Dump pod(s) nginx-lite logs
 replace Replace pod(s) with same configuration
 reqlog  Dump pod(s) requestlogger logs
 res     Get pod(s) container resources
-tail    Tail pod(s) appe logs 100 lines
+tail    Tail pod(s) app logs 100 lines
 tailf   Tail pod(s) app logs 25 lines and follow
 yaml	Get pod(s) app configuration in YAML
 *       Exec shell commands on pod(s) app container
