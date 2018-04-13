@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 
 	yaml "gopkg.in/yaml.v2"
@@ -31,15 +32,31 @@ func (q *Query) pair() string {
 	return fmt.Sprintf("%s=%s", q.Key, q.Val)
 }
 
-func Yaml(main string) Config {
+// use filepath.Base instead of path.Base to support Windows slashes
+//path.Base(main)
+func read(cfgfile string) Config {
 	var config Config
-
-	data, err := ioutil.ReadFile(main + ".yaml")
+	data, err := ioutil.ReadFile(cfgfile)
 	if err == nil {
 		err = yaml.Unmarshal(data, &config)
 		if err != nil {
 			log.Fatal(err)
 		}
+	}
+	fmt.Printf("Loaded configuration from: %s\n", cfgfile)
+	return config
+}
+
+func Yaml(main string) Config {
+	var config Config
+
+	// use filepath.Base instead of path.Base to support Windows slashes
+	dir := filepath.Dir(main) + "/"
+	base := filepath.Base(main) + ".yaml"
+	if _, err := os.Stat(base); err == nil {
+		config = read(base)
+	} else if _, err := os.Stat(dir + base); err == nil {
+		config = read(dir + base)
 	}
 
 	// default text to Seek
