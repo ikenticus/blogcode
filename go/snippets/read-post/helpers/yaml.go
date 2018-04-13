@@ -51,7 +51,13 @@ func Yaml(main string) Config {
 	var config Config
 
 	// use filepath.Base instead of path.Base to support Windows slashes
-	dir := filepath.Dir(main) + "/"
+	abs, err := filepath.Abs(main)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Exe:", abs)
+
+	dir := filepath.Dir(abs) + "/"
 	base := filepath.Base(main) + ".yaml"
 	if _, err := os.Stat(base); err == nil {
 		config = read(base)
