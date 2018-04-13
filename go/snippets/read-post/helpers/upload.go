@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -22,6 +22,9 @@ func buildQuery(query []Query) string {
 }
 
 func Post(config Config, file string) {
+	// use filepath.Base instead of path.Base to support Windows slashes
+	base := filepath.Base(file)
+
 	for _, api := range config.Post {
 		data, err := ioutil.ReadFile(file)
 		if err != nil {
@@ -29,8 +32,8 @@ func Post(config Config, file string) {
 		}
 
 		if strings.Contains(string(data), config.Text) {
-			url := api.Url + path.Base(file) + buildQuery(api.Query)
-			fmt.Printf("Uploading %s file: %s to %s\n", config.Text, path.Base(file), url)
+			url := api.Url + base + buildQuery(api.Query)
+			fmt.Printf("Uploading %s file: %s to %s\n", config.Text, base, url)
 			req, err := http.NewRequest("POST", url, bytes.NewReader(data))
 			if err != nil {
 				log.Fatal(err)
@@ -44,12 +47,12 @@ func Post(config Config, file string) {
 			}
 
 			if resp.StatusCode == 200 {
-				fmt.Printf("Successfully uploaded file: %s\n", path.Base(file))
+				fmt.Printf("Successfully uploaded file: %s\n", base)
 			} else {
-				fmt.Printf("Error uploading file: %s\n%+v\n", path.Base(file), resp)
+				fmt.Printf("Error uploading file: %s\n%+v\n", base, resp)
 			}
 		} else {
-			fmt.Printf("Skipping non-%s file: %s\n", config.Text, path.Base(file))
+			fmt.Printf("Skipping non-%s file: %s\n", config.Text, base)
 		}
 	}
 
