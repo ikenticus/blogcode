@@ -29,8 +29,8 @@ func Post(config Config, file string) {
 		}
 
 		if strings.Contains(string(data), config.Text) {
-			fmt.Printf("Uploading %s file: %s to %s\n", config.Text, path.Base(file), api.Url)
 			url := api.Url + path.Base(file) + buildQuery(api.Query)
+			fmt.Printf("Uploading %s file: %s to %s\n", config.Text, path.Base(file), url)
 			req, err := http.NewRequest("POST", url, bytes.NewReader(data))
 			if err != nil {
 				log.Fatal(err)
