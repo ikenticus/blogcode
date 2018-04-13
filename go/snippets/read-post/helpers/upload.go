@@ -55,30 +55,4 @@ func Post(config Config, file string) {
 			fmt.Printf("Skipping non-%s file: %s\n", config.Text, base)
 		}
 	}
-
-	/*
-		for _,
-
-		   req, err := http.NewRequest("POST", graphQLURL, textAssetQuery)
-		   if err != nil {
-		       log.Fatal(err)
-		   }
-
-		   req.Header.Add("content-type", "application/graphql")
-		   req.Header.Add("x-sitecode", "USAT")
-		   req.Header.Add("x-api-key", "blah")
-
-		   resp, err := http.DefaultClient.Do(req)
-		   if err != nil {
-		       log.Fatal(err)
-		   }
-
-		   var content textAsset
-		   dec := json.NewDecoder(resp.Body)
-		   if err := dec.Decode(&content); err != nil {
-		       log.Fatal(err)
-		   }
-
-		   fmt.Printf("Section: %q", content.SSTS.Section)
-	*/
 }

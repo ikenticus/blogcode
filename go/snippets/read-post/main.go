@@ -1,14 +1,7 @@
+// Read-Post scans specified paths and uploads data to APIs via POST
 package main
 
 import (
-	/*
-	   "bytes"
-	   "fmt"
-	   "encoding/json"
-	   "log"
-	   "net/http"
-	*/
-
 	"os"
 	"path"
 
