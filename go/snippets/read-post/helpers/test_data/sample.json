@@ -1,0 +1,23 @@
+{
+    "text": "validate",
+	"read": [
+		"relative/path/directory",
+		"/absolute/path/location",
+		"C:\\scan\\windows\\example"
+	],
+	"post": [
+		{
+			"url": "http://domain/path/to/post/sagarin/",
+			"query": [
+				{
+					"key": "source",
+					"val": "gannettdigital"
+				},
+				{
+					"key": "api_key",
+					"val": "123456789"
+				}
+			]
+		}
+	]
+}
