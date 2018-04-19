@@ -1,0 +1,36 @@
+#!/bin/bash
+#
+# KS: Kubernetes Switch shortcut between clusters
+#
+# created before kubectx was discovered
+#
+
+help() {
+    echo -e "\nUsage: ${0##*/} <app-name>\n"
+    exit 1
+}
+
+app=$1
+if [ -z "$app" ]; then
+    help
+fi
+
+names=$(kubectl config view | grep -- '^- name' | awk '{ print $NF }')
+context=$(echo $names | tr [[:space:]] "\n" | grep $app)
+
+test=$(echo $context)
+if [ -z "${test//* */}" ]; then
+    IFS=-
+    set -- $app
+    unset IFS
+    context=$(echo $names | tr [[:space:]] "\n" | egrep ".*${1}.*-.*${2}.*")
+    if [ -z "$context" ]; then
+        echo Invalid app: $context
+        help
+    fi
+fi
+
+echo kubectl config use-context $context
+kubectl config use-context $context
+kubectl cluster-info
+kubectl proxy
