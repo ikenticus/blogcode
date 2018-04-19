@@ -4,29 +4,42 @@
 #
 
 help() {
-    echo -e "\nUsage: ${0##*/} <app> <noc|staging> [<vault-key>] [<iam-email>]\n"
+    echo -e "\nUsage: ${0##*/} <vault-path> <pem-key> <email-key>"
+    echo -e "\nExamples:"
+    echo -e "  secret/paas-api/desknet-subscriber/staging pubsub_subscriber_private_key pubsub_subscriber_client_email"
+    echo -e "  secret/cs-sports/jenkins/nearline/api-services-sagarin-app private_key client_email"
+    echo
     exit 1
 }
 
 base64url() {
-    base64 | tr '+/' '-_' | tr -d '='
+    openssl base64 -A | tr '+/' '-_' | tr -d '='
 }
 
-app=$1; shift
-if [ -z "$app" ]; then
+vault=$1; shift
+if [ -z "$vault" ]; then
     help
 fi
-noc=${1:-staging}; shift
-vault=${1:-pubsub_subscriber_private_key}; shift
-email=${1:-$app@gannett-product-$noc.iam.gserviceaccount.com}
+private=${1:-private_key}; shift
+client=${1:-client_email}; shift
+email=$(vault read -field=$client $vault)
 
-pem=/tmp/$app.pem
-echo -e $(vault read secret/paas-api/$app/$noc | grep $vault | cut -f2-) > $pem
+case $vault in
+    *sub*) scope=pubsub ;;
+    *) scope=devstorage.full_control
+esac
+
+pem=/tmp/gcp.pem
+vault read -field=$private $vault > $pem
+if [ ! -z "$(grep '\\n' $pem)" ]; then
+    echo -e $(vault read -field=$private $vault) > $pem
+fi
 
 jwt_head=$(echo -n '{"alg":"RS256","typ":"JWT"}' | base64url)
 
-jwt_data=$(echo "{\"iss\":\"$email\",\
-\"scope\":\"https://www.googleapis.com/auth/pubsub\",\
+# data = claim
+jwt_data=$(echo -n "{\"iss\":\"$email\",\
+\"scope\":\"https://www.googleapis.com/auth/$scope\",\
 \"aud\":\"https://www.googleapis.com/oauth2/v4/token\",\
 \"exp\":$(gdate +%s --date=+600\ seconds),\
 \"iat\":$(gdate +%s)}" | base64url)
@@ -39,3 +52,4 @@ out=$(curl -s -X POST https://www.googleapis.com/oauth2/v4/token \
 
 echo $out | jq
 echo $out | jq -r '.access_token'
+

@@ -23,7 +23,7 @@ vault_key() {
     BASE=${PWD##*/}
     CONFIG=$(vault read secret/paas-api/general/$BASE/$ENVIRONMENT)
     if [ $? -eq 0 ]; then
-        vault read secret/paas-api/general/$BASE/$ENVIRONMENT | grep $KEY | awk '{ print $NF }'
+        vault read -field=$KEY secret/paas-api/general/$BASE/$ENVIRONMENT
         return
     fi
 }
