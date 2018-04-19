@@ -29,7 +29,7 @@ const storage = new Storage({
 */
 
 var bucket = storage.bucket(process.env.BUCKET_NAME);
-bucket.getFiles(function(err, files) {
+bucket.getFiles((err, files) => {
     if (err) {
         console.log('ERROR', err);
     } else {
