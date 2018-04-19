@@ -1,11 +1,12 @@
 
 const Storage = require('@google-cloud/storage');
-
-// using environment variable GOOGLE_APPLICATION_CREDENTIALS=/path/to/service_account.json
+// authenticate using ONE (not ALL) of the following methods:
+ 
+// setting environment variable GOOGLE_APPLICATION_CREDENTIALS=/path/to/service_account.json
 const storage = new Storage();
-
+ 
 /*
-// explicitly specifying service_acount credentials file
+// explicitly specifying service_account credentials file
 const storage = new Storage({
     keyFilename: '/path/to/service_account.json'
 });
