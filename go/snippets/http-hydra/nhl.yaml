@@ -1,0 +1,29 @@
+output: _archive/
+
+baseurl: VAULT.secret/paas-api/sports/sdi
+apikey: VAULT.secret/paas-api/sports/sdi
+url:
+  prefix: /sport/v2/
+  sport: hockey
+  league: NHL
+  season: 2017-2018
+
+paths:
+  - type: season
+    params: [ prefix, sport, league, season, league, suffix ]
+    formats:
+    - "%s/%s/%s/results/%s/results_%s.xml%s"
+    - "%s/%s/%s/teams/%s/teams_%s.xml%s"
+    - "%s/%s/%s/team-stats/%s/team_stats_%s.xml%s"
+
+  - type: teams
+    params: [ prefix, sport, league, season, team, league, suffix ]
+    formats:
+    - "%s/%s%s/players/%s/players_%s_%s.xml%s"
+    - "%s/%s%s/player-stats/%s/player_stats_%s_%s.xml%s"
+
+  - type: results
+    params: [ prefix, sport, league, season, league, event, suffix ]
+    formats:
+    - "%s/%s/%s/boxscores/%s/boxscore_%s_%s.xml%s"
+    - "%s/%s/%s/season-stats/%s/season_stats%s_%s.xml%s"
