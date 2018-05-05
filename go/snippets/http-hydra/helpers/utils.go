@@ -42,7 +42,7 @@ func replaceList(src []string, target string, ids []int) (results []string) {
 func buildFiles(c Config, p Paths) (files []string) {
 	values, lists := convertSlice(c, p.Params)
 	for _, f := range p.Formats {
-		line := fmt.Sprintf(f+"\n", values...)
+		line := fmt.Sprintf(f, values...)
 		if len(lists) == 0 {
 			files = append(files, line)
 		} else {

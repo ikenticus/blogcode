@@ -3,6 +3,7 @@ package helpers
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 var funcMap = map[string]interface{}{
@@ -25,10 +26,16 @@ func teamsFiles(c Config, p Paths) {
 	fmt.Println("Processing teams", c, "\n", p.Params, "\n")
 }
 
-func allFiles(c Config, p Paths) Config {
+func getFiles(c Config, p Paths) Config {
 	files := buildFiles(c, p)
-	fmt.Println(p.Type, files, "\n")
-	// download files, parse for teams/results
+	for _, f := range files {
+		fmt.Println("Downloading", p.Type, "file", f)
+		for _, t := range c.Paths {
+			if strings.Contains(f, "/"+strings.ToLower(t.Type)+"/") {
+				fmt.Println("Building", t.Type)
+			}
+		}
+	}
 	return c
 }
 
@@ -39,14 +46,15 @@ func Build(config Config) {
 	}
 	config.URL.Teams = append(config.URL.Teams, 1, 2, 3)
 	config.URL.Results = append(config.URL.Results, 7, 8, 9)
-	for _, f := range config.Paths {
+	for _, p := range config.Paths {
 		if debug {
-			fmt.Println("Calling", f.Type)
+			fmt.Println("Calling", p.Type)
 		}
 
 		// leaving below to demonstrate dynamic function call
-		// if different parameters, then use a switch(f.Type)
-		//funcMap[strings.ToLower(f.Type)].(func(Config, Paths))(config, f)
-		config = allFiles(config, f)
+		// if different parameters, then use a switch(p.Type)
+		//funcMap[strings.ToLower(p.Type)].(func(Config, Paths))(config, p)
+
+		config = getFiles(config, p)
 	}
 }
