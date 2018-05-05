@@ -14,25 +14,29 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+const debug = false
+
 type URL struct {
-	Prefix string
-	Sport  string
-	League string
-	Season string
+	Prefix  string
+	Sport   string
+	League  string
+	Season  string
+	Results []int
+	Teams   []int
 }
 
-type Path struct {
+type Paths struct {
 	Type    string
 	Params  []string
 	Formats []string
 }
 
 type Config struct {
-	Output  string `env:"OUTPUT"`
-	BaseURL string `env:"BASE_URL"`
-	APIKey  string `env:"API_KEY"`
-	URL     URL    `env:"URL"`
-	Paths   []Path `env:PATHS"`
+	Output  string  `env:"OUTPUT"`
+	BaseURL string  `env:"BASE_URL"`
+	APIKey  string  `env:"API_KEY"`
+	URL     URL     `env:"URL"`
+	Paths   []Paths `env:PATHS"`
 }
 
 func getVaultField(vaultPath string, field string) string {
@@ -55,35 +59,42 @@ func initConfig(config Config) Config {
 	v := reflect.ValueOf(config)
 
 	for i := 0; i < v.NumField(); i++ {
-		fmt.Println(i,
-			k.Elem().Type().Field(i).Name,
-			k.Elem().Type().Field(i).Tag.Get("env"),
-			reflect.TypeOf(v.Field(i)),
-			v.Field(i).Kind(),
-			v.Field(i).Type(),
-			v.Field(i),
-		)
+		if debug {
+			fmt.Println(i,
+				k.Elem().Type().Field(i).Name,
+				k.Elem().Type().Field(i).Tag.Get("env"),
+				reflect.TypeOf(v.Field(i)),
+				v.Field(i).Kind(),
+				v.Field(i).Type(),
+				v.Field(i),
+			)
+		}
 
 		// Need to figure out how to recurse
 		switch v.Field(i).Kind() {
 		case reflect.String:
 			if strings.HasPrefix(v.Field(i).String(), "VAULT") {
-				fmt.Println("\t", strcase.LowerCamelCase(k.Elem().Type().Field(i).Tag.Get("env")))
-				fmt.Println("\t", strings.Split(v.Field(i).String(), ".")[1])
 				vv := getVaultField(
 					strings.Split(v.Field(i).String(), ".")[1],
 					strcase.LowerCamelCase(k.Elem().Type().Field(i).Tag.Get("env")),
 				)
-				fmt.Println("\t", vv)
+				if debug {
+					fmt.Println("\t", strcase.LowerCamelCase(k.Elem().Type().Field(i).Tag.Get("env")))
+					fmt.Println("\t", strings.Split(v.Field(i).String(), ".")[1])
+					fmt.Println("\t", vv)
+				}
 				k.Elem().Field(i).SetString(vv)
 			}
 		case reflect.Slice:
-			for s := 0; s < v.Field(i).Len(); s++ {
-				fmt.Println("\t", s, v.Field(i).Index(s))
+			if debug {
+				for s := 0; s < v.Field(i).Len(); s++ {
+					fmt.Println("\t", s, v.Field(i).Index(s))
+				}
 			}
 		case reflect.Struct:
-			sv := reflect.ValueOf(v.Field(i))
-			fmt.Println("\t", sv)
+			if debug {
+				fmt.Println("\t", reflect.ValueOf(v.Field(i)))
+			}
 		}
 	}
 	return config
