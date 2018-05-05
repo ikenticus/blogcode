@@ -100,6 +100,7 @@ func initConfig(config Config) Config {
 	return config
 }
 
+// readYaml will read and unmarshal YAML file
 func readYaml(yamlFile string) Config {
 	var config Config
 	data, err := ioutil.ReadFile(yamlFile)

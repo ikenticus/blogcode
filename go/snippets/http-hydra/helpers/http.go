@@ -1,16 +1,33 @@
-func downloadFile(URL string) ([]byte, error) {
-	response, err := http.Get(URL)
+package helpers
+
+import (
+	"io"
+	"net/http"
+	"os"
+)
+
+// downloadFile will download a url to a local file. It's efficient because it will
+// write as it downloads and not load the whole file into memory.
+func downloadFile(filepath string, url string) error {
+	// Create the file
+	out, err := os.Create(filepath)
 	if err != nil {
-		return nil, err
+		return err
 	}
-        defer response.Body.Close()
-	if response.StatusCode != http.StatusOK {
-		return nil, errors.New(response.Status)
-	}
-	var data bytes.Buffer
-	_, err = io.Copy(&data, response.Body)
+	defer out.Close()
+
+	// Get the data
+	resp, err := http.Get(url)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return data.Bytes(), nil
+	defer resp.Body.Close()
+
+	// Write the body to file
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// getField will extract field from Config struct via dot-notation
 func getField(c Config, key string) reflect.Value {
 	v := reflect.ValueOf(c)
 	for _, s := range strings.Split(key, ".") {
@@ -15,6 +16,7 @@ func getField(c Config, key string) reflect.Value {
 	return v
 }
 
+// convertSlice will convert []interface{} into []string for range loops
 func convertSlice(c Config, dataSlice []string) (ifaceSlice []interface{}, lists []string) {
 	ifaceSlice = make([]interface{}, len(dataSlice))
 	for i, d := range dataSlice {
@@ -30,6 +32,7 @@ func convertSlice(c Config, dataSlice []string) (ifaceSlice []interface{}, lists
 	return ifaceSlice, lists
 }
 
+// replaceList will build results using src list and map ids to {target string}
 func replaceList(src []string, target string, ids []int) (results []string) {
 	for _, s := range src {
 		for _, i := range ids {
@@ -39,6 +42,7 @@ func replaceList(src []string, target string, ids []int) (results []string) {
 	return results
 }
 
+// buildFiles will generate a files slice for each Config.Paths
 func buildFiles(c Config, p Paths) (files []string) {
 	values, lists := convertSlice(c, p.Params)
 	for _, f := range p.Formats {
