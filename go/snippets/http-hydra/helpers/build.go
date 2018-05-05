@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+const skipExist = true
+
 // funcMap maps path types to functions
 var funcMap = map[string]interface{}{
 	"results": resultsFiles,
@@ -37,10 +39,14 @@ func getFiles(c Config, p Paths) Config {
 		fmt.Println("Downloading", p.Type, "file", f)
 		file := fmt.Sprintf("%s/%s", c.Output, f)
 		url := fmt.Sprintf("%s/%s/%s?apiKey=%s", c.BaseURL, c.URL.Prefix, f, c.APIKey)
-		downloadFile(file, url)
-		for _, t := range c.Paths {
-			if strings.Contains(f, "/"+strings.ToLower(t.Type)+"/") {
-				fmt.Println("Building", t.Type)
+		err := downloadFile(file, url)
+		if err != nil {
+			fmt.Printf("FAILED to download %s due to %v\n", f, err)
+		} else {
+			for _, t := range c.Paths {
+				if strings.Contains(f, "/"+strings.ToLower(t.Type)+"/") {
+					fmt.Println("Building", t.Type)
+				}
 			}
 		}
 	}
@@ -52,6 +58,7 @@ func Build(config Config) {
 		fmt.Println(config.BaseURL, config.APIKey, reflect.ValueOf(config).FieldByName("URL").FieldByName("Prefix"))
 		fmt.Println(getField(config, "URL.Prefix"))
 	}
+	//reflect.ValueOf(&r).Elem().Field(i).SetInt( i64 )
 	//config.URL.Teams = append(config.URL.Teams, 1, 2, 3)
 	//config.URL.Results = append(config.URL.Results, 7, 8, 9)
 	for _, p := range config.Paths {
