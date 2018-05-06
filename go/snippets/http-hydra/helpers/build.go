@@ -24,11 +24,11 @@ func getFiles(c Config, p Paths) Config {
 			url := fmt.Sprintf("%s/%s/%s?apiKey=%s", c.BaseURL, c.URL.Prefix, f, c.APIKey)
 			err := downloadFile(file, url, true)
 			if err != nil {
-				fmt.Printf("FAILED to download %s due to %v\n", f, err)
+				fmt.Printf("-Failed to download %s due to %v\n", f, err)
 			} else {
 				for _, t := range c.Paths {
 					if strings.Contains(f, "/"+strings.ToLower(t.Type)+"/") {
-						fmt.Println("Building list for", t.Type)
+						fmt.Println("+Building list for", t.Type)
 						values := parseXML(t.Type, file)
 						c = setFieldSlice(c, "URL."+t.Type, values)
 					}

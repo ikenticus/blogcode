@@ -23,7 +23,7 @@ const maxBuffer = 25
 func downloadFile(filePath string, url string, pretty bool) error {
 	if skipExist {
 		if _, err := os.Stat(filePath); err == nil {
-			fmt.Println("SKIPPING existing file:", filePath)
+			fmt.Println("-Skipping existing file:", filePath)
 			return nil
 		}
 	}

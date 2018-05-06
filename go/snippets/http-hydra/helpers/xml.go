@@ -57,7 +57,6 @@ var funcMap = map[string]interface{}{
 
 // getResults will retrieve competition.ids
 func getResults(root xmlNode) (results []int) {
-	fmt.Println("Processing results")
 	node := getXMLNode(root, "team-sport-content.league-content.season-content")
 	for _, n := range node.Children {
 		if n.XMLName.Local == "competition" {
@@ -75,11 +74,40 @@ func getResults(root xmlNode) (results []int) {
 	return results
 }
 
+// getContent will loop through node-content and retrieve team.ids
+func getContent(node xmlNode, input []int) (child xmlNode, output []int) {
+	copy(input, output)
+	for _, c := range node.Children {
+		if strings.HasSuffix(c.XMLName.Local, "-content") {
+			child, input = getContent(c, output)
+			output = append(output, input...)
+		}
+		if c.XMLName.Local == "team" {
+			for _, t := range c.Children {
+				if t.XMLName.Local == "id" {
+					team := strings.Split(t.Text, ":")
+					id, err := strconv.Atoi(team[len(team)-1])
+					if err == nil {
+						output = append(output, id)
+					}
+				}
+			}
+		}
+	}
+	return child, output
+}
+
 // getTeams will retrieve team.ids
 func getTeams(root xmlNode) (teams []int) {
-	fmt.Println("Processing teams")
-	node := getXMLNode(root, "team-sport-content.league-content.season-content.conference-content.division-content.team-content")
-	fmt.Println(node.XMLName.Local)
+	node := getXMLNode(root, "team-sport-content.league-content.season-content")
+	node, teams = getContent(node, teams)
+	for _, n := range node.Children {
+		if strings.HasSuffix(n.XMLName.Local, "-content") {
+			for _, c := range n.Children {
+				fmt.Println(n.XMLName.Local, c.XMLName.Local)
+			}
+		}
+	}
 	return teams
 }
 
