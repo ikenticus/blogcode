@@ -13,18 +13,16 @@ const useMulti = true
 func getFiles(c Config, p Paths) Config {
 	files := buildFiles(c, p)
 	switch getField(c, "URL."+p.Type).Kind() {
-	/*
-			case reflect.Slice:
-					channelFiles(c, files)
-					//syncFiles(c, files)
-		case reflect.String:
-	*/
-	default:
+	case reflect.Slice:
+		channelFiles(c, files)
+		//syncFiles(c, files)
+	case reflect.String:
+		//default:
 		for _, f := range files {
 			fmt.Println("Downloading", p.Type, "file", f)
 			file := fmt.Sprintf("%s/%s", c.Output, f)
 			url := fmt.Sprintf("%s/%s/%s?apiKey=%s", c.BaseURL, c.URL.Prefix, f, c.APIKey)
-			err := downloadFile(file, url)
+			err := downloadFile(file, url, true)
 			if err != nil {
 				fmt.Printf("FAILED to download %s due to %v\n", f, err)
 			} else {
