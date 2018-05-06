@@ -36,7 +36,7 @@ type Config struct {
 	BaseURL string  `env:"BASE_URL"`
 	APIKey  string  `env:"API_KEY"`
 	URL     URL     `env:"URL"`
-	Paths   []Paths `env:PATHS"`
+	Paths   []Paths `env:"PATHS"`
 }
 
 func getVaultField(vaultPath string, field string) string {
@@ -60,13 +60,13 @@ func initConfig(config Config) Config {
 
 	for i := 0; i < v.NumField(); i++ {
 		if debug {
-			fmt.Println(i,
-				k.Elem().Type().Field(i).Name,
-				k.Elem().Type().Field(i).Tag.Get("env"),
-				reflect.TypeOf(v.Field(i)),
-				v.Field(i).Kind(),
-				v.Field(i).Type(),
-				v.Field(i),
+			fmt.Println(i, // index: 4
+				k.Elem().Type().Field(i).Name,           // key: Paths
+				k.Elem().Type().Field(i).Tag.Get("env"), // tag.key: PATHS
+				reflect.TypeOf(v.Field(i)),              // typeof: reflect.Value
+				v.Field(i).Kind(),                       // kind: slice
+				v.Field(i).Type(),                       // type: []helpers.Paths
+				v.Field(i),                              // value: [{Season [Sport League Season League] [%s/%s/result...
 			)
 		}
 
@@ -100,8 +100,8 @@ func initConfig(config Config) Config {
 	return config
 }
 
-// readYaml will read and unmarshal YAML file
-func readYaml(yamlFile string) Config {
+// readYAML will read and unmarshal YAML file
+func readYAML(yamlFile string) Config {
 	var config Config
 	data, err := ioutil.ReadFile(yamlFile)
 	if err == nil {
@@ -122,7 +122,7 @@ func Yaml(yamlFile string) Config {
 		os.Exit(2)
 	}
 	if _, err := os.Stat(yamlPath); err == nil {
-		config = initConfig(readYaml(yamlPath))
+		config = initConfig(readYAML(yamlPath))
 	}
 	return config
 }

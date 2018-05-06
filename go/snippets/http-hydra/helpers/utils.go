@@ -16,6 +16,16 @@ func getField(c Config, key string) reflect.Value {
 	return v
 }
 
+// setFieldSlice will set dot-notated Config field with slice
+func setFieldSlice(c Config, key string, ids []int) Config {
+	v := reflect.ValueOf(&c).Elem()
+	for _, s := range strings.Split(key, ".") {
+		v = v.FieldByName(s)
+	}
+	v.Set(reflect.AppendSlice(v, reflect.ValueOf(ids)))
+	return c
+}
+
 // convertSlice will convert []interface{} into []string for range loops
 func convertSlice(c Config, dataSlice []string) (ifaceSlice []interface{}, lists []string) {
 	ifaceSlice = make([]interface{}, len(dataSlice))
