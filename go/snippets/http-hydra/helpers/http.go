@@ -1,6 +1,3 @@
-// http comparison for NHL results (box/ss):
-//	real	11m53.835s	downloadFile (1445/1445)
-//	real	11m52.862s	channelFiles 10 (1445/1445)
 package helpers
 
 import (
@@ -14,7 +11,12 @@ import (
 	"sync"
 )
 
-const maxBuffer = 10
+// http comparison for NHL results (box/ss):
+//	real	11m53.835s	downloadFile (1445/1445) w/o pretty
+//	real	11m52.862s	channelFiles 10 (1445/1445)
+//	real	11m10.620s	channelFiles 25 (1445/1445)
+//	real	11m10.620s	channelFiles 100 (1445/1445)
+const maxBuffer = 25
 
 // downloadFile will download a url to a local file. It's efficient because it will
 // write as it downloads and not load the whole file into memory.

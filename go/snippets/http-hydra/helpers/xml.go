@@ -29,7 +29,7 @@ func readXML(xmlFile string) xmlNode {
 func cleanXML(input string) string {
 	data := xmlNode{}
 	xml.Unmarshal([]byte(input), &data)
-	output, err := xml.MarshalIndent(data, "", "    ")
+	output, err := xml.MarshalIndent(data, "", "\t")
 	if err != nil {
 		fmt.Errorf("Error marshaling XML:", err)
 		return ""
