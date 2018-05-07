@@ -55,7 +55,7 @@ var funcMap = map[string]interface{}{
 	"teams":   getTeams,
 }
 
-// getContent will loop through node-content and retrieve key.ids
+// getContent will recurse through node-content and retrieve key.ids
 func getContent(node xmlNode, input []int, findKey string) (output []int) {
 	copy(input, output)
 	for _, c := range node.Children {
@@ -113,6 +113,7 @@ func parseXML(xmlFile string, pathType string, findKey string) (values []int) {
 		}
 	*/
 
+	// Generalized to work from YAML key, this replaces the above funcMaps/switch logic
 	values = getContent(root, values, findKey)
 	fmt.Printf("+Found %s: %v\n", findKey, values)
 	return values
