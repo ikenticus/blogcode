@@ -77,23 +77,35 @@ func main() {
 
 	for i := 0; i < v.NumField(); i++ {
 		fmt.Println(i,
-			k.Elem().Type().Field(i).Name,
-			k.Elem().Type().Field(i).Tag.Get("env"),
-			reflect.TypeOf(v.Field(i)),
-			v.Field(i).Kind(),
-			v.Field(i).Type(),
-			v.Field(i),
+			"\t", k.Elem().Type().Field(i).Name,
+			"|", k.Elem().Type().Field(i),
+			"|", k.Elem().Type(),
+			"|", k.Elem(),
+			"\n\t", k.Elem().Type().Field(i).Tag.Get("env"),
+			"|", k.Elem().Type().Field(i).Tag,
+			"|", reflect.TypeOf(v.Field(i)),
+			"|", v.Field(i).Kind(),
+			"|", v.Field(i).Type(),
+			"|", v.Field(i),
 		)
 	}
 	/*
-		0 a INT_A reflect.Value int int 9
-		1 b STR_B reflect.Value string string nine
-		2 c BOOL_C reflect.Value bool bool false
-		3 d SLICE_INT_D reflect.Value slice []int []
-		4 e SLICE_STR_E reflect.Value slice []string []
-		5 f SLICE_IFACE_F reflect.Value slice []interface {} []
-		6 g IFACE_G reflect.Value interface interface {} <nil>
-		7 h MAP_STR_INT_H reflect.Value map map[string]int map[]
+		0 	 a | {a main int env:"INT_A" 0 [0] false} | main.Types | {9 nine false [] [] [] <nil> map[]}
+			 INT_A | env:"INT_A" | reflect.Value | int | int | 9
+		1 	 b | {b main string env:"STR_B" 8 [1] false} | main.Types | {9 nine false [] [] [] <nil> map[]}
+			 STR_B | env:"STR_B" | reflect.Value | string | string | nine
+		2 	 c | {c main bool env:"BOOL_C" 24 [2] false} | main.Types | {9 nine false [] [] [] <nil> map[]}
+			 BOOL_C | env:"BOOL_C" | reflect.Value | bool | bool | false
+		3 	 d | {d main []int env:"SLICE_INT_D" 32 [3] false} | main.Types | {9 nine false [] [] [] <nil> map[]}
+			 SLICE_INT_D | env:"SLICE_INT_D" | reflect.Value | slice | []int | []
+		4 	 e | {e main []string env:"SLICE_STR_E" 56 [4] false} | main.Types | {9 nine false [] [] [] <nil> map[]}
+			 SLICE_STR_E | env:"SLICE_STR_E" | reflect.Value | slice | []string | []
+		5 	 f | {f main []interface {} env:"SLICE_IFACE_F" 80 [5] false} | main.Types | {9 nine false [] [] [] <nil> map[]}
+			 SLICE_IFACE_F | env:"SLICE_IFACE_F" | reflect.Value | slice | []interface {} | []
+		6 	 g | {g main interface {} env:"IFACE_G" 104 [6] false} | main.Types | {9 nine false [] [] [] <nil> map[]}
+			 IFACE_G | env:"IFACE_G" | reflect.Value | interface | interface {} | <nil>
+		7 	 h | {h main map[string]int env:"MAP_STR_INT_H" 120 [7] false} | main.Types | {9 nine false [] [] [] <nil> map[]}
+			 MAP_STR_INT_H | env:"MAP_STR_INT_H" | reflect.Value | map | map[string]int | map[]
 	*/
 
 	fmt.Println(strings.Repeat("-", 99))
