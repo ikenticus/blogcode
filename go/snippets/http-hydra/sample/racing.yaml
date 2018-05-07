@@ -13,6 +13,7 @@ paths:
     params: [ Sport, League, Season, League ]
     formats:
     - "%s/%s/results/%s/results_%s.xml"
+    - "%s/%s/teams/%s/teams_%s.xml"
     - "%s/%s/driver-stats/%s/driver_stats_%s.xml"
 
   - type: Results

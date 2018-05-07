@@ -16,7 +16,7 @@ paths:
     - "%s/%s/results/%s/results_%s.xml"
     - "%s/%s/players/%s/players_%s.xml"
 
-  - type: Latest
+  - type: Serial
     params: [ Sport, League, Season, Serial ]
     formats:
     - "%s/%s/rankings/%s/rankings_%s.xml"
