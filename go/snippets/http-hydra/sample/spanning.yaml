@@ -4,8 +4,8 @@ baseurl: VAULT.secret/paas-api/sports/sdi
 apikey: VAULT.secret/paas-api/sports/sdi
 url:
   prefix: sport/v2
-  sport: hockey
-  league: NHL
+  sport: usateam
+  league: TLA
   season: 2017-2018
 
 paths:

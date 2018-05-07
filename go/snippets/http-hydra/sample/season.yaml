@@ -1,0 +1,29 @@
+output: _archive
+
+baseurl: VAULT.secret/paas-api/sports/sdi
+apikey: VAULT.secret/paas-api/sports/sdi
+url:
+  prefix: sport/v2
+  sport: usateam
+  league: TLA
+  season: 2018
+
+paths:
+  - type: Season
+    params: [ Sport, League, Season, League ]
+    formats:
+    - "%s/%s/results/%s/results_%s.xml"
+    - "%s/%s/teams/%s/teams_%s.xml"
+    - "%s/%s/team-stats/%s/team_stats_%s.xml"
+
+  - type: Teams
+    params: [ Sport, League, Season, Teams, League ]
+    formats:
+    - "%s/%s/players/%s/players_%s_%s.xml"
+    - "%s/%s/player-stats/%s/player_stats_%s_%s.xml"
+
+  - type: Results
+    params: [ Sport, League, Season, League, Results ]
+    formats:
+    - "%s/%s/boxscores/%s/boxscore_%s_%s.xml"
+    - "%s/%s/season-stats/%s/season_stats_%s_%s.xml"

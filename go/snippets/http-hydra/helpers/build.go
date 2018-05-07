@@ -19,7 +19,7 @@ func getFiles(c Config, p Paths) Config {
 	case reflect.String:
 		//default:
 		for _, f := range files {
-			fmt.Println("Downloading", p.Type, "file", f)
+			fmt.Println("Downloading file", f)
 			file := fmt.Sprintf("%s/%s", c.Output, f)
 			url := fmt.Sprintf("%s/%s/%s?apiKey=%s", c.BaseURL, c.URL.Prefix, f, c.APIKey)
 			err := downloadFile(file, url, true)

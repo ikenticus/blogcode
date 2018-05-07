@@ -8,6 +8,8 @@ import (
 )
 
 func main() {
-	config := helpers.Yaml(os.Args[1])
-	helpers.Build(config)
+	for _, y := range os.Args[1:] {
+		config := helpers.Yaml(y)
+		helpers.Build(config)
+	}
 }
