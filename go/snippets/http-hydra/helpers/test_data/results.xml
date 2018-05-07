@@ -1,0 +1,26 @@
+<content>
+	<team-sport-content>
+		<sport>
+			<id>/sport/baseball</id>
+			<name>baseball</name>
+		</sport>
+		<league-content>
+			<league>
+				<name>Major League Baseball</name>
+			</league>
+			<season-content>
+				<season>
+					<name>2018</name>
+				</season>
+				<competition>
+					<id>/sport/baseball/competition:123456</id>
+					<details/>
+				</competition>
+				<competition>
+					<id>/sport/baseball/competition:135791</id>
+					<details/>
+				</competition>
+			</season-content>
+		</league-content>
+	</team-sport-content>
+</content>

@@ -1,0 +1,35 @@
+<content>
+	<tennis-content>
+		<sport>
+			<id>/sport/tennis</id>
+			<name>tennis</name>
+		</sport>
+		<league-content>
+			<league>
+				<name>ATP Tour</name>
+			</league>
+			<season-content>
+				<season>
+					<name>2018</name>
+				</season>
+				<competition>
+					<id>/sport/tennis/competition:1234</id>
+					<name>Brisbane International presented by Suncorp</name>
+					<tournament>
+						<name>Brisbane International</name>
+					</tournament>
+				</competition>
+				<competition>
+					<id>/sport/tennis/competition:5678</id>
+					<name>Tata Maharashtra Open</name>
+					<result-scope>
+						<competition-status>complete</competition-status>
+					</result-scope>
+					<tournament>
+						<name>Aircel Chennai Open</name>
+					</tournament>
+				</competition>
+			</season-content>
+		</league-content>
+	</tennis-content>
+</content>

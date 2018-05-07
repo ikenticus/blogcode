@@ -1,0 +1,58 @@
+<content>
+	<team-sport-content>
+		<sport>
+			<id>/sport/baseball</id>
+			<name>baseball</name>
+		</sport>
+		<league-content>
+			<league>
+				<name>Major League Baseball</name>
+			</league>
+			<season-content>
+				<season>
+					<name>2018</name>
+				</season>
+				<conference-content>
+					<conference>
+						<name>National League</name>
+					</conference>
+					<division-content>
+						<division>
+							<alias>NL East</alias>
+						</division>
+						<team-content>
+							<team>
+								<id>/sport/baseball/team:1234</id>
+								<name>NY Yankees</name>
+								<name type="first">New York</name>
+								<name type="nick">Yankees</name>
+								<name type="short">NYY</name>
+							</team>
+						</team-content>
+						<team-content>
+							<team>
+								<id>/sport/baseball/team:5678</id>
+								<name>Boston</name>
+								<name type="first">Boston</name>
+								<name type="nick">Red Sox</name>
+								<name type="short">BOS</name>
+							</team>
+						</team-content>
+					</division-content>
+					<team-content>
+						<meta>
+							<property name="team-type">all-star</property>
+						</meta>
+						<team>
+							<id>/sport/baseball/team:9999</id>
+							<name>American League</name>
+							<name type="first">American League</name>
+							<name type="nick">All-Stars</name>
+							<name type="short">AL</name>
+						</team>
+					</team-content>
+				</conference-content>
+			</season-content>
+		</league-content>
+	</team-sport-content>
+</content>
