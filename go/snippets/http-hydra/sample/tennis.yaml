@@ -1,0 +1,29 @@
+output: _archive
+
+baseurl: VAULT.secret/paas-api/sports/sdi
+apikey: VAULT.secret/paas-api/sports/sdi
+url:
+  prefix: sport/v2
+  sport: tennis
+  league: ATP
+  season: 2018
+  serial: 20180430
+
+paths:
+  - type: Season
+    params: [ Sport, League, Season, League ]
+    formats:
+    - "%s/%s/results/%s/results_%s.xml"
+    - "%s/%s/players/%s/players_%s.xml"
+
+  - type: Latest
+    params: [ Sport, League, Season, Serial ]
+    formats:
+    - "%s/%s/rankings/%s/rankings_%s.xml"
+    - "%s/%s/money-leaders/%s/earnings_rankings_%s.xml"
+
+  - type: Results
+    key: competition
+    params: [ Sport, League, Season, Results ]
+    formats:
+    - "%s/%s/tournaments/%s/tournament_%s.xml"

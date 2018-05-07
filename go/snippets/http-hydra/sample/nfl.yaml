@@ -4,9 +4,9 @@ baseurl: VAULT.secret/paas-api/sports/sdi
 apikey: VAULT.secret/paas-api/sports/sdi
 url:
   prefix: sport/v2
-  sport: usateam
-  league: TLA
-  season: 2018
+  sport: football
+  league: NFL
+  season: 2017-2018
 
 paths:
   - type: Season
@@ -17,12 +17,14 @@ paths:
     - "%s/%s/team-stats/%s/team_stats_%s.xml"
 
   - type: Teams
+    key: team
     params: [ Sport, League, Season, Teams, League ]
     formats:
     - "%s/%s/players/%s/players_%s_%s.xml"
     - "%s/%s/player-stats/%s/player_stats_%s_%s.xml"
 
   - type: Results
+    key: competition
     params: [ Sport, League, Season, League, Results ]
     formats:
     - "%s/%s/boxscores/%s/boxscore_%s_%s.xml"

@@ -21,11 +21,13 @@ type URL struct {
 	Sport   string
 	League  string
 	Season  string
+	Serial  string
 	Results []int
 	Teams   []int
 }
 
 type Paths struct {
+	Key     string
 	Type    string
 	Params  []string
 	Formats []string

@@ -55,38 +55,19 @@ var funcMap = map[string]interface{}{
 	"teams":   getTeams,
 }
 
-// getResults will retrieve competition.ids
-func getResults(root xmlNode) (results []int) {
-	node := getXMLNode(root, "team-sport-content.league-content.season-content")
-	for _, n := range node.Children {
-		if n.XMLName.Local == "competition" {
-			for _, c := range n.Children {
-				if c.XMLName.Local == "id" {
-					game := strings.Split(c.Text, ":")
-					id, err := strconv.Atoi(game[len(game)-1])
-					if err == nil {
-						results = append(results, id)
-					}
-				}
-			}
-		}
-	}
-	return results
-}
-
-// getContent will loop through node-content and retrieve team.ids
-func getContent(node xmlNode, input []int) (child xmlNode, output []int) {
+// getContent will loop through node-content and retrieve key.ids
+func getContent(node xmlNode, input []int, findKey string) (output []int) {
 	copy(input, output)
 	for _, c := range node.Children {
 		if strings.HasSuffix(c.XMLName.Local, "-content") {
-			child, input = getContent(c, output)
+			input = getContent(c, output, findKey)
 			output = append(output, input...)
 		}
-		if c.XMLName.Local == "team" {
+		if c.XMLName.Local == findKey {
 			for _, t := range c.Children {
 				if t.XMLName.Local == "id" {
-					team := strings.Split(t.Text, ":")
-					id, err := strconv.Atoi(team[len(team)-1])
+					keyId := strings.Split(t.Text, ":")
+					id, err := strconv.Atoi(keyId[len(keyId)-1])
 					if err == nil {
 						output = append(output, id)
 					}
@@ -94,36 +75,45 @@ func getContent(node xmlNode, input []int) (child xmlNode, output []int) {
 			}
 		}
 	}
-	return child, output
+	return output
+}
+
+// getResults will retrieve competition.ids
+func getResults(root xmlNode) (results []int) {
+	results = getContent(root, results, "competition")
+	if debug {
+		fmt.Println("RESULTS", results)
+	}
+	return results
 }
 
 // getTeams will retrieve team.ids
 func getTeams(root xmlNode) (teams []int) {
-	node := getXMLNode(root, "team-sport-content.league-content.season-content")
-	node, teams = getContent(node, teams)
-	for _, n := range node.Children {
-		if strings.HasSuffix(n.XMLName.Local, "-content") {
-			for _, c := range n.Children {
-				fmt.Println(n.XMLName.Local, c.XMLName.Local)
-			}
-		}
+	teams = getContent(root, teams, "team")
+	if debug {
+		fmt.Println("TEAMS", teams)
 	}
 	return teams
 }
 
-func parseXML(pathType string, xmlFile string) (values []int) {
+func parseXML(xmlFile string, pathType string, findKey string) (values []int) {
 	root := readXML(xmlFile)
 
 	// leaving below to demonstrate dynamic function call
-	// if different parameters, then use a switch(p.Type)
 	// however, since no idea how to return values, nixed
 	//funcMap[strings.ToLower(pathType)].(func(xmlNode))(root)
 
-	switch pathType {
-	case "Results":
-		values = getResults(root)
-	case "Teams":
-		values = getTeams(root)
-	}
+	// if different parameters, or returning value, then use a switch(pathType)
+	/*
+		switch pathType {
+		case "Results":
+			values = getResults(root)
+		case "Teams":
+			values = getTeams(root)
+		}
+	*/
+
+	values = getContent(root, values, findKey)
+	fmt.Printf("+Found %s: %v\n", findKey, values)
 	return values
 }

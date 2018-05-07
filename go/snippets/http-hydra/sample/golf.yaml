@@ -1,0 +1,22 @@
+output: _archive
+
+baseurl: VAULT.secret/paas-api/sports/sdi
+apikey: VAULT.secret/paas-api/sports/sdi
+url:
+  prefix: sport/v2
+  sport: golf
+  league: PGA
+  season: 2017-2018
+
+paths:
+  - type: Season
+    params: [ Sport, League, Season, League ]
+    formats:
+    - "%s/%s/results/%s/results_%s.xml"
+    - "%s/%s/player-stats/%s/player_stats_%s.xml"
+
+  - type: Results
+    key: competition
+    params: [ Sport, League, Season, League, Results ]
+    formats:
+    - "%s/%s/tournaments/%s/tournament_%s_%s.xml"

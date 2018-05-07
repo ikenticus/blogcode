@@ -29,7 +29,7 @@ func getFiles(c Config, p Paths) Config {
 				for _, t := range c.Paths {
 					if strings.Contains(f, "/"+strings.ToLower(t.Type)+"/") {
 						fmt.Println("+Building list for", t.Type)
-						values := parseXML(t.Type, file)
+						values := parseXML(file, t.Type, t.Key)
 						c = setFieldSlice(c, "URL."+t.Type, values)
 					}
 				}
