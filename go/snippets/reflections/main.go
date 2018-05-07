@@ -73,21 +73,3 @@ func main() {
 
 	fmt.Println(strings.Repeat("-", 99))
 }
-
-/*
-k := reflect.ValueOf(&config)
-v := reflect.ValueOf(config)
-
-for i := 0; i < v.NumField(); i++ {
-    if debug {
-        // 4 Paths PATHS reflect.Value slice []helpers.Paths [{Season [Sport League Season League] [%s/%s/result
-        fmt.Println(i, // index
-            k.Elem().Type().Field(i).Name,           // key
-            k.Elem().Type().Field(i).Tag.Get("env"), // tag.key
-            reflect.TypeOf(v.Field(i)),              // type of var
-            v.Field(i).Kind(),                       // kind of var
-            v.Field(i).Type(),                       // struct type
-            v.Field(i),                              // value
-        )
-    }
-*/
