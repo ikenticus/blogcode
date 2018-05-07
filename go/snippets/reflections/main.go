@@ -7,14 +7,14 @@ import (
 )
 
 type Types struct {
-	a int
-	b string
-	c bool
-	d []int
-	e []string
-	f []interface{}
-	g interface{}
-	h map[string]int
+	a int            `env:"INT_A"`
+	b string         `env:"STR_B"`
+	c bool           `env:"BOOL_C"`
+	d []int          `env:"SLICE_INT_D"`
+	e []string       `env:"SLICE_STR_E"`
+	f []interface{}  `env:"SLICE_IFACE_F"`
+	g interface{}    `env:"IFACE_G"`
+	h map[string]int `env:"MAP_STR_INT_H"`
 }
 
 func main() {
@@ -70,6 +70,31 @@ func main() {
 	fmt.Println(reflect.ValueOf(&e)) // &[one two three]
 	fmt.Println(reflect.ValueOf(&f)) // &[<nil> <nil> <nil>]
 	fmt.Println(reflect.ValueOf(&g)) // &{9 nine false [] [] [] <nil> map[]}
+
+	fmt.Println(strings.Repeat("-", 99), "\nInterface Reflections")
+	k := reflect.ValueOf(&g)
+	v := reflect.ValueOf(g)
+
+	for i := 0; i < v.NumField(); i++ {
+		fmt.Println(i,
+			k.Elem().Type().Field(i).Name,
+			k.Elem().Type().Field(i).Tag.Get("env"),
+			reflect.TypeOf(v.Field(i)),
+			v.Field(i).Kind(),
+			v.Field(i).Type(),
+			v.Field(i),
+		)
+	}
+	/*
+		0 a INT_A reflect.Value int int 9
+		1 b STR_B reflect.Value string string nine
+		2 c BOOL_C reflect.Value bool bool false
+		3 d SLICE_INT_D reflect.Value slice []int []
+		4 e SLICE_STR_E reflect.Value slice []string []
+		5 f SLICE_IFACE_F reflect.Value slice []interface {} []
+		6 g IFACE_G reflect.Value interface interface {} <nil>
+		7 h MAP_STR_INT_H reflect.Value map map[string]int map[]
+	*/
 
 	fmt.Println(strings.Repeat("-", 99))
 }
