@@ -5,9 +5,47 @@ import (
 	"testing"
 )
 
-const testPath = "test_data/"
+const testDir = "test_data/"
 
-func TestSetDefaults(t *testing.T) {
+func TestCleanXML(t *testing.T) {
+	tests := []struct {
+		description string
+		input       string
+		output      string
+	}{
+		{
+			description: "successful clean",
+			input:       "<html><body><table></table></body></html>",
+			output:      "<html>\n\t<body>\n\t\t<table></table>\n\t</body>\n</html>",
+		},
+		{
+			description: "unmarshal failure",
+			input:       "<html><body><table</body></html>",
+			output:      "<html></html>",
+		},
+	}
+
+	for _, test := range tests {
+		if got, want := cleanXML(test.input), test.output; got != want {
+			t.Errorf("Test %q - got %v, want %v", test.description, got, want)
+		}
+	}
+}
+
+/*
+func TestGetXMLNode(t *testing.T) {
+	(x xmlNode, key string) xmlNode {
+	for _, s := range strings.Split(key, ".") {
+		for _, n := range x.Children {
+			if n.XMLName.Local == s {
+				x = n
+			}
+		}
+	}
+	return x
+}
+*/
+func TestParseXML(t *testing.T) {
 	tests := []struct {
 		description string
 		xmlFile     string
@@ -17,21 +55,21 @@ func TestSetDefaults(t *testing.T) {
 	}{
 		{
 			description: "successful results",
-			xmlFile:     testPath + "results.xml",
+			xmlFile:     testDir + "results.xml",
 			pathType:    "Results",
 			findKey:     "competition",
 			wantValues:  []int{123456, 135791},
 		},
 		{
 			description: "successful teams",
-			xmlFile:     testPath + "teams.xml",
+			xmlFile:     testDir + "teams.xml",
 			pathType:    "Teams",
 			findKey:     "team",
 			wantValues:  []int{1234, 5678, 9999},
 		},
 		{
 			description: "successful tourneys",
-			xmlFile:     testPath + "tourneys.xml",
+			xmlFile:     testDir + "tourneys.xml",
 			pathType:    "Results",
 			findKey:     "competition",
 			wantValues:  []int{1234, 5678},

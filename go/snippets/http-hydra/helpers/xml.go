@@ -37,6 +37,7 @@ func cleanXML(input string) string {
 	return string(output)
 }
 
+/*
 // getXMLNode will extract xmlNode via dot-notation
 func getXMLNode(x xmlNode, key string) xmlNode {
 	for _, s := range strings.Split(key, ".") {
@@ -48,12 +49,7 @@ func getXMLNode(x xmlNode, key string) xmlNode {
 	}
 	return x
 }
-
-// funcMap maps path types to functions
-var funcMap = map[string]interface{}{
-	"results": getResults,
-	"teams":   getTeams,
-}
+*/
 
 // getContent will recurse through node-content and retrieve key.ids
 func getContent(node xmlNode, input []int, findKey string) (output []int) {
@@ -78,6 +74,7 @@ func getContent(node xmlNode, input []int, findKey string) (output []int) {
 	return output
 }
 
+/*
 // getResults will retrieve competition.ids
 func getResults(root xmlNode) (results []int) {
 	results = getContent(root, results, "competition")
@@ -96,8 +93,19 @@ func getTeams(root xmlNode) (teams []int) {
 	return teams
 }
 
+// funcMap maps path types to functions
+var funcMap = map[string]interface{}{
+	"results": getResults,
+	"teams":   getTeams,
+}
+*/
+
 func parseXML(xmlFile string, pathType string, findKey string) (values []int) {
 	root := readXML(xmlFile)
+	// Generalized to work from YAML key, this replaces the above funcMaps/switch logic
+	values = getContent(root, values, findKey)
+	fmt.Printf("+Found %s: %v\n", findKey, values)
+	return values
 
 	// leaving below to demonstrate dynamic function call
 	// however, since no idea how to return values, nixed
@@ -112,9 +120,4 @@ func parseXML(xmlFile string, pathType string, findKey string) (values []int) {
 			values = getTeams(root)
 		}
 	*/
-
-	// Generalized to work from YAML key, this replaces the above funcMaps/switch logic
-	values = getContent(root, values, findKey)
-	fmt.Printf("+Found %s: %v\n", findKey, values)
-	return values
 }

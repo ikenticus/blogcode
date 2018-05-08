@@ -61,17 +61,6 @@ func initConfig(config Config) Config {
 	v := reflect.ValueOf(config)
 
 	for i := 0; i < v.NumField(); i++ {
-		if debug {
-			fmt.Println(i, // index: 4
-				k.Elem().Type().Field(i).Name,           // key: Paths
-				k.Elem().Type().Field(i).Tag.Get("env"), // tag.key: PATHS
-				reflect.TypeOf(v.Field(i)),              // typeof: reflect.Value
-				v.Field(i).Kind(),                       // kind: slice
-				v.Field(i).Type(),                       // type: []helpers.Paths
-				v.Field(i),                              // value: [{Season [Sport League Season League] [%s/%s/result...
-			)
-		}
-
 		// Need to figure out how to recurse
 		switch v.Field(i).Kind() {
 		case reflect.String:
@@ -86,16 +75,6 @@ func initConfig(config Config) Config {
 					fmt.Println("\t", vv)
 				}
 				k.Elem().Field(i).SetString(vv)
-			}
-		case reflect.Slice:
-			if debug {
-				for s := 0; s < v.Field(i).Len(); s++ {
-					fmt.Println("\t", s, v.Field(i).Index(s))
-				}
-			}
-		case reflect.Struct:
-			if debug {
-				fmt.Println("\t", reflect.ValueOf(v.Field(i)))
 			}
 		}
 	}
