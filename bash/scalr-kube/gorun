@@ -28,8 +28,8 @@ vault_key() {
     fi
 }
 CONSUL_TOKEN=$(vault_key consul_acl_token)
-VAULT_ROLE=$(vault_key role_id)
-VAULT_SECRET=$(vault_key secret_id)
+VAULT_ROLE=$(vault_key vault_role_id)
+VAULT_SECRET=$(vault_key vault_secret_id)
 
 if [ $SCRIPT == "help" ]; then
     #ls k8/deployment/${ENVIRONMENT}*.json
