@@ -6,11 +6,17 @@
 
 repo=$1
 src=/Users/kklee/repos/go/src
-owners="
-    github.com/GannettDigital
-    github.com/ikenticus
-"
 
-for work in $owners; do
-    [ -d $src/$work/$repo ] && cd $src/$work/$repo
-done
+IFS=/
+set -- $repo
+unset IFS
+
+base=github.com
+case $# in
+    3)  cd $src/$repo ;;
+    2)  cd $src/$base/$repo ;;
+    *)  owners="GannettDigital ikenticus"
+        for work in $owners; do
+            [ -d $src/$base/$work/$repo ] && cd $src/$base/$work/$repo
+        done
+esac

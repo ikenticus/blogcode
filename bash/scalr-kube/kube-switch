@@ -6,6 +6,7 @@
 #
 
 help() {
+    kubectl config get-contexts
     echo -e "\nUsage: ${0##*/} <app-name>\n"
     exit 1
 }
@@ -15,7 +16,7 @@ if [ -z "$app" ]; then
     help
 fi
 
-names=$(kubectl config view | grep -- '^- name' | awk '{ print $NF }')
+names=$(kubectl config view | grep -A4 -- '^- context' | grep name:  | awk '{ print $NF }')
 context=$(echo $names | tr [[:space:]] "\n" | grep $app)
 
 test=$(echo $context)
@@ -30,7 +31,9 @@ if [ -z "${test//* */}" ]; then
     fi
 fi
 
-echo kubectl config use-context $context
 kubectl config use-context $context
-kubectl cluster-info
-kubectl proxy
+ns=$(kubectl config get-contexts | grep ^* | awk '{ print $NF }')
+kubectl config use-context $context --namespace=$ns
+echo kubectl config use-context $context $ns
+#kubectl cluster-info
+#kubectl proxy

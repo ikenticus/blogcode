@@ -13,7 +13,7 @@ if [ -z "$app" ]; then
     help
 fi
 role=${1:-master}
-[ "$1" == "master" ] && shift
+[ "$1" == "slave" ] && shift
 sshcmds=$*
 
 # cs-sports-service
@@ -35,6 +35,7 @@ names="
     sre-east=40,4566
     sre-west=40,4564
     tools=11,4381
+    tools-slave=11,4381
 "
 
 context=$(echo $names | tr [[:space:]] "\n" | grep $app)
@@ -69,6 +70,7 @@ if [ "$role" == "master" ]; then
     scalr-ssh $farm $master chmod +x kc
     scalr-ssh $farm $master $sshcmds
 else
+echo sshcmds $sshcmds
     hosts=$(scalr-find ${ids}=$role | grep " : \[" | awk '{ print $NF }' | tr "[]" " ")
     unset IFS
     for host in $hosts; do

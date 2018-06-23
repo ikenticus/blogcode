@@ -6,7 +6,8 @@
 SCRIPT=${1:-main.go}
 
 ### ENV: Static
-REGION=us-east-1
+TEAM=api-services
+REGION=us-east4
 VAULT_URL=$VAULT_ADDR
 CONSUL_URL=https://consul.service.gciconsul.com:8443
 
@@ -21,13 +22,14 @@ fi
 vault_key() {
     local KEY=$1
     BASE=${PWD##*/}
-    CONFIG=$(vault read secret/paas-api/general/$BASE/$ENVIRONMENT)
+    CONFIG=$(vault read secret/$TEAM/general/$BASE)
     if [ $? -eq 0 ]; then
-        vault read -field=$KEY secret/paas-api/general/$BASE/$ENVIRONMENT
+        vault read -field=$KEY secret/$TEAM/general/$BASE
         return
     fi
 }
-CONSUL_TOKEN=$(vault_key consul_acl_token)
+
+CONSUL_TOKEN=$(vault_key consul_token)
 VAULT_ROLE=$(vault_key vault_role_id)
 VAULT_SECRET=$(vault_key vault_secret_id)
 
@@ -38,6 +40,7 @@ if [ $SCRIPT == "help" ]; then
     echo -e "\nMinimal ENV variables needed:\n${MIN}\n"
     exit 0
 fi
+
 
 ENVIRONMENT=$ENVIRONMENT \
 REGION=$REGION \

@@ -7,7 +7,17 @@ export TERM=vt100
 export COLUMNS=250
 
 jobs=$(kubectl get jobs 2> /dev/null | grep -v NAME | awk '{ print $1 }')
+
+# Deployment-API app_names
 names=$(kubectl get pods -o jsonpath="{..app_name}" | tr [[:space:]] "\n" | sort -u)
+selector=app_name
+
+if [ -z "$names" ]; then   # alternately check for tiller app
+    # Helm-based deployments using "app"
+    names=$(kubectl get pods -o jsonpath="{..app}{..app_name}" | tr [[:space:]] "\n" | sort -u)
+    selector=app
+fi
+
 help() {
     echo -e "\nUsage: ${0##*/} <partial-app-name> [<pod-num>] [<cmds>]\n"
     cat << EOF
@@ -90,7 +100,7 @@ deploy() {
             scale) echo "Scale options (from gethpa: --replicas=2 --current-replicas=1" ;;
         esac
     else
-        local dep=$(kubectl get deployment --selector=app_name=$app | tail -1 | awk '{ print $1 }')
+        local dep=$(kubectl get deployment --selector=$selector=$app | tail -1 | awk '{ print $1 }')
         case $act in
             reset) kubectl set resources deployment $dep -c $app $opt ;;
             scale) kubectl scale deployment/$dep $opt ;;
@@ -105,7 +115,7 @@ auto() {
     if [ "$opt" == "help" ]; then
         echo "Autoscale options (from gethpa): cpu=80 min=2 max=4"
     else
-        local auto=$(kubectl get hpa --selector=app_name=$app | tail -1 | awk '{ print $1 }')
+        local auto=$(kubectl get hpa --selector=$selector=$app | tail -1 | awk '{ print $1 }')
         for o in $opt; do
             IFS==
             set -- $o
@@ -181,23 +191,23 @@ echo MATCHED: $context
 
 if [ -z "$cmds" ]; then
     case $num in
-        get*) kubectl get ${num#get} --selector=app_name=$context ;;
-        desc*) kubectl describe ${num#desc} --selector=app_name=$context ;;
-        json*) kubectl get ${num#json} -o json --selector=app_name=$context ;;
-        use) kubectl top pod --selector=app_name=$context ;;
-        wide*) kubectl get ${num#wide} -o wide --selector=app_name=$context ;;
-        yaml*) kubectl get ${num#yaml} -o yaml --selector=app_name=$context ;;
-        *) kubectl get pods --selector=app_name=$context ;;
+        get*) kubectl get ${num#get} --selector=$selector=$context ;;
+        desc*) kubectl describe ${num#desc} --selector=$selector=$context ;;
+        json*) kubectl get ${num#json} -o json --selector=$selector=$context ;;
+        use) kubectl top pod --selector=$selector=$context ;;
+        wide*) kubectl get ${num#wide} -o wide --selector=$selector=$context ;;
+        yaml*) kubectl get ${num#yaml} -o yaml --selector=$selector=$context ;;
+        *) kubectl get pods --selector=$selector=$context ;;
     esac
 else
     if [ -z "$isJOB" ]; then
-        pods=$(kubectl get pods --selector=app_name=$context | grep Running | awk '{ print $1 }')
+        pods=$(kubectl get pods --selector=$selector=$context | grep Running | awk '{ print $1 }')
     else
         pods=$(kubectl get pods --selector=job-name=$context | grep -v NAME | awk '{ print $1 }')
     fi
     if [ "$num" != "-" ]; then
        case $num in
-            --) pods=--selector=app_name=$context ;;
+            --) pods=--selector=$selector=$context ;;
             auto) auto $context $cmds ;;
             reset) deploy reset $context $cmds ;;
             scale) deploy scale $context $cmds ;;
