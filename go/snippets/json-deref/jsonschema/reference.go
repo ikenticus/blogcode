@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path"
 	"path/filepath"
 	"reflect"
@@ -27,7 +26,10 @@ func Dereference(schemaPath string, input []byte) ([]byte, error) {
 
 	var data interface{}
 	json.Unmarshal([]byte(input), &data)
-	refs := walkInterface(data, []string{}, []jsonRef{})
+	refs, err := walkInterface(data, []string{}, []jsonRef{})
+	if err != nil {
+		return input, fmt.Errorf("unable to walk interface %s: %v", schemaPath, err)
+	}
 
 	for _, ref := range refs {
 		top := data
@@ -35,7 +37,10 @@ func Dereference(schemaPath string, input []byte) ([]byte, error) {
 			if i < len(ref.Source)-1 {
 				top = top.(map[string]interface{})[item]
 			} else {
-				targetRef := buildReference(schemaPath, data, ref.Target)
+				targetRef, err := buildReference(schemaPath, data, ref.Target)
+				if err != nil {
+					return input, fmt.Errorf("unable to build reference from %s: %v", ref.Target, err)
+				}
 				targetKeys := reflect.ValueOf(targetRef).MapKeys()
 				if len(targetKeys) > 1 {
 					top.(map[string]interface{})[item] = targetRef
@@ -52,7 +57,8 @@ func Dereference(schemaPath string, input []byte) ([]byte, error) {
 }
 
 // walkInterface traverses the map[string]interface{} to located json references
-func walkInterface(node interface{}, source []string, refs []jsonRef) []jsonRef {
+func walkInterface(node interface{}, source []string, refs []jsonRef) ([]jsonRef, error) {
+	var err error
 	for key, val := range node.(map[string]interface{}) {
 		switch reflect.TypeOf(val).Kind() {
 		case reflect.String:
@@ -65,18 +71,24 @@ func walkInterface(node interface{}, source []string, refs []jsonRef) []jsonRef 
 		case reflect.Slice:
 			for i, item := range val.([]interface{}) {
 				if reflect.TypeOf(item).Kind() == reflect.Map {
-					refs = walkInterface(item, append(source, string(i)), refs)
+					refs, err = walkInterface(item, append(source, string(i)), refs)
+					if err != nil {
+						return nil, fmt.Errorf("unable to walk slice interface: %v", err)
+					}
 				}
 			}
 		case reflect.Map:
-			refs = walkInterface(node.(map[string]interface{})[key], append(source, key), refs)
+			refs, err = walkInterface(node.(map[string]interface{})[key], append(source, key), refs)
+			if err != nil {
+				return nil, fmt.Errorf("unable to walk map interface: %v", err)
+			}
 		}
 	}
-	return refs
+	return refs, nil
 }
 
 // buildReference constructs the json reference: internal, file or http
-func buildReference(schemaPath string, top interface{}, ref string) interface{} {
+func buildReference(schemaPath string, top interface{}, ref string) (interface{}, error) {
 	target := strings.Split(ref, "#")
 	var source interface{}
 
@@ -88,24 +100,22 @@ func buildReference(schemaPath string, top interface{}, ref string) interface{} 
 			Uri: target[0],
 		}.Do()
 		if err != nil {
-			fmt.Errorf("unable to get reference from %s: %v", target[0], err)
-			os.Exit(1)
+			return nil, fmt.Errorf("unable to get reference from %s: %v", target[0], err)
 		}
 		res.Body.FromJsonTo(&source)
 	default:
 		refPath, err := filepath.Abs(path.Dir(schemaPath) + "/" + target[0])
 		if err != nil {
-			fmt.Errorf("unable to expand reference filepath %s: %v", target[0], err)
-			os.Exit(1)
+			return nil, fmt.Errorf("unable to expand reference filepath %s: %v", target[0], err)
 		}
 		data, err := ioutil.ReadFile(refPath)
 		if err != nil {
-			fmt.Errorf("failed to read reference file %q: %v", refPath, err)
+			return nil, fmt.Errorf("failed to read reference file %q: %v", refPath, err)
 		}
 		json.Unmarshal([]byte(data), &source)
 	}
 
-	return parseReference(source, strings.Split(target[1], "/")[1:])
+	return parseReference(source, strings.Split(target[1], "/")[1:]), nil
 }
 
 // parseReference recursively parses the given reference path
