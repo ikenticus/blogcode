@@ -13,6 +13,12 @@ import (
 	"github.com/franela/goreq"
 )
 
+// jsonRef represents a JSON Reference source and targetRef
+type jsonRef struct {
+	Source []string
+	Target string
+}
+
 // Dereference parse JSON string and replaces all $ref with the referenced data.
 func Dereference(schemaPath string, input []byte) ([]byte, error) {
 	if !strings.Contains(string(input), "$ref") {
@@ -21,17 +27,15 @@ func Dereference(schemaPath string, input []byte) ([]byte, error) {
 
 	var data interface{}
 	json.Unmarshal([]byte(input), &data)
-	refs := walkInterface(data, []string{}, []string{})
+	refs := walkInterface(data, []string{}, []jsonRef{})
 
 	for _, ref := range refs {
 		top := data
-		pair := strings.Split(ref, "=")
-		list := strings.Split(pair[0], ".")
-		for i, item := range list {
-			if i < len(list)-1 {
+		for i, item := range ref.Source {
+			if i < len(ref.Source)-1 {
 				top = top.(map[string]interface{})[item]
 			} else {
-				targetRef := buildReference(schemaPath, data, pair[1])
+				targetRef := buildReference(schemaPath, data, ref.Target)
 				targetKeys := reflect.ValueOf(targetRef).MapKeys()
 				if len(targetKeys) > 1 {
 					top.(map[string]interface{})[item] = targetRef
@@ -48,12 +52,15 @@ func Dereference(schemaPath string, input []byte) ([]byte, error) {
 }
 
 // walkInterface traverses the map[string]interface{} to located json references
-func walkInterface(node interface{}, source []string, refs []string) []string {
+func walkInterface(node interface{}, source []string, refs []jsonRef) []jsonRef {
 	for key, val := range node.(map[string]interface{}) {
 		switch reflect.TypeOf(val).Kind() {
 		case reflect.String:
 			if key == "$ref" {
-				refs = append(refs, strings.Join(source, ".")+"="+val.(string))
+				refs = append(refs, jsonRef{
+					Source: source,
+					Target: val.(string),
+				})
 			}
 		case reflect.Slice:
 			for i, item := range val.([]interface{}) {
