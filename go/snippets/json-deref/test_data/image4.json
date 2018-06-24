@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "image"
+      ]
+    },
+    "crops": {
+      "$ref": "#/definitions/arraytype",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "default": "name"
+          },
+          "width": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "path": {
+            "type": "string"
+          },
+          "relativePath": {
+            "type": "string"
+          }
+        },
+        "required":[
+          "name",
+          "width",
+          "height",
+          "path",
+          "relativePath"
+        ]
+      }
+    },
+    "URL1": {
+      "$ref": "#/definitions/imageurl"
+    },
+    "URL2": {
+      "$ref": "#/definitions/imageurl"
+    }
+  },
+  "definitions": {
+      "arraytype": {
+          "type": "array"
+      },  
+      "imageurl": {
+          "type": "object",
+          "properties": {
+            "publish": {
+              "type": "string",
+              "transform": {
+                "cumulo": {
+                  "from" : [
+                    {
+                      "jsonPath": "$.publishUrl"
+                    }
+                  ]
+                }
+              }
+            },
+            "absolute": {
+              "type": "string",
+              "transform": {
+                "cumulo": {
+                  "from" : [
+                    {
+                      "jsonPath": "$.absoluteUrl"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+      }
+  },
+  "required": [
+    "type",
+    "crops",
+    "orientation",
+    "credit",
+    "URL",
+    "caption",
+    "originalSize",
+    "datePhotoTaken"
+  ]
+}
