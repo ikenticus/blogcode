@@ -47,38 +47,38 @@
     }
   },
   "definitions": {
-      "arraytype": {
-          "type": "array"
-      },  
-      "imageurl": {
-          "type": "object",
-          "properties": {
-            "publish": {
-              "type": "string",
-              "transform": {
-                "cumulo": {
-                  "from" : [
-                    {
-                      "jsonPath": "$.publishUrl"
-                    }
-                  ]
+    "arraytype": {
+        "type": "array"
+    },
+    "imageurl": {
+      "type": "object",
+      "properties": {
+        "publish": {
+          "type": "string",
+          "transform": {
+            "cumulo": {
+              "from" : [
+                {
+                  "jsonPath": "$.publishUrl"
                 }
-              }
-            },
-            "absolute": {
-              "type": "string",
-              "transform": {
-                "cumulo": {
-                  "from" : [
-                    {
-                      "jsonPath": "$.absoluteUrl"
-                    }
-                  ]
-                }
-              }
+              ]
             }
           }
+        },
+        "absolute": {
+          "type": "string",
+          "transform": {
+            "cumulo": {
+              "from" : [
+                {
+                  "jsonPath": "$.absoluteUrl"
+                }
+              ]
+            }
+          }
+        }
       }
+    }
   },
   "required": [
     "type",

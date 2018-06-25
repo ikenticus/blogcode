@@ -7,6 +7,7 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/franela/goreq"
@@ -35,7 +36,12 @@ func Dereference(schemaPath string, input []byte) ([]byte, error) {
 		top := data
 		for i, item := range ref.Source {
 			if i < len(ref.Source)-1 {
-				top = top.(map[string]interface{})[item]
+				// assuming integer item is slice[index] instead of map[string]
+				if intKey, err := strconv.Atoi(item); err == nil {
+					top = top.([]interface{})[intKey]
+				} else {
+					top = top.(map[string]interface{})[item]
+				}
 			} else {
 				targetRef, err := buildReference(schemaPath, data, ref.Target)
 				if err != nil {
@@ -43,8 +49,14 @@ func Dereference(schemaPath string, input []byte) ([]byte, error) {
 				}
 				targetKeys := reflect.ValueOf(targetRef).MapKeys()
 				if len(targetKeys) > 1 {
-					top.(map[string]interface{})[item] = targetRef
+					// assuming integer item is slice[index] instead of map[string]
+					if intKey, err := strconv.Atoi(item); err == nil {
+						top.([]interface{})[intKey] = targetRef
+					} else {
+						top.(map[string]interface{})[item] = targetRef
+					}
 				} else {
+					// when targetRef = single KV pair, set the value using the key instead of overwriting entire map
 					key := targetKeys[0].Interface().(string)
 					top.(map[string]interface{})[item].(map[string]interface{})[key] = targetRef.(map[string]interface{})[key]
 					delete(top.(map[string]interface{})[item].(map[string]interface{}), "$ref")
@@ -71,7 +83,7 @@ func walkInterface(node interface{}, source []string, refs []jsonRef) ([]jsonRef
 		case reflect.Slice:
 			for i, item := range val.([]interface{}) {
 				if reflect.TypeOf(item).Kind() == reflect.Map {
-					refs, err = walkInterface(item, append(source, string(i)), refs)
+					refs, err = walkInterface(item, append(source, key, strconv.Itoa(i)), refs)
 					if err != nil {
 						return nil, fmt.Errorf("unable to walk slice interface: %v", err)
 					}
