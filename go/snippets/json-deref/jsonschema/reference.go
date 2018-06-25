@@ -60,11 +60,11 @@ func Dereference(schemaPath string, input []byte) ([]byte, error) {
 					key := targetKeys[0].Interface().(string)
 					// assuming integer item is slice[index] instead of map[string]
 					if intKey, err := strconv.Atoi(item); err == nil {
-					    top.([]interface{})[intKey].(map[string]interface{})[key] = targetRef.(map[string]interface{})[key]
-					    delete(top.([]interface{})[intKey].(map[string]interface{}), "$ref")
+						top.([]interface{})[intKey].(map[string]interface{})[key] = targetRef.(map[string]interface{})[key]
+						delete(top.([]interface{})[intKey].(map[string]interface{}), "$ref")
 					} else {
-					    top.(map[string]interface{})[item].(map[string]interface{})[key] = targetRef.(map[string]interface{})[key]
-					    delete(top.(map[string]interface{})[item].(map[string]interface{}), "$ref")
+						top.(map[string]interface{})[item].(map[string]interface{})[key] = targetRef.(map[string]interface{})[key]
+						delete(top.(map[string]interface{})[item].(map[string]interface{}), "$ref")
 					}
 				}
 			}
@@ -108,6 +108,9 @@ func walkInterface(node interface{}, source []string, refs []jsonRef) ([]jsonRef
 // buildReference constructs the json reference: internal, file or http
 func buildReference(schemaPath string, top interface{}, ref string) (interface{}, error) {
 	target := strings.Split(ref, "#")
+	if len(target) < 2 {
+		target = append(target, "/")
+	}
 	var source interface{}
 
 	switch {
@@ -130,9 +133,12 @@ func buildReference(schemaPath string, top interface{}, ref string) (interface{}
 		if err != nil {
 			return nil, fmt.Errorf("failed to read reference file %q: %v", refPath, err)
 		}
+		data, err = Dereference(refPath, data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to dereference refPath %s: %v", refPath, err)
+		}
 		json.Unmarshal([]byte(data), &source)
 	}
-
 	return parseReference(source, strings.Split(target[1], "/")[1:]), nil
 }
 
@@ -141,6 +147,10 @@ func parseReference(source interface{}, refPaths []string) interface{} {
 	if len(refPaths) > 1 {
 		return parseReference(source.(map[string]interface{})[refPaths[0]], refPaths[1:])
 	} else {
-		return source.(map[string]interface{})[refPaths[0]]
+		if refPaths[0] != "" {
+			return source.(map[string]interface{})[refPaths[0]]
+		} else {
+			return source
+		}
 	}
 }

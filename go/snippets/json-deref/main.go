@@ -14,13 +14,13 @@ func main() {
     input, err := ioutil.ReadFile(source)
 	if err != nil {
 		fmt.Errorf("failed to read json file %q: %v", source, err)
-        os.Exit(1)
+		os.Exit(10)
 	}
 
 	input, err = jsonschema.Dereference(source, input)
 	if err != nil {
 		fmt.Errorf("failed to Dereference json: %v", err)
-        os.Exit(2)
+		os.Exit(20)
 	}
 
     var data interface{}
@@ -29,7 +29,7 @@ func main() {
     output, err := json.MarshalIndent(data, "", "    ")
 	if err != nil {
 		fmt.Errorf("failed to marshal indent json: %v", err)
-        os.Exit(2)
+		os.Exit(30)
 	}
 
     fmt.Println(string(output))
