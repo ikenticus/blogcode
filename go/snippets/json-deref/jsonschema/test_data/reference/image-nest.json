@@ -9,7 +9,7 @@
       ]
     },
     "crops": {
-      "$ref": "#/definitions/arraytype",
+      "type": "array",
       "items": {
         "type": "object",
         "properties": {
@@ -39,45 +39,22 @@
         ]
       }
     },
-    "URL1": {
-      "$ref": "#/definitions/imageurl"
-    },
-    "URL2": {
-      "$ref": "#/definitions/imageurl"
-    }
-  },
-  "definitions": {
-    "arraytype": {
-        "type": "array"
-    },
-    "imageurl": {
-      "type": "object",
-      "properties": {
-        "publish": {
-          "type": "string",
-          "transform": {
-            "cumulo": {
-              "from" : [
-                {
-                  "jsonPath": "$.publishUrl"
-                }
-              ]
-            }
+    "URL": {
+      "allOf": [
+        {
+          "properties": {
+            "index": "first"
           }
         },
-        "absolute": {
-          "type": "string",
-          "transform": {
-            "cumulo": {
-              "from" : [
-                {
-                  "jsonPath": "$.absoluteUrl"
-                }
-              ]
-            }
+        {
+          "$ref": "./image-list2.json"
+        },
+        {
+          "properties": {
+            "index": "last"
           }
         }
-      }
+      ]
     }
   },
   "required": [

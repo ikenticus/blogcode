@@ -105,6 +105,11 @@ func walkInterface(node interface{}, source []string, refs []jsonRef) ([]jsonRef
 	return refs, nil
 }
 
+// HttpReferenceClient isolates the HTTP call for testing purposes
+func HttpReferenceClient(url string) (*goreq.Response, error) {
+	return goreq.Request{Uri: url}.Do()
+}
+
 // buildReference constructs the json reference: internal, file or http
 func buildReference(schemaPath string, top interface{}, ref string) (interface{}, error) {
 	target := strings.Split(ref, "#")
@@ -117,9 +122,7 @@ func buildReference(schemaPath string, top interface{}, ref string) (interface{}
 	case len(target[0]) == 0:
 		source = top
 	case strings.HasPrefix(target[0], "http"):
-		res, err := goreq.Request{
-			Uri: target[0],
-		}.Do()
+		res, err := HttpReferenceClient(target[0])
 		if err != nil {
 			return nil, fmt.Errorf("unable to get reference from %s: %v", target[0], err)
 		}

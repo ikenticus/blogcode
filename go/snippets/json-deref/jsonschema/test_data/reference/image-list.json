@@ -40,7 +40,21 @@
       }
     },
     "URL": {
-      "$ref": "./image3.json#/definitions/imageurl"
+      "allOf": [
+        {
+          "$ref": "./image-defs.json#/definitions/imageurl"
+        },
+        {
+          "properties": {
+            "index": "middle"
+          }
+        },
+        {
+          "properties": {
+            "index": "last"
+          }
+        }
+      ]
     }
   },
   "required": [

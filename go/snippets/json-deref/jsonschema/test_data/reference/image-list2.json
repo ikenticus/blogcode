@@ -40,36 +40,18 @@
       }
     },
     "URL": {
-      "type": "object",
-      "properties": {
-        "publish": {
-          "type": "string",
-          "transform": {
-            "cumulo": {
-              "from" : [
-                {
-                  "jsonPath": "$.publishUrl"
-                }
-              ]
-            }
+      "allOf": [
+        {
+          "$ref": "./image-defs.json#/definitions/imageurl"
+        },
+        {
+          "properties": {
+            "index": "middle"
           }
         },
-        "absolute": {
-          "type": "string",
-          "transform": {
-            "cumulo": {
-              "from" : [
-                {
-                  "jsonPath": "$.absoluteUrl"
-                }
-              ]
-            }
-          }
+        {
+          "$ref": "./image-defs.json#/definitions/imageurl"
         }
-      },
-      "required":[
-        "publish",
-        "absolute"
       ]
     }
   },

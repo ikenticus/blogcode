@@ -40,7 +40,7 @@
       }
     },
     "URL": {
-      "$ref": "https://sports-aggregator-east.production.gannettdigital.com/doc/show/feed_usat_image#/definitions/imageurl"
+      "$ref": "./image-defs.json#/definitions/imageurl"
     }
   },
   "required": [
