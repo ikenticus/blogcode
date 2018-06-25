@@ -58,8 +58,14 @@ func Dereference(schemaPath string, input []byte) ([]byte, error) {
 				} else {
 					// when targetRef = single KV pair, set the value using the key instead of overwriting entire map
 					key := targetKeys[0].Interface().(string)
-					top.(map[string]interface{})[item].(map[string]interface{})[key] = targetRef.(map[string]interface{})[key]
-					delete(top.(map[string]interface{})[item].(map[string]interface{}), "$ref")
+					// assuming integer item is slice[index] instead of map[string]
+					if intKey, err := strconv.Atoi(item); err == nil {
+					    top.([]interface{})[intKey].(map[string]interface{})[key] = targetRef.(map[string]interface{})[key]
+					    delete(top.([]interface{})[intKey].(map[string]interface{}), "$ref")
+					} else {
+					    top.(map[string]interface{})[item].(map[string]interface{})[key] = targetRef.(map[string]interface{})[key]
+					    delete(top.(map[string]interface{})[item].(map[string]interface{}), "$ref")
+					}
 				}
 			}
 		}
