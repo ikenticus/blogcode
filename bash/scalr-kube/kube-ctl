@@ -140,6 +140,7 @@ run() {
         json) kubectl get pod $pod -o json ;;
         logs) kubectl logs $pod -c $app ;;
         nginx) kubectl logs $pod -c nginx-lite ;;
+        nt) kubectl logs $pod -c nginx-lite | tail ;;
         replace) kubectl get pod $pod -o yaml | kubectl replace --force -f - ;;
         reqlog) kubectl logs $pod -c requestlogger ;;
         res) kubectl get pod $pod -o yaml | grep -B1 -A6 resources ;;
