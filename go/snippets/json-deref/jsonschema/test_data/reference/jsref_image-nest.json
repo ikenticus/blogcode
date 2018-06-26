@@ -42,15 +42,17 @@
     "URL": {
       "allOf": [
         {
-          "$ref": "./image-defs.json#/definitions/imageurl"
-        },
-        {
           "properties": {
-            "index": "middle"
+            "index": "first"
           }
         },
         {
-          "$ref": "./image-defs.json#/definitions/imageurl"
+          "$ref": "./jsref_image-list2.json"
+        },
+        {
+          "properties": {
+            "index": "last"
+          }
         }
       ]
     }

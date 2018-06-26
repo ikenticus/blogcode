@@ -2,10 +2,9 @@ package jsonschema
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
-	"path"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -16,42 +15,47 @@ func TestDereference(t *testing.T) {
 	}{
 		{
 			description: "Self Reference",
-			schemaPath:  "./test_data/reference/image-self.json",
+			schemaPath:  "./test_data/reference/jsref_image-self.json",
+		},
+		{
+			description: "Type Reference",
+			schemaPath:  "./test_data/reference/jsref_image-type.json",
 		},
 		{
 			description: "File Reference",
-			schemaPath:  "./test_data/reference/image-file.json",
+			schemaPath:  "./test_data/reference/jsref_image-file.json",
 		},/*
         // TODO: figure out mock http client to test http json references
 		{
 			description: "Http Reference",
-			schemaPath:  "./test_data/reference/image-http.json",
+			schemaPath:  "./test_data/reference/jsref_image-http.json",
 		},*/
 		{
 			description: "List Reference",
-			schemaPath:  "./test_data/reference/image-list.json",
+			schemaPath:  "./test_data/reference/jsref_image-list.json",
 		},
 		{
 			description: "Shifted List Reference",
-			schemaPath:  "./test_data/reference/image-list1.json",
+			schemaPath:  "./test_data/reference/jsref_image-list1.json",
 		},
 		{
 			description: "Multiple List Reference",
-			schemaPath:  "./test_data/reference/image-list2.json",
+			schemaPath:  "./test_data/reference/jsref_image-list2.json",
 		},
 		{
 			description: "Nested List Reference",
-			schemaPath:  "./test_data/reference/image-nest.json",
+			schemaPath:  "./test_data/reference/jsref_image-nest.json",
 		},
 		{
 			description: "Ingestion Example",
-			schemaPath:  "./test_data/reference/asset-event-facebook.json",
+			schemaPath:  "./test_data/reference/jsref_asset-event-facebook.json",
 		},
 	}
 	for _, test := range tests {
 
 		var want interface{}
-		wantPath := fmt.Sprintf("%s/deref_%s", path.Dir(test.schemaPath), path.Base(test.schemaPath))
+		//wantPath := fmt.Sprintf("%s/deref_%s", path.Dir(test.schemaPath), path.Base(test.schemaPath))
+		wantPath := strings.Replace(test.schemaPath, "/jsref_", "/deref_", 1)
 		wantJson, err := ioutil.ReadFile(wantPath)
 		if err != nil {
 			t.Errorf("Test %q - failed to read json file %q: %v", test.description, wantPath, err)
