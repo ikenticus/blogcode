@@ -7,8 +7,10 @@
     },
     "properties": {
         "URL": {
+            "type": "object",
             "properties": {
                 "absolute": {
+                    "type": "string",
                     "transform": {
                         "cumulo": {
                             "from": [
@@ -17,10 +19,10 @@
                                 }
                             ]
                         }
-                    },
-                    "type": "string"
+                    }
                 },
                 "publish": {
+                    "type": "string",
                     "transform": {
                         "cumulo": {
                             "from": [
@@ -29,14 +31,14 @@
                                 }
                             ]
                         }
-                    },
-                    "type": "string"
+                    }
                 }
-            },
-            "type": "object"
+            }
         },
         "crops": {
+            "$ref": "#/definitions/arraytype",
             "items": {
+                "type": "object",
                 "properties": {
                     "height": {
                         "type": "number"
@@ -61,16 +63,14 @@
                     "height",
                     "path",
                     "relativePath"
-                ],
-                "type": "object"
-            },
-            "type": "array"
+                ]
+            }
         },
         "type": {
+            "type": "string",
             "enum": [
                 "image"
-            ],
-            "type": "string"
+            ]
         }
     },
     "required": [
