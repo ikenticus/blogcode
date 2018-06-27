@@ -19,7 +19,7 @@ type jsonRef struct {
 	Target string
 }
 
-// Dereference parse JSON string and replaces all $ref with the referenced data.
+// Dereference parses JSON string and replaces all $ref with the referenced data.
 func Dereference(schemaPath string, input []byte) ([]byte, error) {
 	if !strings.Contains(string(input), "$ref") {
 		return input, nil
