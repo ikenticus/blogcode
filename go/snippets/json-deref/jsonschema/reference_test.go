@@ -3,7 +3,6 @@ package jsonschema
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -13,10 +12,11 @@ import (
 )
 
 func TestDereference(t *testing.T) {
-	// create a listener with the desired port.
-	tl, err := net.Listen("tcp", "127.0.0.1:12345")
+	// create listener with desired port
+	custom := "127.0.0.1:12345"
+	tl, err := net.Listen("tcp", custom)
 	if err != nil {
-		log.Fatal(err)
+		t.Errorf("Test failed to create listener on %s %v", custom, err)
 	}
 
 	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
