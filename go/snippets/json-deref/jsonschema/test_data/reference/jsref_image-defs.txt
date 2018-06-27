@@ -1,0 +1,2 @@
+curl -X POST -H 'Content-type: application/json' https://sports-aggregator/doc/save/feed_usat_image -d@jsonschema/test_data/reference/jsref_image-defs.json
+
