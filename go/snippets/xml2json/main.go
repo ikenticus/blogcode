@@ -25,7 +25,7 @@ func main() {
 		fmt.Errorf("failed to convert %s to json: %v", source, err)
 		os.Exit(20)
 	}
-	fmt.Println(output.String())
+	//fmt.Println(output.String())
 
     var clean interface{}
     json.Unmarshal(output.Bytes(), &clean)
