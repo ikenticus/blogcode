@@ -1,10 +1,9 @@
 package merge
 
-type Sharon struct {
+type Wilbur struct {
 	Base
 
 	Competition struct {
-		Game // no json or will get overwritten
 		Away struct {
 			Player struct {
 				FirstName  string `json:"firstName"`
@@ -69,5 +68,7 @@ type Sharon struct {
 				} `json:"statistics"`
 			} `json:"team"`
 		} `json:"home"`
-	} `json:"competition"`
+	} //`json:"competition"`
+
+	Game `json:"competition"`
 }

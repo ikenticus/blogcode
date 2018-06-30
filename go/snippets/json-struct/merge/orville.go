@@ -1,10 +1,10 @@
 package merge
 
-type Sharon struct {
+type Orville struct {
 	Base
+	Game `json:"competition"`
 
 	Competition struct {
-		Game // no json or will get overwritten
 		Away struct {
 			Player struct {
 				FirstName  string `json:"firstName"`
@@ -69,5 +69,5 @@ type Sharon struct {
 				} `json:"statistics"`
 			} `json:"team"`
 		} `json:"home"`
-	} `json:"competition"`
+	} //`json:"competition"`
 }

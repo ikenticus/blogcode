@@ -2,7 +2,7 @@ package merge
 
 import "time"
 
-type Competition struct {
+type Game struct {
     Id        string `json:"id"`
     Officials []struct {
         FirstName string `json:"firstName,omitempty"`
