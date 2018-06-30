@@ -1,0 +1,59 @@
+{
+  "id": "merge_12345",
+  "dataType": "child",
+  "league": {
+    "id": "/sport/baseball/league:1",
+    "name": "Major League Baseball",
+    "alias": "MLB"
+  },
+  "season": {
+    "id": "/sport/baseball/season:1",
+    "name": "2018",
+    "end-date": "2018-11-30",
+    "start-date": "2018-02-01"
+  },
+  "competition": {
+    "id": "/sport/baseball/competition:12345",
+    "startDate": "2018-06-27T22:10:00-04:00",
+    "status": "scheduled",
+    "away": {
+      "team": {
+        "id": "/sports/baseball/team:1",
+        "name": "Yankees"
+      }
+    },
+    "home": {
+      "team": {
+        "id": "/sports/baseball/team:2",
+        "name": "Red Sox"
+      }
+    },
+    "officials": [
+      {
+        "id": "/sport/baseball/player:999",
+        "firstName": "John",
+        "lastName": "Wayne",
+        "position": {
+          "id": "/sports/baseball/position:1",
+          "name": "Home Plate Umpire",
+          "alias": "HP"
+        },
+        "seasons": 10
+      }
+    ],
+    "recentMeetings": [
+      {
+        "season": "/sport/baseball/season:1",
+        "competition": "/sport/baseball/competition:123"
+      },
+      {
+        "season": "/sport/baseball/season:2",
+        "competition": "/sport/baseball/competition:456"
+      },
+      {
+        "season": "/sport/baseball/season:3",
+        "competition": "/sport/baseball/competition:789"
+      }
+    ]
+  }
+}
