@@ -1,6 +1,6 @@
 package merge
 
-type Child struct {
+type Guido struct {
 	Base
 
 	Competition struct {
@@ -68,5 +68,5 @@ type Child struct {
 				} `json:"statistics"`
 			} `json:"team"`
 		} `json:"home"`
-	} `json:"competition1"`
+	} `json:"competition"`
 }
