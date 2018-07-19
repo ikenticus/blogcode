@@ -22,10 +22,14 @@ type URL struct {
 }
 
 type Config struct {
-	APIKey   string `env:"apigeeconsumerkey"`
-	Front    string
-	SiteCode string
-	URL      URL
+	APIKey    string `env:"apigeeconsumerkey"`
+	Bucket    string
+	Couchbase string `env:"couchbaseurl"`
+	Front     string
+	Query     string
+	SASL      string `env:"couchbasebucketpassword"`
+	SiteCode  string
+	URL       URL
 }
 
 func getVaultField(vaultPath string, field string) string {

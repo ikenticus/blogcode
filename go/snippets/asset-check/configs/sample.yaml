@@ -1,7 +1,10 @@
 
 apikey: VAULT.secret/services/general/graph-api
-front: section-front_SITE_home
+bucket: fronts
+couchbase: VAULT.secret/services/graph-api/production
+query: "select meta().id from `fronts` where meta().id LIKE 'section-front_%'"
+sasl: VAULT.secret/services/graph-api/production
 sitecode: SITE
 url:
-  api: http://json-api.production.domain.com/api/v1/{FRONTNAME}?readmodel=push-publishing
+  api: http://jsonimo-api.production.domain.com/api/v1/{FRONTNAME}?readmodel=push-publishing
   graphql: https://graph-api.domain.com/v1/graphql?type=asset&query=%7B%20front%28id%3A%20%22{FRONTNAME}%22%29%20%7B%20id%20displayName%20layoutModules%20%7B%20moduleDisplayName%20contents%20%7B%20asset%20%7B%20contentSourceCode%20id%20type%20headline%20%7D%20%7D%20%7D%20%7D%20%7D%20
