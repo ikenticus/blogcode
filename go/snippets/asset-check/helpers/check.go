@@ -23,7 +23,7 @@ func loopFronts(config Config, fronts []string) {
 			fmt.Errorf("Failed to get GraphQL API\n")
 		}
 
-		jsData, err := getAPI(config, f)
+		jsData, err := getPresAPI(config, f)
 		if err != nil {
 			fmt.Errorf("Failed to get JSON API\n")
 		}
@@ -41,9 +41,12 @@ func loopFronts(config Config, fronts []string) {
 	fmt.Printf("\nTotal: %5d\nFail:  %5d\nPass:  %5d\n", count.Total, count.Fail, count.Pass)
 }
 
-func testFront(f string, g GraphQL, j JSONAPI) string {
+func testFront(f string, g GraphQL, j PresAPI) string {
+	layoutModules := j.LayoutModules // diagAPI, presAPI
+	//layoutModules = j.ReadModel.LayoutModules	// jsonAPI
+
 	gLayoutCount := len(g.Data.Front.LayoutModules)
-	jLayoutCount := len(j.ReadModel.LayoutModules)
+	jLayoutCount := len(layoutModules)
 	if gLayoutCount != jLayoutCount {
 		return fmt.Sprintf("FAIL %-50s: Mismatched Layout Mods (GQL %3d vs %3d API)", f, gLayoutCount, jLayoutCount)
 	}
@@ -52,21 +55,17 @@ func testFront(f string, g GraphQL, j JSONAPI) string {
 	var gAssetIDs []string
 	for _, gModule := range g.Data.Front.LayoutModules {
 		gAssetCount += len(gModule.Contents)
-		//fmt.Printf("  gMODULE: %s\n", gModule.ModuleDisplayName)
 		for _, gAsset := range gModule.Contents {
 			gAssetIDs = append(gAssetIDs, gAsset.ID)
-			//fmt.Printf("    gASSET: %+v %s\n", gAsset, gAsset.ID)
 		}
 	}
 
 	var jAssetCount int
 	var jAssetIDs []string
-	for _, jModule := range j.ReadModel.LayoutModules {
+	for _, jModule := range layoutModules {
 		jAssetCount += len(jModule.Contents)
-		//fmt.Printf("  jMODULE: %s\n", jModule.ModuleDisplayName)
 		for _, jAsset := range jModule.Contents {
 			jAssetIDs = append(jAssetIDs, fmt.Sprintf("%d", jAsset.ID))
-			//fmt.Printf("    jASSET: %+v %d\n", jAsset, jAsset.ID)
 		}
 	}
 

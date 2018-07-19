@@ -18,7 +18,9 @@ const debug = false
 
 type URL struct {
 	API     string
+	DiagAPI string
 	GraphQL string
+	PresAPI string
 }
 
 type Config struct {
