@@ -3,6 +3,7 @@ package helpers
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 type Tally struct {
@@ -28,6 +29,12 @@ func loopFronts(config Config, fronts []string) {
 		}
 
 		result := testFront(f, gqData, jsData)
+		switch {
+		case strings.HasPrefix(result, "FAIL "):
+			count.Fail++
+		case strings.HasPrefix(result, "PASS "):
+			count.Pass++
+		}
 		fmt.Println(result)
 	}
 
