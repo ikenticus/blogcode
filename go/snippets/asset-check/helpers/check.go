@@ -45,7 +45,7 @@ func testFront(f string, g GraphQL, j JSONAPI) string {
 	gLayoutCount := len(g.Data.Front.LayoutModules)
 	jLayoutCount := len(j.ReadModel.LayoutModules)
 	if gLayoutCount != jLayoutCount {
-		return fmt.Sprintf("FAIL %-50s: Mismatched LayoutModules (GQL %d vs %d API)", f, gLayoutCount, jLayoutCount)
+		return fmt.Sprintf("FAIL %-50s: Mismatched Layout Mods (GQL %3d vs %3d API)", f, gLayoutCount, jLayoutCount)
 	}
 
 	var gAssetCount int
@@ -72,7 +72,7 @@ func testFront(f string, g GraphQL, j JSONAPI) string {
 
 	switch {
 	case gAssetCount != jAssetCount:
-		return fmt.Sprintf("FAIL %-50s: Mismatched Asset Count (GQL %d vs %d API)", f, gAssetCount, jAssetCount)
+		return fmt.Sprintf("FAIL %-50s: Mismatched Asset Count (GQL %3d vs %3d API)", f, gAssetCount, jAssetCount)
 	case !reflect.DeepEqual(gAssetIDs, jAssetIDs):
 		return fmt.Sprintf("FAIL %-50s: Mismatched Asset IDs\n%+v\n%+v", f, gAssetIDs, jAssetIDs)
 	default:
