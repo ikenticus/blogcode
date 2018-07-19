@@ -12,7 +12,10 @@ import (
 func main() {
 	if len(os.Args) > 1 {
 		config := helpers.Yaml(os.Args[1])
-		helpers.Check(config)
+		err := helpers.Check(config)
+		if err != nil {
+			fmt.Printf("Asset Check failed: %s\n", err)
+		}
 	} else {
 		fmt.Printf("Usage: %s <config>.yaml\n", path.Base(os.Args[0]))
 	}

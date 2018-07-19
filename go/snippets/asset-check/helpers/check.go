@@ -71,7 +71,7 @@ func testFront(f string, g GraphQL, j JSONAPI) string {
 	}
 }
 
-func Check(config Config) {
+func Check(config Config) error {
 	if debug {
 		fmt.Println(config.APIKey, config.Front, config.SiteCode)
 		fmt.Println(config.Couchbase, config.Bucket, config.SASL)
@@ -80,7 +80,9 @@ func Check(config Config) {
 
 	fronts, err := runQuery(config)
 	if err != nil {
-		fmt.Errorf("Failed to get Query list\n")
+		return err
 	}
+
 	loopFronts(config, fronts)
+	return nil
 }

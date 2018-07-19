@@ -37,6 +37,9 @@ func (c *Connection) connectDB() (err error) {
 func (c *Connection) queryDB(config Config) (results []string, err error) {
 	myQuery := gocb.NewN1qlQuery(config.Query)
 	rows, err := c.SourceBucket.ExecuteN1qlQuery(myQuery, nil)
+	if err != nil {
+		return nil, fmt.Errorf("could not execute N1QL: %s\n", err)
+	}
 	var row interface{}
 	for rows.Next(&row) {
 		results = append(results, row.(map[string]interface{})["id"].(string))
