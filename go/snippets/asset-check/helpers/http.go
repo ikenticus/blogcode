@@ -21,6 +21,7 @@ type GraphQL struct {
 						ID                string `json:"id"`
 						Type              string `json:"type"`
 					} `json:"asset"`
+					ID string `json:"id"`
 				} `json:"contents"`
 				ModuleDisplayName string `json:"moduleDisplayName"`
 			} `json:"layoutModules"`
