@@ -24,7 +24,7 @@ type URL struct {
 type Config struct {
 	APIKey   string `env:"apigeeconsumerkey"`
 	Front    string
-	Sitecode string
+	SiteCode string
 	URL      URL
 }
 
