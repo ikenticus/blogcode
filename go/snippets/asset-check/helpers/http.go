@@ -89,8 +89,9 @@ type PresAPI struct {
 		LayoutModuleID    string `json:"layoutModuleId"`
 		ModuleDisplayName string `json:"moduleDisplayName"`
 	} `json:"layoutModules"`
-	SiteCode string `json:"siteCode"`
-	SiteID   int64  `json:"siteId"`
+	SiteCode    string `json:"siteCode"`
+	SiteID      int64  `json:"siteId"`
+	UpdatedDate string
 }
 
 func getAPI(config Config, front string) (source JSONAPI, e error) {

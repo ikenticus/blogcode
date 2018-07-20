@@ -7,9 +7,12 @@ import (
 )
 
 type Tally struct {
-	Fail  int
-	Pass  int
-	Total int
+	Total           int
+	Pass            int
+	Fail            int
+	FailCountLayout int
+	FailCountAsset  int
+	FailSliceAsset  int
 }
 
 func loopFronts(config Config, fronts []string) {
@@ -30,15 +33,24 @@ func loopFronts(config Config, fronts []string) {
 
 		result := testFront(f, gqData, jsData)
 		switch {
-		case strings.HasPrefix(result, "FAIL "):
+		case strings.HasPrefix(result, "FAIL"):
 			count.Fail++
+			switch {
+			case strings.HasPrefix(result, "FAIL1"):
+				count.FailCountLayout++
+			case strings.HasPrefix(result, "FAIL2"):
+				count.FailCountAsset++
+			case strings.HasPrefix(result, "FAIL3"):
+				count.FailSliceAsset++
+			}
 		case strings.HasPrefix(result, "PASS "):
 			count.Pass++
 		}
 		fmt.Println(result)
 	}
 
-	fmt.Printf("\nTotal: %5d\nFail:  %5d\nPass:  %5d\n", count.Total, count.Fail, count.Pass)
+	fmt.Printf("\nTotal: %5d\nPass:  %5d\nFail:  %5d", count.Total, count.Pass, count.Fail)
+	fmt.Printf("\n  Count Layout: %5d\n  Count Asset:  %5d\n  Slice Asset:  %5d\n", count.FailCountLayout, count.FailCountAsset, count.FailSliceAsset)
 }
 
 func testFront(f string, g GraphQL, j PresAPI) string {
@@ -48,7 +60,7 @@ func testFront(f string, g GraphQL, j PresAPI) string {
 	gLayoutCount := len(g.Data.Front.LayoutModules)
 	jLayoutCount := len(layoutModules)
 	if gLayoutCount != jLayoutCount {
-		return fmt.Sprintf("FAIL %-50s: Mismatched Layout Mods (GQL %3d vs %3d API)", f, gLayoutCount, jLayoutCount)
+		return fmt.Sprintf("FAIL1 %-50s: %s Mismatched Layout Mods (GQL %3d vs %3d API)", f, j.UpdatedDate, gLayoutCount, jLayoutCount)
 	}
 
 	var gAssetCount int
@@ -71,11 +83,11 @@ func testFront(f string, g GraphQL, j PresAPI) string {
 
 	switch {
 	case gAssetCount != jAssetCount:
-		return fmt.Sprintf("FAIL %-50s: Mismatched Asset Count (GQL %3d vs %3d API)", f, gAssetCount, jAssetCount)
+		return fmt.Sprintf("FAIL2 %-50s: %s Mismatched Asset Count (GQL %3d vs %3d API)", f, j.UpdatedDate, gAssetCount, jAssetCount)
 	case !reflect.DeepEqual(gAssetIDs, jAssetIDs):
-		return fmt.Sprintf("FAIL %-50s: Mismatched Asset IDs\n%+v\n%+v", f, gAssetIDs, jAssetIDs)
+		return fmt.Sprintf("FAIL3 %-50s: %s Mismatched Asset IDs\n%+v\n%+v", f, j.UpdatedDate, gAssetIDs, jAssetIDs)
 	default:
-		return fmt.Sprintf("PASS %-50s: All Checks Succeeded", f)
+		return fmt.Sprintf("PASS  %-50s: %s All Checks Succeeded", f, j.UpdatedDate)
 	}
 }
 
