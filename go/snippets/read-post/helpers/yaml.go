@@ -27,10 +27,10 @@ type Config struct {
 }
 
 const (
-	Seek   = "Sagarin"
-	ApiUrl = "https://api.gannett-cdn.com/sportssvc/post/sagarin/"
+	Seek   = "Splenda"
+	ApiUrl = "https://api.domain.com/service/post/splenda/"
 	ApiKey = "api_key"
-	ApiVal = "57646bc6bca4811fea000001d1227c937acd4a17696f2718976d19a5"
+	ApiVal = "1234567890abcdefedcba0987654321"
 )
 
 func (q *Query) pair() string {
