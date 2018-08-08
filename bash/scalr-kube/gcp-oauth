@@ -3,11 +3,14 @@
 # Generate Bearer token for Google Cloud Platform
 #
 
+PEM=/tmp/gcp.pem
+
 help() {
     echo -e "\nUsage: ${0##*/} <vault-path> <pem-key> <email-key>"
     echo -e "\nExamples:"
     echo -e "  secret/paas-api/desknet-subscriber/staging pubsub_subscriber_private_key pubsub_subscriber_client_email"
-    echo -e "  secret/cs-sports/jenkins/nearline/api-services-sagarin-app private_key client_email"
+    echo -e "  secret/cs-sports/jenkins/nearline/api-services-sagarin-app [private_key] [client_email]"
+    echo -e "  secret/api-services/content-ingestor-api/staging pubsub"
     echo
     exit 1
 }
@@ -20,20 +23,46 @@ vault=$1; shift
 if [ -z "$vault" ]; then
     help
 fi
-private=${1:-private_key}; shift
-client=${1:-client_email}; shift
-email=$(vault read -field=$client $vault)
 
-case $vault in
-    *sub*) scope=pubsub ;;
-    *) scope=devstorage.full_control
-esac
+if [ $# -eq 0 ]; then
+    # only vault info provided, must be full JSON
+    key=${vault##*/}
+    data=$(vault read -field=$key ${vault%/*})
+    if [ ! -z ${data//\{*} ]; then
+        data=$(echo $data | base64 -d)
+    fi
+    scope=${key%%_*}
+    email=$(echo $data | jq .client_email | tr -d \")
 
-pem=/tmp/gcp.pem
-vault read -field=$private $vault > $pem
-if [ ! -z "$(grep '\\n' $pem)" ]; then
-    echo -e $(vault read -field=$private $vault) > $pem
+    echo $data | jq .private_key > $PEM
+    if [ ! -z "$(grep '\\n' $PEM)" ]; then
+        echo -e $(echo $data | jq .private_key | tr -d \") > $PEM
+    fi
+else
+    if [ $1 == "pubsub" ]; then
+        for type in publisher subscriber; do
+            echo $type
+            [ -s $(vault read -field=pubsub_${type}_private_key $vault) ] && \
+                vault read -field=pubsub_${type}_private_key $vault > $PEM
+            [ -s $(vault read -field=pubsub_${type}_client_email $vault) ] && \
+                email=$(vault read -field=pubsub_${type}_client_email $vault)
+        done
+    else
+        private=${1:-private_key}; shift
+        vault read -field=$private $vault > $PEM
+        client=${1:-client_email}; shift
+        email=$(vault read -field=$client $vault)
+    fi
+    if [ ! -z "$(grep '\\n' $PEM)" ]; then
+        echo -e $(vault read -field=$private $vault) > $PEM
+    fi
+
+    case $vault in
+        *sub*) scope=pubsub ;;
+        *) scope=devstorage.full_control
+    esac
 fi
+
 
 jwt_head=$(echo -n '{"alg":"RS256","typ":"JWT"}' | base64url)
 
@@ -44,7 +73,7 @@ jwt_data=$(echo -n "{\"iss\":\"$email\",\
 \"exp\":$(gdate +%s --date=+600\ seconds),\
 \"iat\":$(gdate +%s)}" | base64url)
 
-jwt_sign=$(echo -n "${jwt_head}.${jwt_data}" | openssl dgst -sha256 -sign $pem | base64url )
+jwt_sign=$(echo -n "${jwt_head}.${jwt_data}" | openssl dgst -sha256 -sign $PEM | base64url )
 
 out=$(curl -s -X POST https://www.googleapis.com/oauth2/v4/token \
     --data-urlencode "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer" \

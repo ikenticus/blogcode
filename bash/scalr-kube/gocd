@@ -11,12 +11,23 @@ IFS=/
 set -- $repo
 unset IFS
 
+unset switched
+loop() {
+    local owners=$*
+    [ ! -z $switched ] && return
+    for work in $owners; do
+        if [ -d $src/$base/$work/$repo ]; then
+            cd $src/$base/$work/$repo
+            switched=1
+        fi
+    done
+}
+
 base=github.com
 case $# in
     3)  cd $src/$repo ;;
     2)  cd $src/$base/$repo ;;
-    *)  owners="GannettDigital ikenticus"
-        for work in $owners; do
-            [ -d $src/$base/$work/$repo ] && cd $src/$base/$work/$repo
-        done
+    *)  #owners="GannettDigital ikenticus"
+        loop GannettDigital ikenticus
+        loop $(cd $src/$base; ls -td *)
 esac

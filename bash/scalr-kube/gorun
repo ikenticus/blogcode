@@ -14,7 +14,7 @@ CONSUL_URL=https://consul.service.gciconsul.com:8443
 ### ENV: Overrides
 var=ENVIRONMENT
 if [ -z "$ENVIRONMENT" ]; then
-    eval $var="staging"
+    eval $var="local"
 fi
 #eval echo $var=\$$var
 
@@ -41,12 +41,11 @@ if [ $SCRIPT == "help" ]; then
     exit 0
 fi
 
-
 ENVIRONMENT=$ENVIRONMENT \
 REGION=$REGION \
 CONSUL_URL=$CONSUL_URL \
-VAULT_URL=$VAULT_URL \
 CONSUL_TOKEN=$CONSUL_TOKEN \
+VAULT_URL=$VAULT_URL \
 VAULT_ROLE_ID=$VAULT_ROLE \
 VAULT_SECRET_ID=$VAULT_SECRET \
 go run $SCRIPT
