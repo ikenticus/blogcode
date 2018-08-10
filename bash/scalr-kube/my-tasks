@@ -10,4 +10,4 @@ if [ $? -gt 0 ]; then
     echo -e "Go -> Connect to Server: smb://192.168.1.2/share\n"
     exit 1
 fi
-cp -rpv ~/repos/tasks/* /Volumes/share/repos/tasks/
+cp -rpv ~/repos/tasks/* $share/repos/tasks/
