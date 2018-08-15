@@ -1,0 +1,36 @@
+#!/bin/bash
+#
+# Recursively crawl vault
+#
+
+store=~/repos/tasks/vault
+access="
+    secret/api-services
+    secret/cs-sports
+    secret/paas-api
+    secret/paas-delivery
+"
+
+dir() {
+    local secret=$1
+    echo Listing $secret
+    children=$(vault list $secret | egrep -v "^(Keys|----)$")
+    for child in $children; do
+        case $child in
+            */) dir $secret/${child%/} ;;
+            *) key $secret/$child ;;
+        esac
+    done
+}
+
+key() {
+    local secret=$1
+    echo Saving $secret
+    [ ! -d $store/${secret%/*} ] && mkdir -p $store/${secret%/*}
+    vault read -format=json -field=data $secret > $store/$secret.json
+}
+
+for top in $access; do
+    dir $top
+done
+

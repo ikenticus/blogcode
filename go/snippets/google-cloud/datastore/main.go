@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -30,7 +31,7 @@ type DatastoreKind struct {
 	Bytes               int       `datastore:"bytes"`
 }
 
-func listKinds(ctx context.Context, client *datastore.Client) {
+func listKinds(ctx context.Context, client *datastore.Client, limit int) {
 	query := datastore.NewQuery("__Stat_Kind__").Order("kind_name")
 
 	kinds := []*DatastoreKind{}
@@ -45,12 +46,12 @@ func listKinds(ctx context.Context, client *datastore.Client) {
 
 	for _, k := range kinds {
 		fmt.Printf("\nKind: %s\n  Count: %d\n  Bytes: %d\n", k.KindName, k.Count, k.Bytes)
-		listKeys(ctx, client, k.KindName)
+		listKeys(ctx, client, k.KindName, limit)
 	}
 }
 
-func listKeys(ctx context.Context, client *datastore.Client, key string) {
-	query := datastore.NewQuery(key).KeysOnly().Limit(10)
+func listKeys(ctx context.Context, client *datastore.Client, key string, limit int) {
+	query := datastore.NewQuery(key).KeysOnly().Limit(limit)
 
 	keys, err := client.GetAll(ctx, query, nil)
 	if err != nil {
@@ -66,16 +67,18 @@ func listKeys(ctx context.Context, client *datastore.Client, key string) {
 			keys = keys[:10]
 		} // same as .Limit(#) above
 	*/
-	var last string
+	//var last string
 	for _, k := range keys {
 		fmt.Printf("  %s\n", k.Name)
-		last = k.Name
+		//last = k.Name
 	}
 
-	if !strings.HasPrefix(key, "__") {
-		//fmt.Printf("\nLast: %q, %q\n", last, key)
-		readKey(ctx, client, key, last)
-	}
+	/*
+		if !strings.HasPrefix(key, "__") {
+			//fmt.Printf("\nLast: %q, %q\n", last, key)
+			readKey(ctx, client, key, last)
+		}
+	*/
 }
 
 // struct for Datastore Kind
@@ -155,7 +158,7 @@ type KeyData struct {
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Printf("Usage: %s key.json\n", path.Base(os.Args[0]))
+		fmt.Printf("Usage: %s key.json [limit] [kind] [id]\n", path.Base(os.Args[0]))
 		os.Exit(1)
 	}
 	keyPath := os.Args[1]
@@ -179,9 +182,20 @@ func main() {
 		fmt.Errorf("\nFailed to connect to datastore\n")
 	}
 
+	limit := 10
+	if len(os.Args) > 2 {
+		limit, err = strconv.Atoi(os.Args[2])
+		if err != nil {
+			fmt.Errorf("\nFailed to convert limit parameter\n")
+		}
+	}
+
 	fmt.Printf("\nProject: %s\n%s\n", projectID, strings.Repeat("-", utf8.RuneCountInString(projectID)+10))
-	listKeys(ctx, client, "__kind__")
-	listKinds(ctx, client)
+	listKeys(ctx, client, "__kind__", limit)
+	listKinds(ctx, client, limit)
 	listTasks(ctx, client)
-	//readKey(ctx, client, "rawAsset", "107797671")
+
+	if len(os.Args) > 4 {
+		readKey(ctx, client, os.Args[3], os.Args[4])
+	}
 }

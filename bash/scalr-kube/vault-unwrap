@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+# Vault unwrapper into permanent secret path
+#
+
+if [ $# -lt 2 ]; then
+    echo "Usage: ${0##*/} <token> <secret/path>"
+    exit 0
+fi
+
+token=$1
+secret=$2
+if [ ! -z ${secret##secret/*} ]; then
+    echo "$secret does not begin with secret/"
+    secret=secret/api-services/general/$2
+fi
+
+vault unwrap -format=json -field=data $token | vault write $secret -
