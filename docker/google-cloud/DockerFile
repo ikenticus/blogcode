@@ -1,0 +1,14 @@
+FROM quay.io/gannett/paas-centos7-base:latest
+MAINTAINER Platform Engineering API Services <api-services@gannett.com>
+
+# uncomment to update yum or latest EPEL release
+#RUN yum update -y
+#RUN yum install -y epel-release
+
+# install jq for json parsing
+RUN yum install -y jq
+
+# install gcloud tools
+RUN yum install -y curl which
+RUN curl -sSL https://sdk.cloud.google.com | bash
+ENV PATH $PATH:/root/google-cloud-sdk/bin

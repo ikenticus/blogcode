@@ -1,0 +1,15 @@
+
+Write a script to calculate the Fibonacci number associated with the x numerical parameter
+
+    F(n) = F(n-1) + F(n-2)
+
+    F(0) = 0
+    F(1) = 1
+    F(2) = 1
+    F(3) = 2
+    F(4) = 3
+    F(5) = 5
+
+Bonus: display the entire sequence
+
+https://en.wikipedia.org/wiki/Fibonacci_number
