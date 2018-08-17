@@ -13,9 +13,10 @@ def parse (data):
     lines = data.split('\n')
     for c in lines:
         if len(c) > 0:
-            s = c.split(':', 2)
+            #s = c.split(':', 2) # limit does not merge additional items
+            s = c.split(':')
             user = s[0].strip()
-            chat = s[1].strip()
+            chat = ':'.join(s[1:]).strip()
 
             if user not in stat.keys():
                 stat[user] = {

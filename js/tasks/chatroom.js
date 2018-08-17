@@ -16,9 +16,10 @@ function parse (data) {
 	let lines = data.split('\n');
     _.forEach(lines, (c) => {
         if (c.length > 0) {
-            let s = c.split(':', 2);
+            //let s = c.split(':', 2); // limit does not merge additional items
+            let s = c.split(':');
             let user = _.trim(s[0]),
-                chat = _.trim(s[1]);
+                chat = _.trim(s.slice(1).join(':'));
 
             if (!stat[user])
                 stat[user] =  {

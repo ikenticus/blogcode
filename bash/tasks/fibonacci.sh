@@ -7,6 +7,7 @@ usage() {
     echo -e "Calculate the Nth Fibonacci number\nUsage: ${0##*/} <n>"
 }
 
+# main
 SEQ=(0 1)
 if [ $# -eq 0 ]; then
     usage
