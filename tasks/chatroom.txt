@@ -1,0 +1,253 @@
+moderator: Given this chatroom file with multiple speakers
+handler: hello
+handler: world
+moderator: write a script to parse the file and find the Nth more wordy participant
+listener: 80
+listener: 443
+listener: 8080
+moderator: bonus would be to find the least Nth wordy participant using -N
+moderator: another bonus would be to list all participants in order using N=0
+announcer: Knock Knock Jokes
+break: 1. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Cow says.
+host: Cow says who?
+guest: No, a cow says mooooo!
+break: 2. -----
+guest: guest: Knock knock.
+host: Who’s there?
+guest: A little old lady.
+host: A little old lady who?
+guest: All this time, I had no idea you could yodel.
+break: 3. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Europe.
+host: Europe who?
+guest: No I’m not!
+break: 4. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Etch.
+host: Etch who?
+guest: Bless you, friend.
+break: 5. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Robin.
+host: Robin who?
+guest: Robin you, now hand over the cash.
+break: 6. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Cash.
+host: Cash who?
+guest: No thanks, I’ll have some peanuts.
+break: 7. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Mustache.
+host: Mustache who?
+guest: I mustache you a question, but I’ll shave it for later.
+break: 8. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Tank.
+host: Tank who?
+guest: You’re welcome.
+break: 9. -----
+guest: Knock knock.
+host: Who’s there?
+guest: I smell mop.
+host: I smell mop who?
+guest: Ew.
+break: 10. -----
+guest: Knock knock.
+host: Who’s there?
+guest: I eat mop.
+host: I eat mop who?
+guest: That’s revolting.
+break: 11. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Ya.
+host: Ya who?
+guest: Yahoo! I’m just as psyched to see you!
+break: 12. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Voodoo.
+host: Voodoo who?
+guest: Voodoo you think you are, asking me so many questions?
+break: 13. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Spell.
+host: Spell who?
+guest: Okay, okay: W. H. O.
+break: 14. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Candice.
+host: Candice who?
+guest: Candice door open, or what?
+break: 15. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Boo.
+host: Boo who?
+guest: No need to cry, it’s only a joke.
+break: 16. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Stopwatch.
+host: Stopwatch who?
+guest: Stopwatch you’re doing and pay attention!
+break: 17. -----
+guest: Knock knock.
+host: Who’s there?
+guest: To.
+host: To who?
+guest: It’s to whom.
+break: 18. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Dewey.
+host: Dewey who?
+guest: Dewey have to use a condom every time?
+break: 19. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Honey bee.
+host: Honey bee who?
+guest: Honey bee a dear and open up, would you?
+break: 20. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Lettuce.
+host: Lettuce who?
+guest: Lettuce in, it’s cold out here!
+break: 21. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Mikey.
+host: Mikey who?
+guest: Mikey doesn’t work so help me out, would you?
+break: 22. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Dwayne.
+host: Dwayne who?
+guest: Dwayne the bathtub already. I’m drowning!
+break: 23. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Razor.
+host: Razor who?
+guest: Razor hands, this is a stick up!
+break: 24. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Olive.
+host: Olive who?
+guest: Olive you. Do you love me too?
+break: 25. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Alec.
+host: Alec who?
+guest: Alec-tricity. Ain’t that a shocker?
+break: 26. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Howl.
+host: Howl who?
+guest: Howl you know unless you open the door?
+break: 27. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Iran.
+host: Iran who?
+guest: Iran all the way here. Let me in already!
+break: 28. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Says.
+host: Says who?
+guest: Says me, that’s who.
+break: 29. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Snow.
+host: Snow who?
+guest: Snow use askin’ when you can just open.
+break: 30. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Some.
+host: Some who?
+guest: Some day you’ll recognize me, hopefully.
+break: 31. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Stupid.
+host: Stupid who?
+guest: Stupid you, that’s who.
+break: 32. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Needle.
+host: Needle who?
+guest: Needle little help gettin’ through.
+break: 33. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Thermos.
+host: Thermos who?
+guest: Thermos be a better way to get through to you.
+break: 34. -----
+guest: Knock Knock
+host: Who’s there?
+guest: Water.
+host: Water who?
+guest: Water you doing? Just open the door!
+break: 35. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Amos.
+host: Amos who?
+guest: A mosquito.
+break: 36. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Dozen.
+host: Dozen who?
+guest: Dozen anyone wanna let me in?
+break: 37. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Nanna.
+host: Nanna who?
+guest: Nanna your business, that’s who.
+break: 38. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Euripides.
+host: Euripides who?
+guest: Euripides jeans, you pay for ’em, okay?
+break: 39. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Annie.
+host: Annie who?
+guest: Annie way you can let me in soon?
+break: 40. -----
+guest: Knock knock.
+host: Who’s there?
+guest: Canoe.
+host: Canoe who?
+guest: Canoe come out or what?
+break: END discussion -----
+moderator: what happens when a colon: is used within the chat?
+announcer: no clue

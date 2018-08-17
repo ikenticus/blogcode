@@ -1,5 +1,5 @@
 
-Write a script to calculate the Fibonacci number associated with the x numerical parameter
+Write a script to calculate the Fibonacci number associated with the Nth numerical parameter
 
     F(n) = F(n-1) + F(n-2)
 
@@ -10,6 +10,6 @@ Write a script to calculate the Fibonacci number associated with the x numerical
     F(4) = 3
     F(5) = 5
 
-Bonus: display the entire sequence
+Bonus: display the entire Fibonacci sequence up to the Nth value
 
 https://en.wikipedia.org/wiki/Fibonacci_number
