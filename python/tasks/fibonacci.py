@@ -7,6 +7,7 @@ import sys
 def usage():
     print 'Calculate the Nth Fibonacci number\nUsage: %s <n>' % os.path.basename(sys.argv[0])
 
+# main
 SEQ = [ 0, 1 ]
 if len(sys.argv) == 1:
     usage()

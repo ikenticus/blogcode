@@ -8,7 +8,7 @@ let _ = require('lodash'),
     path = require('path');
 
 function usage() {
-    console.log(format('Display chatroom statistics\nUsage: %s <chatfile> <n>\n', path.basename(process.argv[1])));
+    console.log(format('Display chatroom statistics\nUsage: {} <chatfile> <n>', path.basename(process.argv[1])));
 }
 
 function parse (data) {
@@ -52,7 +52,7 @@ function output (order, stat) {
     }
 }
 
-// MAIN
+// main
 if (process.argv.length < 4) {
     usage();
     process.exit(1);

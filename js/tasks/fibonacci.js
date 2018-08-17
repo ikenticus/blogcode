@@ -9,7 +9,7 @@ function usage() {
     console.log(format('Calculate the Nth Fibonacci number\nUsage: {} <n>', path.basename(process.argv[1])));
 }
 
-// MAIN
+// main
 let SEQ = [ 0, 1 ];
 if (process.argv.length === 2) {
     usage();
