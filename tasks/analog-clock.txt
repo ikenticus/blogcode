@@ -1,0 +1,9 @@
+
+Write a script to calculate the angle between the hour and minute hands on an analog clock given the HH:MM format
+
+For example:
+    12:00     0 degrees
+     3:00    90 degrees
+     6:00   180 degrees
+     6:30    15 degrees
+     9:00   270 degrees
