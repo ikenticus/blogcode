@@ -132,7 +132,8 @@ auto() {
 
 run() {
     local pod=$1
-    local app=${2%-queue}
+    local app=$2
+    #local app=${2%-queue}
     echo -e "\n> Pod: $pod, Container: $app"
     cmds=$(lazy $cmds)
     case $cmds in
