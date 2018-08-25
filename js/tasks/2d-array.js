@@ -13,6 +13,7 @@ process.stdin.on('data', inputStdin => {
     // original code needed modification to fix excess spaces
     inputString += inputStdin.replace(/ +/g, ' ')
         .replace(/^\s+/, '');
+    // actually, testcases would not contain excess spaces
 });
 
 process.stdin.on('end', _ => {
