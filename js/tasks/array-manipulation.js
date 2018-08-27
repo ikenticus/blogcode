@@ -26,11 +26,12 @@ function readLine() {
 
 // Complete the arrayManipulation function below.
 function arrayManipulation(n, queries) {
+    /*
+    // this method times out with 10k queries
     let arr = Array(n);
     for (let i = 0; i < n;  i++) {
         arr[i] = 0;
     }
-
     for (let q = 0; q < queries.length; q++) {
         let [a, b, k] = queries[q]
         for (let i = a; i <= b; i++) {
@@ -39,6 +40,26 @@ function arrayManipulation(n, queries) {
         //console.log('ARR', arr);
     }
     return Math.max(...arr);
+    */
+
+    // https://codereview.stackexchange.com/questions/95755/algorithmic-crush-problem-hitting-timeout-errors
+    const _ = require('lodash');
+    let arr = _.fill(Array(n+1), 0);
+    _.forEach(queries, (q) => {
+        let [a, b, k] = q
+        // calculate differance array
+        arr[a-1] += k;
+        arr[b] -= k;
+    });
+    let max = 0,
+        sum =0;
+    _.forEach(arr, (i) => {
+        // determine max using prefix sum
+        sum += i
+        if (sum > max)
+            max = sum;
+    });
+    return max;
 }
 
 function main() {
