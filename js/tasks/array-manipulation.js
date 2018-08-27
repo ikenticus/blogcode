@@ -29,7 +29,7 @@ function arrayManipulation(n, queries) {
     /*
     // this method times out with 10k queries
     let arr = Array(n);
-    for (let i = 0; i < n;  i++) {
+    for (let i = 0; i < n; i++) {
         arr[i] = 0;
     }
     for (let q = 0; q < queries.length; q++) {

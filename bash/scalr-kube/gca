@@ -1,0 +1,19 @@
+#!/bin/bash
+#
+# Google Cloud Auth
+#   authenticates using specified key-file and sets project id
+#
+
+
+help() {
+    echo -e "Usage: ${0##*/} <key-file>"
+    exit 1
+}
+
+if [ $# -eq 0 ]; then
+    help
+else
+    KEY=$1
+    gcloud auth activate-service-account --key-file $KEY
+    gcloud config set project $(cat $KEY | jq -r .project_id)
+fi
