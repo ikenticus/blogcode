@@ -11,10 +11,12 @@ def minimumSwaps(arr):
     ord = arr[:]
     ord.sort()
     swaps = 0
+
+    '''
     while arr != ord:
         # extract unsorted items first
         mix = []
-        for i in range(0, len(arr)):
+        for i in xrange(0, len(arr)):
             if arr[i] != ord[i]:
                 mix.append(arr[i])
         arr = mix[:]
@@ -22,7 +24,7 @@ def minimumSwaps(arr):
         ord.sort()
 
         # then figure out swaps from reduced list
-        for i in range(0, len(arr)):
+        for i in xrange(0, len(arr)):
             a = arr[i]
             if a != ord[i]:
                 swaps += 1
@@ -30,8 +32,22 @@ def minimumSwaps(arr):
                 arr[i] = arr[j]
                 arr[j] = a
 
-        # while this two-pronged method in node.js
+        # while this two-pronged method worked in node.js
         # still times out in python2 on 100k array
+    '''
+
+    # build reverse ordered index
+    ordict = {}
+    for idx, val in enumerate(ord):
+        ordict[val] = idx
+
+    while arr != ord:
+        for i in xrange(0, len(arr)):
+            if arr[i] != ord[i]:
+                swaps += 1
+                j = ordict[arr[i]]
+                arr[i], arr[j] = arr[j], arr[i]
+
     return swaps
 
 if __name__ == '__main__':

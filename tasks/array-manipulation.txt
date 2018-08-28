@@ -153,3 +153,19 @@ Testcase 7: 2497169732
 < array-manipulation-testcase7.txt
 
 -----
+
+# https://wcipeg.com/wiki/Prefix_sum_array_and_difference_array
+
+Using the first sample
+Initially we have [   0   0    0 0 0 ]
+Applying 1 2 100: [ 100 100    0 0 0 ]
+Difference Array: [ 100   0 -100 0 0 ]
+[ 100-100, 0-100, 0-0, 0-0 ] with the 100 upfront
+yields the (a += k) and the ([b+1] -= k) logic
+
+The resulting arr [ 100, 100, 0, 0, -100, -100 ]
+Coupled with the maximum value from the Prefix Sum Array:
+[ 100, 100+100, 100+100+0, 100+100+0+0, 100+100+0+0-100, 100+100+0+0-100-100 ]
+gives the overall max as if you added them up iteratively
+
+-----
