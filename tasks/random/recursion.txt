@@ -1,3 +1,0 @@
-
-Write a script to recursively loop through a json file and list all occurrences of each letter
-
