@@ -13,7 +13,7 @@ public class Solution {
         scanner.nextLine();
         H = scanner.nextInt();
         scanner.close();
-        if (B < 0 || H < 0) {
+        if (B <= 0 || H <= 0) {
             flag = false;
             System.out.println("java.lang.Exception: Breadth and height must be positive");
         }
