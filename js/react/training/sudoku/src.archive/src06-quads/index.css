@@ -1,0 +1,101 @@
+body {
+  font: 14px "Arial Narrow", Futura, sans-serif;
+  margin: 20px;
+}
+
+ol, ul {
+  padding-left: 30px;
+}
+
+.board-row:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
+.status {
+  margin-bottom: 10px;
+}
+
+.square {
+  background: #fff;
+  border: 1px solid #999;
+  float: left;
+  font-size: 24px;
+  font-weight: normal;
+  line-height: 34px;
+  height: 50px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 50px;
+}
+
+.square.left3,
+.square.left6 {
+  border-left: 3px solid black;
+}
+
+.square.top3,
+.square.top6 {
+  border-top: 3px solid black;
+}
+
+.square:focus {
+  outline: none;
+}
+
+.square.red {
+  color: #ee2222;
+}
+
+.kbd-navigation .square:focus {
+  background: #ddd;
+}
+
+.game {
+  display: flex;
+  flex-direction: row;
+}
+
+.game-nums {
+  margin-left: 30px;
+  width: 50px;
+}
+
+.circle {
+  background: #eee;
+  border: 1px solid #999;
+  border-radius: 60%;
+  float: left;
+  font-size: 24px;
+  font-weight: normal;
+  line-height: 34px;
+  height: 45px;
+  margin: 2px;
+  padding: 0;
+  text-align: center;
+  width: 45px;
+}
+
+.circle:focus {
+  outline: none;
+}
+
+.circle:hover {
+  background: #bbb;
+}
+
+.circle.filled {
+  background: #229922;
+}
+
+.circle.active {
+  background: #222;
+  color: #ddd;
+}
+
+.circle.active.filled {
+  background: #229922;
+}
