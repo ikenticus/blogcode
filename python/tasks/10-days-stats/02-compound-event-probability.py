@@ -8,9 +8,14 @@ There are  urns labeled X, Y, and Z.
 '''
 # One ball is drawn from each of the 3 urns. What is the probability that, of the 3 balls drawn, 2 are red and 1 is black?
 
-# http://www.fileformat.info/info/unicode/char/2229/index.htm
+# http://www.personal.psu.edu/ejp10/blogs/gotunicode/2007/09/inserting-the-union-and-inters-1.html
+#  ∪  http://www.fileformat.info/info/unicode/char/222a/index.htm (union)
+#  ∩  http://www.fileformat.info/info/unicode/char/2229/index.htm (intersection)
+#  ∅  https://www.fileformat.info/info/unicode/char/2205/index.htm (empty set)
+
 # Intersection, multiplication rule:
-# P(A and B) = P(A) x P(B)
+# P(A and B) = P(A) * P(B)
+# P(A ∩ B) = P(A) * P(B)
 
 '''
 Urn X:  P(Red) = 4/7    P(Black) = 3/7

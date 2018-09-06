@@ -146,7 +146,6 @@ ReactDOM.render(
 );
 
 function checkConflicts(r, c, squares, circle) {
-  //let check = circle; //(circle === 1) ? -1 : circle;
   for (let i = 0; i < s; i++) {
     // Horizontal check
     if (i !== c && Math.abs(squares[s*r+i]) === circle) {
