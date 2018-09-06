@@ -83,3 +83,19 @@ function main() {
     printLinkedList(llist.head);
 }
 
+
+/*
+
+Testcase0:
+2
+16
+13
+
+Testcase1:
+4
+17
+19
+5
+12
+
+*/
