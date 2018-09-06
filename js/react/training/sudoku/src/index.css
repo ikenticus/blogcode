@@ -47,3 +47,41 @@ ol, ul {
 .kbd-navigation .square:focus {
   background: #ddd;
 }
+
+.game {
+  display: flex;
+  flex-direction: row;
+}
+
+.game-nums {
+  margin-left: 30px;
+  width: 50px;
+}
+
+.circle {
+  background: #eee;
+  border: 1px solid #999;
+  border-radius: 60%;
+  float: left;
+  font-size: 24px;
+  font-weight: normal;
+  line-height: 34px;
+  height: 45px;
+  margin: 2px;
+  padding: 0;
+  text-align: center;
+  width: 45px;
+}
+
+.circle:focus {
+  outline: none;
+}
+
+.circle:hover {
+  background: #bbb;
+}
+
+.circle.active {
+  background: #222;
+  color: #ddd;
+}

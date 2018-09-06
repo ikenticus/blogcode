@@ -3,6 +3,14 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import _ from 'lodash';
 
+function Circle(props) {
+  return (
+    <button className="circle" onClick={props.onClick}>
+      {props.value}
+    </button>
+  );
+}
+
 class Square extends React.Component {
   constructor(props) {
     super(props);
@@ -53,13 +61,21 @@ class Board extends React.Component {
 }
 
 class Game extends React.Component {
+  renderCircle(i) {
+    return <Circle value={i} />;
+  }
+
   render() {
+    const s = 9;
     return (
       <div className="game">
         <div className="game-board">
           <Board />
         </div>
-        <div className="game-info">
+        <div className="game-nums">
+          {_.times(s, i =>
+            this.renderCircle(i+1)
+          )}
         </div>
       </div>
     );
