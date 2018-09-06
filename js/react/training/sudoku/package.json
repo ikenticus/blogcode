@@ -2,6 +2,7 @@
   "name": "sudoku",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
