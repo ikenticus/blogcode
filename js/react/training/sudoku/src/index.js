@@ -104,9 +104,10 @@ class Game extends React.Component {
 
   handleClickSquare(r, c) {
     const circle = this.state.circle;
-    const squares = this.state.squares.slice();
+    let squares = this.state.squares.slice();
     squares[s*r+c] = (Math.abs(squares[s*r+c]) === circle) ? null : circle;
     let circles = _.countBy(squares, Math.floor);
+    squares = revertSquares(squares.slice());
     this.setState({
       circles: circles,
       squares: squares[s*r+c] < 1 ? squares : checkConflicts(r, c, squares, circle)
@@ -146,15 +147,18 @@ ReactDOM.render(
 
 // operational complexity? 3 * O(s)
 function checkConflicts(r, c, squares, circle) {
+  let conflict = false;
   for (let i = 0; i < s; i++) {
     // Horizontal check
     if (i !== c && Math.abs(squares[s*r+i]) === circle) {
       squares[s*r+i] = squares[s*r+c] = -circle;
+      conflict = true;
     }
 
     // Vertical check
     if (i !== r && Math.abs(squares[s*i+c]) === circle) {
       squares[s*i+c] = squares[s*r+c] = -circle;
+      conflict = true;
     }
 
     // Quadrant check
@@ -162,7 +166,19 @@ function checkConflicts(r, c, squares, circle) {
     let k = 9*Q - 6*(Q%3) + 6*Math.floor(i/3) + i
     if (i !== 3*(r%3) + (c%3) && Math.abs(squares[k]) === circle) {
       squares[k] = squares[s*r+c] = -circle;
+      conflict = true;
     }
   }
+  if (!conflict) squares[s*r+c] = circle;
   return squares;
+}
+
+function revertSquares(squares) {
+    for (let r = 0; r < s; r++) {
+      for (let c = 0; c < s; c++) {
+        if (squares[s*r+c] < 0)
+          squares = checkConflicts(r, c, squares, Math.abs(squares[s*r+c]));
+      }
+    }
+    return squares;
 }

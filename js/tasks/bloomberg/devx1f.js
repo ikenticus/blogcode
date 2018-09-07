@@ -38,6 +38,7 @@ function main() {
         nodes.addNode(i);
     }
 
+    console.log(JSON.stringify(nodes, null, 4));
     console.log(nodes);
     printList(nodes.head);
 }
