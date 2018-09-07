@@ -52,3 +52,32 @@ The longest root-to-leaf path is shown below:
 
 There are 4 nodes in this path that are connected by 3 edges, meaning our BST's height = 3. Thus, we print 3 as our answer.
 
+-----
+
+Testcase0: 3
+7
+3
+5
+2
+1
+4
+6
+7
+
+Testcase2: 5
+13
+25
+39
+12
+19
+9
+23
+55
+31
+60
+35
+41
+70
+90
+
+-----

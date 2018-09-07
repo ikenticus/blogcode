@@ -21,7 +21,7 @@ function loop(x, queue=[]) {
         delete x.child;
     } else if (x.next) { 
         loop(nodes[x.next], queue);
-    } else if (queue) {
+    } else { // if (queue) {
         x.next = queue.pop();
         if (x.next) loop(nodes[x.next], queue);
     }
