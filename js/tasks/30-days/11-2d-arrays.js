@@ -1,7 +1,5 @@
 'use strict';
 
-const fs = require('fs');
-
 process.stdin.resume();
 process.stdin.setEncoding('utf-8');
 
@@ -9,10 +7,7 @@ let inputString = '';
 let currentLine = 0;
 
 process.stdin.on('data', inputStdin => {
-    //inputString += inputStdin;
-    // original code needed modification to fix excess spaces
-    inputString += inputStdin.replace(/ +/g, ' ')
-        .replace(/^\s+/, '');
+    inputString += inputStdin;
 });
 
 process.stdin.on('end', _ => {
@@ -27,9 +22,14 @@ function readLine() {
     return inputString[currentLine++];
 }
 
-// Complete the hourglassSum function below.
-function hourglassSum(arr) {
-    //console.log(arr);
+
+
+function main() {
+    let arr = Array(6);
+
+    for (let i = 0; i < 6; i++) {
+        arr[i] = readLine().split(' ').map(arrTemp => parseInt(arrTemp, 10));
+    }
 
     let hours = [];
     for (let r = 0; r < arr.length - 2; r++) {
@@ -41,7 +41,6 @@ function hourglassSum(arr) {
                 ]);
         }
     }
-    //console.log(hours);
     
     let max = -100; // do not initialize to zero for negative cases
     let sums = [];
@@ -52,35 +51,7 @@ function hourglassSum(arr) {
         }
         if (sums[r] > max) max = sums[r];
     }
-    //console.log(sums);
     
-    return max;
-
-/*
-    // lodash method
-    const _ = require('lodash');
-    let sums = [];
-    _.forEach(hours, (h) => {
-        sums.push(_.sum(h));
-    });
-    //console.log(sums);
-    
-    return _.max(sums);
-*/
+    console.log(max);
 }
 
-function main() {
-    const ws = fs.createWriteStream(process.env.OUTPUT_PATH);
-
-    let arr = Array(6);
-
-    for (let i = 0; i < 6; i++) {
-        arr[i] = readLine().split(' ').map(arrTemp => parseInt(arrTemp, 10));
-    }
-
-    let result = hourglassSum(arr);
-
-    ws.write(result + "\n");
-
-    ws.end();
-}
