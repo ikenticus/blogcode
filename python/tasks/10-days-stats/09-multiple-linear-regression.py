@@ -98,6 +98,7 @@ FY = numpy.array([raw_input().rstrip().split(" ") for _ in range(n)], float)
 
 # F = [ f1, ..., f2, 1 ]; Y = [ Y1, ... Ym ]
 # reasoning is equation = f1 * b1 + ... fm * bm + f0 * 1, where f0 = a
+# 2D Array notation: FY[range of outer array, range of inner array]
 F = numpy.hstack( ( FY[:,:-1], numpy.ones((n,1)) ) )
 Y = FY[:,-1]
 
