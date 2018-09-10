@@ -64,7 +64,8 @@ function Square(props) {
         props.class +
         " top" + props.row +
         " left" + props.col +
-        (props.bad ? " red" : "")
+        (props.bad ? " red" : "") +
+        (props.lock ? " green": "")
       }
       onClick={props.onClick}>
       {props.value}
@@ -77,8 +78,9 @@ class Board extends React.Component {
     return (
       <Square
         key={"square" + r + c}
-        bad={this.props.squares[s*r+c] < 0}
         row={r} col={c} class="square"
+        bad={this.props.squares[s*r+c] < 0}
+        lock={this.props.locked[s*r+c] > 0}
         value={Math.abs(this.props.squares[s*r+c]).toString().replace('0', '')}
         onClick={() => this.props.onClick(r, c)}
       />
@@ -107,7 +109,8 @@ class Game extends React.Component {
       input: '',
       circle: 1,
       circles: {},
-      squares: Array(s*s).fill(null)
+      squares: Array(s*s).fill(null),
+      locked: Array(s*s).fill(null)
     };
   }
 
@@ -117,8 +120,10 @@ class Game extends React.Component {
 
   handleSubmit(event) {
     let values = this.state.input.replace(/[^\d]+/g, '');
-    alert('Puzzle:' + values.split(''));
-    this.setState({squares: values.split('')});
+    this.setState({
+      locked: values.split(''),
+      squares: values.split('')
+    });
     event.preventDefault();
   }
 
@@ -129,6 +134,7 @@ class Game extends React.Component {
   }
 
   handleClickSquare(r, c) {
+    if (this.state.locked[s*r+c] > 0) return;
     const circle = this.state.circle;
     let squares = this.state.squares.slice();
     squares[s*r+c] = (Math.abs(squares[s*r+c]) === circle) ? null : circle;
@@ -142,6 +148,7 @@ class Game extends React.Component {
 
   render() {
     const input = this.state.input;
+    const locked = this.state.locked;
     const circle = this.state.circle;
     const circles = this.state.circles;
     const squares = this.state.squares;
@@ -149,6 +156,7 @@ class Game extends React.Component {
       <div className="game">
         <div className="game-board">
           <Board
+            locked={locked}
             squares={squares}
             onClick={(r, c) => this.handleClickSquare(r, c)}
           />

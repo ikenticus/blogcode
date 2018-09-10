@@ -50,6 +50,10 @@ ol, ul {
   color: #ee2222;
 }
 
+.square.green {
+  color: #229922;
+}
+
 .kbd-navigation .square:focus {
   background: #ddd;
 }
