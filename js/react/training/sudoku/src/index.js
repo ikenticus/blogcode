@@ -1,7 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import _ from 'lodash';
+import './index.css';
+
+//import { Router, Route, Link } from 'react-router';
+//const query = new URLSearchParams(this.props.location.search); alert(query.get('input'));
 
 const s = 9;
 
