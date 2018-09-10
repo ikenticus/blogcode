@@ -8,6 +8,17 @@ import './index.css';
 
 const s = 9;
 
+function Input(props) {
+  return (
+    <form class="input" onSubmit={props.onSubmit}>
+      <label>
+        <input class="entry" type="text" value={props.value} onChange={props.onChange} />
+      </label>
+      <input class="submit" type="submit" value="FILL" />
+    </form>
+  );
+}
+
 function Circle(props) {
   return (
     <button
@@ -93,10 +104,22 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      input: '',
       circle: 1,
       circles: {},
       squares: Array(s*s).fill(null)
     };
+  }
+
+  handleChange(event) {
+    this.setState({input: event.target.value});
+  }
+
+  handleSubmit(event) {
+    let values = this.state.input.replace(/[^\d]+/g, '');
+    alert('Puzzle:' + values.split(''));
+    this.setState({squares: values.split('')});
+    event.preventDefault();
   }
 
   handleClickCircle(i) {
@@ -116,8 +139,9 @@ class Game extends React.Component {
       squares: squares[s*r+c] < 1 ? squares : checkConflicts(r, c, squares, circle)
     });
   }
-;
+
   render() {
+    const input = this.state.input;
     const circle = this.state.circle;
     const circles = this.state.circles;
     const squares = this.state.squares;
@@ -127,6 +151,11 @@ class Game extends React.Component {
           <Board
             squares={squares}
             onClick={(r, c) => this.handleClickSquare(r, c)}
+          />
+          <Input
+            value={input}
+            onChange={(e) => this.handleChange(e)}
+            onSubmit={(e) => this.handleSubmit(e)}
           />
         </div>
         <div className="game-nums">

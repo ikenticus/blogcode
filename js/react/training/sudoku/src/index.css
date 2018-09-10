@@ -99,3 +99,11 @@ ol, ul {
 .circle.active.filled {
   background: #229922;
 }
+
+.input {
+  margin-top: 20px;
+}
+
+.input .entry {
+  width: 400px;
+}
