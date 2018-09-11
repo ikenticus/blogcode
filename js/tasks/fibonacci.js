@@ -9,6 +9,15 @@ function usage() {
     console.log(format('Calculate the Nth Fibonacci number\nUsage: {} <n>', path.basename(process.argv[1])));
 }
 
+function fibonacci(n) {
+    f = [0, 1];
+    for (let i = 2; i <= n; i++) {
+        f.push(f[i-2] + f[i-1]);
+    }
+    //console.log(f);
+    return f[n];
+}
+
 // main
 let SEQ = [ 0, 1 ];
 if (process.argv.length === 2) {
