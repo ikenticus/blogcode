@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
     "os"
+    "regexp"
     "strings"
 
 	xj "github.com/basgys/goxml2json"
@@ -30,5 +31,11 @@ func main() {
     var clean interface{}
     json.Unmarshal(output.Bytes(), &clean)
     pretty, _ := json.MarshalIndent(clean, "", "    ")
-    fmt.Println(string(pretty))
+    //fmt.Println(string(pretty))
+
+    // replace all "-A*" with "a*"
+    r := regexp.MustCompile(`"-[A-Z]`)
+    fmt.Println(r.ReplaceAllStringFunc(string(pretty), func(m string) string {
+        return strings.Replace(strings.ToLower(m), "-", "", 1)
+    }))
 }

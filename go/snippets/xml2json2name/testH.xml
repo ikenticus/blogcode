@@ -1,0 +1,14 @@
+<Vote ElectionDate="2016-11-08" Timestamp="2018-09-12T17:20:22.478Z">
+    <Race Test="0" ID="36581" Type="General" TypeID="G" OfficeID="H" OfficeName="U.S. House" Desc="Eastern Long Island" SeatName="District 1" SeatNum="1" National="1">
+        <ReportingUnit StatePostal="NY" Name="New York" Level="state" LastUpdated="2017-02-17T16:49:23.983Z">
+            <Precincts Reporting="473" Total="473" ReportingPct="100.00"/>
+            <Candidate ID="76974" Party="GOP" Incumbent="1" First="Lee" Last="Zeldin" PolID="59740" BallotOrder="2" PolNum="51894" VoteCount="188499" Winner="X"/>
+            <Candidate ID="79242" Party="Dem" First="Anna" Last="Throne-Holst" Abbrv="ThrnHlt" PolID="65237" BallotOrder="1" PolNum="52440" VoteCount="135278"/>
+        </ReportingUnit>
+        <ReportingUnit StatePostal="NY" Name="Suffolk" ID="33052" Level="subunit" FIPSCode="36103" LastUpdated="2017-02-17T16:49:23.983Z">
+            <Precincts Reporting="473" Total="473" ReportingPct="100.00"/>
+            <Candidate ID="76974" Party="GOP" Incumbent="1" First="Lee" Last="Zeldin" PolID="59740" BallotOrder="2" PolNum="51894" VoteCount="188499" Winner="X"/>
+            <Candidate ID="79242" Party="Dem" First="Anna" Last="Throne-Holst" Abbrv="ThrnHlt" PolID="65237" BallotOrder="1" PolNum="52440" VoteCount="135278"/>
+        </ReportingUnit>
+    </Race>
+</Vote>

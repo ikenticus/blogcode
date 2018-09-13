@@ -1,0 +1,18 @@
+<Vote ElectionDate="2016-11-08" Timestamp="2018-09-11T17:45:42.695Z">
+    <Race Test="0" ID="39242" Type="General" TypeID="G" OfficeID="S" OfficeName="U.S. Senate" National="1">
+        <ReportingUnit StatePostal="NY" Name="New York" Level="state" LastUpdated="2017-02-17T16:49:23.983Z">
+            <Precincts Reporting="15056" Total="15056" ReportingPct="100.00"/>
+            <Candidate ID="77148" Party="Dem" Incumbent="1" First="Charles" Last="Schumer" PolID="1745" BallotOrder="1" PolNum="50300" VoteCount="5221949" Winner="X"/>
+            <Candidate ID="79234" Party="GOP" First="Wendy" Last="Long" PolID="62065" BallotOrder="2" PolNum="52615" VoteCount="2009353"/>
+            <Candidate ID="79236" Party="Grn" First="Robin" Last="Wilson" PolID="65204" BallotOrder="4" PolNum="53753" VoteCount="113413"/>
+            <Candidate ID="79241" Party="Lib" First="Alex" Last="Merced" PolID="65673" BallotOrder="9" PolNum="53244" VoteCount="48121"/>
+        </ReportingUnit>
+        <ReportingUnit StatePostal="NY" Name="Albany" ID="33001" Level="subunit" FIPSCode="36001" LastUpdated="2017-02-17T16:49:23.983Z">
+            <Precincts Reporting="317" Total="317" ReportingPct="100.00"/>
+            <Candidate ID="77148" Party="Dem" Incumbent="1" First="Charles" Last="Schumer" PolID="1745" BallotOrder="1" PolNum="50300" VoteCount="98291" Winner="X"/>
+            <Candidate ID="79234" Party="GOP" First="Wendy" Last="Long" PolID="62065" BallotOrder="2" PolNum="52615" VoteCount="33754"/>
+            <Candidate ID="79236" Party="Grn" First="Robin" Last="Wilson" PolID="65204" BallotOrder="4" PolNum="53753" VoteCount="2301"/>
+            <Candidate ID="79241" Party="Lib" First="Alex" Last="Merced" PolID="65673" BallotOrder="9" PolNum="53244" VoteCount="1223"/>
+        </ReportingUnit>
+    </Race>
+</Vote>
