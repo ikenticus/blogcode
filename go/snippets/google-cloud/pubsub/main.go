@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -75,7 +76,7 @@ func getMessage(ctx context.Context, client *pubsub.Client, sub string) {
 	//fmt.Println("No Error")
 }
 
-func putMessage(ctx context.Context, client *pubsub.Client, topic string) {
+func putMessage(ctx context.Context, client *pubsub.Client, topic string, msgPath string) {
 	// service account may not have permissions to create subscription
 	/*
 		sub, err := client.CreateSubscription(ctx, topic, pubsub.SubscriptionConfig{
@@ -87,10 +88,22 @@ func putMessage(ctx context.Context, client *pubsub.Client, topic string) {
 		}
 		fmt.Printf("Created subscription: %v\n", sub)
 	*/
+    msg := fmt.Sprintf("Testing %s", topic)
+    if msgPath != "" {
+	    tmp, err := ioutil.ReadFile(msgPath)
+	    if err != nil {
+		    log.Fatalf("Failed to read file %q: %v", msgPath, err)
+	    }
+        msg = string(tmp)
+        fmt.Println(msg)
+    }
+    hash := base64.StdEncoding.EncodeToString([]byte(msg))
+    check, _ := base64.StdEncoding.DecodeString(hash)
+    fmt.Println(hash, string(check))
 	res := client.Topic(topic).Publish(ctx, &pubsub.Message{
-		Data: []byte(fmt.Sprintf("Testing %s", topic)),
-	})
-	fmt.Printf("Published %q: %q\n", topic, res)
+        Data: []byte(msg),
+    })
+    fmt.Printf("Published %s to %q: %q\n", msgPath, topic, res)
 }
 
 func putTopic(ctx context.Context, client *pubsub.Client, topic string) {
@@ -137,10 +150,18 @@ func main() {
 		log.Fatalf("Failed to connect to datastore\n")
 	}
 
-	sub := "sports-subscription"
 	topic := "sports-aggregation"
 	//listSubscriptions(ctx, client, topic)
 	//putTopic(ctx, client, topic)
-	putMessage(ctx, client, topic)
+
+    msgPath := ""
+    if len(os.Args) > 2 {
+        msgPath = os.Args[2]
+    }
+    fmt.Println(topic, msgPath)
+	putMessage(ctx, client, topic, msgPath)
+
+	//putMessage(ctx, client, topic, "")
+	sub := "sports-subscription"
 	getMessage(ctx, client, sub)
 }
