@@ -182,20 +182,19 @@ func main() {
 		fmt.Errorf("\nFailed to connect to datastore\n")
 	}
 
-	limit := 10
-	if len(os.Args) > 2 {
-		limit, err = strconv.Atoi(os.Args[2])
-		if err != nil {
-			fmt.Errorf("\nFailed to convert limit parameter\n")
+	if len(os.Args) > 3 {
+		readKey(ctx, client, os.Args[2], os.Args[3])
+	} else {
+		limit := 10
+		if len(os.Args) > 2 {
+			limit, err = strconv.Atoi(os.Args[2])
+			if err != nil {
+				fmt.Errorf("\nFailed to convert limit parameter\n")
+			}
 		}
-	}
-
-	fmt.Printf("\nProject: %s\n%s\n", projectID, strings.Repeat("-", utf8.RuneCountInString(projectID)+10))
-	listKeys(ctx, client, "__kind__", limit)
-	listKinds(ctx, client, limit)
-	listTasks(ctx, client)
-
-	if len(os.Args) > 4 {
-		readKey(ctx, client, os.Args[3], os.Args[4])
+		fmt.Printf("\nProject: %s\n%s\n", projectID, strings.Repeat("-", utf8.RuneCountInString(projectID)+10))
+		listKeys(ctx, client, "__kind__", limit)
+		listKinds(ctx, client, limit)
+		listTasks(ctx, client)
 	}
 }
