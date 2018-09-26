@@ -18,6 +18,8 @@ import (
 	"cloud.google.com/go/datastore"
 )
 
+const datastoreMaxPropertyBytes = 1048487
+
 // struct for Datastore Kind
 type DatastoreKind struct {
 	KindName            string    `datastore:"kind_name"`
@@ -46,6 +48,7 @@ func listKinds(ctx context.Context, client *datastore.Client, limit int) {
 
 	for _, k := range kinds {
 		fmt.Printf("\nKind: %s\n  Count: %d\n  Bytes: %d\n", k.KindName, k.Count, k.Bytes)
+		//fmt.Printf("RAW: %+v\n", k)
 		listKeys(ctx, client, k.KindName, limit)
 	}
 }
@@ -142,6 +145,55 @@ func readKey(ctx context.Context, client *datastore.Client, kind string, id stri
 	fmt.Println(string(output))
 }
 
+func deleteKey(ctx context.Context, client *datastore.Client, kind string, id string) {
+	key := datastore.NameKey(kind, id, nil)
+	if err := client.Delete(ctx, key); err != nil {
+		if err == datastore.ErrNoSuchEntity {
+			fmt.Errorf("\nEntity not found: %s\n", id)
+		}
+	}
+	fmt.Printf("Deleted id %s from %s\n", id, kind)
+}
+
+func writeKey(ctx context.Context, client *datastore.Client, kind string, id string, dataPath string) {
+	key := datastore.NameKey(kind, id, nil)
+	data, err := ioutil.ReadFile(dataPath)
+	if err != nil {
+		fmt.Errorf("Unable to read file: %s\n%q\n", dataPath, err)
+	}
+	//fmt.Println(key)
+	//fmt.Println(string(data))
+	//entity := &DatastoreEntity{Value: data}
+
+    var buf bytes.Buffer
+	zip := gzip.NewWriter(&buf)
+	if _, err := zip.Write(data); err != nil {
+		fmt.Errorf("failed gzip for id %q: %v", id, err)
+	}
+	zip.Close()
+	if buf.Len() > datastoreMaxPropertyBytes {
+		fmt.Errorf("compressed size %d bytes excedes datastore max %d bytes", buf.Len(), datastoreMaxPropertyBytes)
+	}
+
+	doc, err := ioutil.ReadAll(&buf)
+	if err != nil {
+		fmt.Errorf("failed reading compressed data for id %q: %v", id, err)
+	}
+	entity := &DatastoreEntity{Value: doc}
+
+	wrote, err := client.Put(ctx, key, entity)
+	if err != nil {
+		fmt.Errorf("failed put for id %q: %v", id, err)
+	}
+	if ctx.Err() != nil {
+		fmt.Errorf("context cancelled")
+	}
+	if !wrote.Equal(key) {
+		fmt.Errorf("put for ID %q, returned key %q which doesn't match the request key", id, wrote)
+	}
+	fmt.Printf("Wrote id %s into %s as %s\n", id, kind, wrote)
+}
+
 // struct for Google key.json data
 type KeyData struct {
 	AuthProviderX509CertURL string  `json:"auth_provider_x509_cert_url"`
@@ -182,8 +234,15 @@ func main() {
 		fmt.Errorf("\nFailed to connect to datastore\n")
 	}
 
-	if len(os.Args) > 3 {
-		readKey(ctx, client, os.Args[2], os.Args[3])
+	if len(os.Args) > 4 {
+		switch os.Args[2] {
+		case "delete":
+			deleteKey(ctx, client, os.Args[3], os.Args[4])
+		case "read":
+			readKey(ctx, client, os.Args[3], os.Args[4])
+		case "write":
+			writeKey(ctx, client, os.Args[3], os.Args[4], os.Args[5])
+		}
 	} else {
 		limit := 10
 		if len(os.Args) > 2 {
