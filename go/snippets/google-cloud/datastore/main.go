@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -53,8 +54,34 @@ func listKinds(ctx context.Context, client *datastore.Client, limit int) {
 	}
 }
 
+func findKeys(ctx context.Context, client *datastore.Client, key string, filter string) {
+	query := datastore.NewQuery(key).KeysOnly()
+	keys, err := client.GetAll(ctx, query, nil)
+	if err != nil {
+		fmt.Errorf("\nFailed to run Keys query\n")
+	}
+	if len(keys) == 0 {
+		fmt.Printf("\nNo Keys found for %s!", key)
+	}
+	fmt.Printf("\n%s:\n", key)
+	for _, k := range keys {
+        // loop through and match until better Query.Filter found
+        matched, err := regexp.MatchString(filter, k.Name)
+	    if err != nil {
+		    fmt.Errorf("\nSyntax error with regexp\n")
+        }
+        if matched {
+        //if strings.Contains(k.Name, filter) {
+		    fmt.Printf("  %s\n", k.Name)
+        }
+	}
+}
+
 func listKeys(ctx context.Context, client *datastore.Client, key string, limit int) {
 	query := datastore.NewQuery(key).KeysOnly().Limit(limit)
+    if (limit < 0) {
+	    query = datastore.NewQuery(key).KeysOnly()
+    }
 
 	keys, err := client.GetAll(ctx, query, nil)
 	if err != nil {
@@ -82,6 +109,9 @@ func listKeys(ctx context.Context, client *datastore.Client, key string, limit i
 			readKey(ctx, client, key, last)
 		}
 	*/
+    if (limit < 0) {
+        fmt.Printf("\n%s contains %d items\n", key, len(keys))
+    }
 }
 
 // struct for Datastore Kind
@@ -238,6 +268,14 @@ func main() {
 		switch os.Args[2] {
 		case "delete":
 			deleteKey(ctx, client, os.Args[3], os.Args[4])
+		case "find":
+			findKeys(ctx, client, os.Args[3], os.Args[4])
+		case "list":
+			size, err := strconv.Atoi(os.Args[4])
+			if err != nil {
+				fmt.Errorf("\nFailed to convert size parameter\n")
+			}
+			listKeys(ctx, client, os.Args[3], size)
 		case "read":
 			readKey(ctx, client, os.Args[3], os.Args[4])
 		case "write":
