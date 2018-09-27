@@ -13,7 +13,7 @@ function usage() {
 
 function parse (data) {
     let stat = {};
-	let lines = data.split('\n');
+    let lines = data.split('\n');
     _.forEach(lines, (c) => {
         if (c.length > 0) {
             //let s = c.split(':', 2); // limit does not merge additional items
@@ -31,7 +31,7 @@ function parse (data) {
             stat[user].Name = user
         }
     });
-	return stat;
+    return stat;
 }
 
 function output (order, stat) {

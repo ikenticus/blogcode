@@ -1,0 +1,64 @@
+-------
+Round 1
+-------
+
+For this question, you are given a log file from a simple web server.
+Each line in the log file contains a URL and nothing else.
+Your job is to write code that will download the log file from the internet, process it, and output the most popular URL in the file.
+You do not need to normalize the URLs in the log files.
+
+You can find the log file at:
+https://gist.githubusercontent.com/zach-karat/dd26fe2387c1f687f655abcca1d688d7/raw/b38f34e31ecd9fd4c3a870722ef321d7d16ef54e/gistfile1.txt
+
+-----
+
+Let's say we wanted to extract the top N URLs instead of the single top URL. Can you change your code to make N a configurable parameter?
+
+TOP URLS:
+('http://www.example.com', 1170)
+('http://www.example.com/world', 482)
+('http://www.example.com/us', 374)
+('http://www.example.com/trends', 286)
+('http://www.example.com/travel', 269)
+('http://www.example.com/tech', 264)
+('http://www.example.com/showbiz', 237)
+('http://www.example.com/profile', 220)
+('http://www.example.com/photos', 204)
+('http://www.example.com/politics', 198)
+('http://www.example.com/living', 169)
+('http://www.example.com/justice', 164)
+('http://www.example.com/2014/07/08/world/meast/syria-civil-war/index.html', 158)
+('http://www.example.com/health', 156)
+('http://www.example.com/opinion', 156)
+('http://www.example.com/feedback', 152)
+
+-----
+
+For this next exercise, we'd like to use Bash scripting.
+
+Let’s say that instead of getting a simple list of URLs, one per line, you get them in a CSV format.
+The URL appears in the second-to-last column, like this:
+
+2014-08-12T01:02:31.922Z,207.60.167.160,http://www.example.com/2014/07/08/world/meast/syria-civil-war/1x1.gif,0
+2014-08-12T01:02:32.922Z,219.252.48.208,http://www.example.com/2014/07/06/us/california-missing-marine-wife/1x1.gif,0
+2014-08-12T01:02:33.922Z,201.113.116.140,http://www.example.com/2013/02/14/showbiz/gallery/celebrity-power-couples/1x1.gif,0
+2014-08-12T01:02:34.922Z,241.119.238.5,http://www.example.com/2014/07/07/showbiz/celebrity-news-gossip/jay-z-solange-fight-lucky-magazine/1x1.gif,0
+
+You can find the CSV file at https://gist.githubusercontent.com/jcs150/11e2b4c9cbf917f9cec3/raw/1b2e47c9761dbf2a971ec13b10b7a9997c3bd4f0/GistFile3
+
+How can you write a script to find the N most popular URLs in this file?
+
+Expected output (N=10):
+http://www.example.com/2014/07/08/world/meast/syria-civil-war/1x1.gif
+http://www.example.com/2013/02/14/showbiz/gallery/celebrity-power-couples/1x1.gif
+http://www.example.com/2014/07/07/us/new-york-baby-left-subway/1x1.gif
+http://www.example.com/2014/07/07/tech/mobile/reservation-hop-app-controversy/1x1.gif
+http://www.example.com/2014/07/03/travel/irpt-summer-skies-around-the-globe/1x1.gif
+http://www.example.com/2014/07/08/worldsport/gallery/what-a-shot-0708/1x1.gif
+http://www.example.com/2014/07/07/world/asia/typhoon-neoguri/1x1.gif
+http://www.example.com/trends/2014/07/07/us/twitter-explodes/1x1.gif
+http://www.example.com/2014/07/08/world/biggest-bird-discovered/1x1.gif
+http://www.example.com/2014/07/08/sport/football/world-cup-brazil-germany-preview/1x1.gif
+
+-------
+
