@@ -21,7 +21,7 @@ class TestRolodex(unittest.TestCase):
         self.assertTrue(len(got['entries']) > 0)
         self.assertTrue(len(got['errors']) > 0)
 
-    def test_write(self):
+    def test_writer(self):
         filename = 'test.json'
         reader.write(config.write_output, filename)
         data = json.loads(open(filename).read())

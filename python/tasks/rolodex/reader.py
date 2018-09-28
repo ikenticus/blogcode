@@ -18,6 +18,8 @@ def parse(line):
                 idx = valid['list'].index(item) + 1
                 if item.startswith('phone'):
                     if item == 'phonenumber':
+                        #entry[item] = '-'.join(check.group(*tuple(range(idx, idx+3))))
+                        # using shorter comma-separated-tuple instead of *tuple(range)
                         entry[item] = '-'.join(check.group(idx, idx+1, idx+2))
                 else:
                     entry[item] = check.group(idx)
