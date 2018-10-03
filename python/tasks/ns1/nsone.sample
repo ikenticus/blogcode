@@ -1,0 +1,15 @@
+{
+    "api_version": "v1",
+    "default_key": "test",
+    "endpoint": "api.nsone.net",
+    "keys": {
+        "test": {
+            "key": "AbCdEfGhiJKlMnOpQrSt",
+            "desc": "test api key",
+            "writeLock": true
+        }
+    },
+    "port": 443,
+    "transport": "twisted",
+    "verbosity": 5
+}
