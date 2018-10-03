@@ -24,22 +24,30 @@ config['verbosity'] = 5
 api = NS1(config=config)
 
 
+def fix_data(r):
+    ''' fix_data is used to reshape the data according to the type '''
+    if r['Type'] == 'MX':
+        data = r['Data'].split(' ')
+        return [[ int(data[0]), ' '.join(data[1:]) ]]
+    else:
+        return r['Data']
+
 @defer.inlineCallbacks
 def add_record(zone, r):
     ''' asynchronous attempt to add record '''
     if r['Name'] == '@':
-        rec = yield getattr(zone, 'add_' + r['Type'])(r['Zone'], r['Data'])
+        rec = yield getattr(zone, 'add_' + r['Type'])(r['Zone'], fix_data(r), ttl=r['TTL'])
     else:
-        rec = yield getattr(zone, 'add_' + r['Type'])(r['Name'], r['Data'])
+        rec = yield getattr(zone, 'add_' + r['Type'])(r['Name'], fix_data(r), ttl=r['TTL'])
     defer.returnValue(rec)
 
 def record_added(record, r):
     ''' callback for add_record '''
-    print('SUCCESS Adding %s record %s: %s' % (r['Type'], r['Name'], record))
+    print('SUCCESS Adding %s %s record %s: %s' % (r['Zone'], r['Type'], r['Name'], record))
 
 def record_add_error(failure, r):
     ''' errorback for add_record '''
-    print('FAILURE Adding %s record %s: %s' % (r['Type'], r['Name'], failure.value))
+    print('FAILURE Adding %s %s record %s: %s' % (r['Zone'], r['Type'], r['Name'], failure.value))
 
 @defer.inlineCallbacks
 def load_record(zone, r):
@@ -52,7 +60,14 @@ def load_record(zone, r):
 
 def record_loaded(record, r):
     ''' callback for load_record '''
-    print('SUCCESS Loading %s record %s: %s' % (r['Type'], r['Name'], record))
+    answers = [ ' '.join([ str(a) for a in ra['answer'] ]) for ra in record.answers ]
+    if r['Data'] in answers:
+        print('SUCCESS Loading %s %s record %s: %s' % (r['Zone'], r['Type'], r['Name'], answers))
+    else:
+        #print('MISSING %s %s record %s: %s' % (r['Zone'], r['Type'], r['Name'], answers))
+        adder = record.addAnswers(fix_data(r))
+        adder.addCallback(record_added, r)
+        adder.addErrback(record_add_error, r)
 
 def record_load_error(failure, zone, r):
     ''' errorback for load_record '''
@@ -61,7 +76,7 @@ def record_load_error(failure, zone, r):
         adder.addCallback(record_added, r)
         adder.addErrback(record_add_error, r)
     else :
-        print('FAILURE Loading %s record %s: %s' % (r['Type'], r['Name'], failure.value))
+        print('FAILURE Loading %s %s record %s: %s' % (r['Zone'], r['Type'], r['Name'], failure.value))
 
 @defer.inlineCallbacks
 def load_zone(name):
