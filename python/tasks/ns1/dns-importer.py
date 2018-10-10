@@ -119,7 +119,7 @@ def read_csv(filename):
     zones = {}
     with open(filename) as csvfile:
         rows = csv.reader(csvfile)
-        header = rows.next()
+        header = next(rows)
         zones = group_zones(header, rows)
     return zones
 
