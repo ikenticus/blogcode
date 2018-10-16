@@ -3,7 +3,7 @@ import re
 
 def get_json_cards(cards):
   for card in cards:
-    card['path'] = re.sub(r'html$', 'json', card['path'])
+    card['path'] = re.sub(r'\.html', '.json', card['path'])
   return cards
 
 cards = []

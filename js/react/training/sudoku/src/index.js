@@ -10,11 +10,11 @@ const s = 9;
 
 function Input(props) {
   return (
-    <form class="input" onSubmit={props.onSubmit}>
+    <form className="input" onSubmit={props.onSubmit}>
       <label>
-        <input class="entry" type="text" value={props.value} onChange={props.onChange} />
+        <input className="entry" type="text" value={props.value} onChange={props.onChange} />
       </label>
-      <input class="submit" type="submit" value="FILL" />
+      <input className="submit" type="submit" value="LOAD" />
     </form>
   );
 }
@@ -38,6 +38,7 @@ class Choice extends React.Component {
   renderCircle(i) {
     return (
       <Circle
+        key={"choice" + i}
         value={i}
         count={this.props.count}
         active={this.props.active}
@@ -91,7 +92,7 @@ class Board extends React.Component {
     return (
       <div>
         {_.times(s, r =>
-          <div className="board-row">
+          <div className={"board-row row" + r}>
             {_.times(s, c =>
               this.renderSquare(r,c)
             )}
@@ -106,7 +107,7 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      input: '',
+      input: '600120384008459072000006005000264030070080006940003000310000050089700000502000190',
       circle: 1,
       circles: {},
       squares: Array(s*s).fill(null),

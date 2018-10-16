@@ -75,7 +75,7 @@ def record_load_error(failure, zone, r):
         adder = add_record(zone, r)
         adder.addCallback(record_added, r)
         adder.addErrback(record_add_error, r)
-    else :
+    else:
         print('FAILURE Loading %s %s record %s: %s' % (r['Zone'], r['Type'], r['Name'], failure.value))
 
 @defer.inlineCallbacks
