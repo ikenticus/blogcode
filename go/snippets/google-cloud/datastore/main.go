@@ -17,6 +17,7 @@ import (
 	"unicode/utf8"
 
 	"cloud.google.com/go/datastore"
+	"github.com/golang/snappy"
 )
 
 const datastoreMaxPropertyBytes = 1048487
@@ -185,6 +186,13 @@ func readMultiKey(ctx context.Context, client *datastore.Client, kind string, id
 		zip, err := gzip.NewReader(bytes.NewBuffer(entity.Value))
 		if err != nil {
 			fmt.Errorf("failed to initialize gzip Reader for ids %q: %v", ids[i], err)
+			snap, err := snappy.Decode(nil, entity.Value)
+			if err != nil {
+				fmt.Errorf("error with snappy decoding: %v", err)
+			} else {
+				fmt.Printf("SNAP: %+v\n", string(snap))
+				return
+			}
 		}
 
 		out, err := ioutil.ReadAll(zip)
@@ -198,9 +206,10 @@ func readMultiKey(ctx context.Context, client *datastore.Client, kind string, id
 		output, err := json.MarshalIndent(data, "", "    ")
 		if err != nil {
 			fmt.Errorf("failed to JSON unmarshal data for id %q: %v", ids[i], err)
+			outputs[i] = string(out)
+		} else {
+			outputs[i] = string(output)
 		}
-
-		outputs[i] = string(output)
 	}
 
 	if len(batchErr.Errors) == 0 {
@@ -227,6 +236,13 @@ func readKey(ctx context.Context, client *datastore.Client, kind string, id stri
 	zip, err := gzip.NewReader(bytes.NewBuffer(entity.Value))
 	if err != nil {
 		fmt.Errorf("failed to initialize gzip Reader for id %q: %v", id, err)
+		snap, err := snappy.Decode(nil, entity.Value)
+		if err != nil {
+			fmt.Errorf("error with snappy decoding: %v", err)
+		} else {
+			fmt.Printf("SNAP: %+v\n", string(snap))
+			return
+		}
 	}
 
 	out, err := ioutil.ReadAll(zip)
@@ -240,8 +256,10 @@ func readKey(ctx context.Context, client *datastore.Client, kind string, id stri
 	output, err := json.MarshalIndent(data, "", "    ")
 	if err != nil {
 		fmt.Errorf("failed to JSON unmarshal data for id %q: %v", id, err)
+		fmt.Println(string(out))
+	} else {
+		fmt.Println(string(output))
 	}
-	fmt.Println(string(output))
 }
 
 func deleteKey(ctx context.Context, client *datastore.Client, kind string, id string) {
