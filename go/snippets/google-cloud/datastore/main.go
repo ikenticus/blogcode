@@ -309,7 +309,15 @@ type KeyData struct {
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Printf("Usage: %s key.json [limit] [kind] [id]\n", path.Base(os.Args[0]))
+		fmt.Printf("\nUsage:\n\t%s key.json [limit]\n\t%s key.json <action> <kind> <id>\n\n",
+			path.Base(os.Args[0]), path.Base(os.Args[0]))
+		fmt.Println(`Actions:
+	delete <kind> <id>
+	find <kind> <pattern>
+	list <kind> <count>
+	read <kind> <id | id1,..,idN>
+	write <kind> <id> <filepath>
+	`)
 		os.Exit(1)
 	}
 	keyPath := os.Args[1]
