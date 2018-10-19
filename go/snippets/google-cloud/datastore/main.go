@@ -65,23 +65,23 @@ func findKeys(ctx context.Context, client *datastore.Client, key string, filter 
 	}
 	fmt.Printf("\n%s:\n", key)
 	for _, k := range keys {
-        // loop through and match until better Query.Filter found
-        matched, err := regexp.MatchString(filter, k.Name)
-	    if err != nil {
-		    fmt.Errorf("\nSyntax error with regexp\n")
-        }
-        if matched {
-        //if strings.Contains(k.Name, filter) {
-		    fmt.Printf("  %s\n", k.Name)
-        }
+		// loop through and match until better Query.Filter found
+		matched, err := regexp.MatchString(filter, k.Name)
+		if err != nil {
+			fmt.Errorf("\nSyntax error with regexp\n")
+		}
+		if matched {
+			//if strings.Contains(k.Name, filter) {
+			fmt.Printf("  %s\n", k.Name)
+		}
 	}
 }
 
 func listKeys(ctx context.Context, client *datastore.Client, key string, limit int) {
 	query := datastore.NewQuery(key).KeysOnly().Limit(limit)
-    if (limit < 0) {
-	    query = datastore.NewQuery(key).KeysOnly()
-    }
+	if limit < 0 {
+		query = datastore.NewQuery(key).KeysOnly()
+	}
 
 	keys, err := client.GetAll(ctx, query, nil)
 	if err != nil {
@@ -109,9 +109,9 @@ func listKeys(ctx context.Context, client *datastore.Client, key string, limit i
 			readKey(ctx, client, key, last)
 		}
 	*/
-    if (limit < 0) {
-        fmt.Printf("\n%s contains %d items\n", key, len(keys))
-    }
+	if limit < 0 {
+		fmt.Printf("\n%s contains %d items\n", key, len(keys))
+	}
 }
 
 // struct for Datastore Kind
@@ -144,6 +144,75 @@ func listTasks(ctx context.Context, client *datastore.Client) {
 type DatastoreEntity struct {
 	Value []byte `datastore:",noindex"`
 }
+
+type BatchError struct {
+	Errors map[string]error
+}
+
+func (b BatchError) Error() string {
+	errList := []string{}
+	for id, err := range b.Errors {
+		errList = append(errList, fmt.Sprintf("ID %q: %v", id, err))
+	}
+
+	return strings.Join(errList, ",")
+}
+
+func readMultiKey(ctx context.Context, client *datastore.Client, kind string, ids []string) {
+	var keys []*datastore.Key
+	for _, id := range ids {
+		keys = append(keys, datastore.NameKey(kind, id, nil))
+	}
+
+	entities := make([]*DatastoreEntity, len(ids))
+	if err := client.GetMulti(ctx, keys, entities); err != nil {
+		if ctx.Err() != nil {
+			fmt.Errorf("context cancelled")
+		}
+		if !strings.HasPrefix(err.Error(), datastore.ErrNoSuchEntity.Error()) {
+			fmt.Errorf("Entities not found %s: %v\n", ids, err)
+		}
+	}
+
+	outputs := make([]string, len(ids))
+	batchErr := BatchError{Errors: make(map[string]error)}
+	for i, entity := range entities {
+		if entity == nil {
+			outputs[i] = ""
+			continue
+		}
+
+		zip, err := gzip.NewReader(bytes.NewBuffer(entity.Value))
+		if err != nil {
+			fmt.Errorf("failed to initialize gzip Reader for ids %q: %v", ids[i], err)
+		}
+
+		out, err := ioutil.ReadAll(zip)
+		if err != nil {
+			batchErr.Errors[ids[i]] = fmt.Errorf("failed to decompress gzipped data for id %q: %v", ids[i], err)
+			continue
+		}
+
+		var data interface{}
+		json.Unmarshal(out, &data)
+		output, err := json.MarshalIndent(data, "", "    ")
+		if err != nil {
+			fmt.Errorf("failed to JSON unmarshal data for id %q: %v", ids[i], err)
+		}
+
+		outputs[i] = string(output)
+	}
+
+	if len(batchErr.Errors) == 0 {
+		fmt.Println(strings.Join(outputs, "\n=====\n"))
+	} else {
+		fmt.Println(batchErr.Errors)
+	}
+}
+
+/*
+	//fmt.Println(string(out))
+*/
 
 func readKey(ctx context.Context, client *datastore.Client, kind string, id string) {
 	key := datastore.NameKey(kind, id, nil)
@@ -195,7 +264,7 @@ func writeKey(ctx context.Context, client *datastore.Client, kind string, id str
 	//fmt.Println(string(data))
 	//entity := &DatastoreEntity{Value: data}
 
-    var buf bytes.Buffer
+	var buf bytes.Buffer
 	zip := gzip.NewWriter(&buf)
 	if _, err := zip.Write(data); err != nil {
 		fmt.Errorf("failed gzip for id %q: %v", id, err)
@@ -277,7 +346,11 @@ func main() {
 			}
 			listKeys(ctx, client, os.Args[3], size)
 		case "read":
-			readKey(ctx, client, os.Args[3], os.Args[4])
+			if strings.Contains(os.Args[4], ",") {
+				readMultiKey(ctx, client, os.Args[3], strings.Split(os.Args[4], ","))
+			} else {
+				readKey(ctx, client, os.Args[3], os.Args[4])
+			}
 		case "write":
 			writeKey(ctx, client, os.Args[3], os.Args[4], os.Args[5])
 		}

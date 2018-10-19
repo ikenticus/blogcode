@@ -21,7 +21,7 @@ fi
 ### ENV: Vault
 vault_key() {
     local KEY=$1
-    BASE=${PWD##*/}
+    [ -z "$BASE" ] && BASE=${PWD##*/}
     CONFIG=$(vault read secret/$TEAM/general/$BASE)
     if [ $? -eq 0 ]; then
         vault read -field=$KEY secret/$TEAM/general/$BASE
