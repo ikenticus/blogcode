@@ -1,0 +1,52 @@
+#!/bin/bash
+#
+# Attempting to automatically retrieve all the necessary environment variables before running golang 
+#
+
+SCRIPT=${1:-./...}
+
+### ENV: Static
+TEAM=api-services
+REGION=us-east4
+VAULT_URL=$VAULT_ADDR
+CONSUL_URL=https://consul.service.gciconsul.com:8443
+
+### ENV: Overrides
+var=ENVIRONMENT
+if [ -z "$ENVIRONMENT" ]; then
+    eval $var="local"
+fi
+#eval echo $var=\$$var
+
+### ENV: Vault
+vault_key() {
+    local KEY=$1
+    [ -z "$BASE" ] && BASE=${PWD##*/}
+    CONFIG=$(vault read secret/$TEAM/general/$BASE)
+    if [ $? -eq 0 ]; then
+        vault read -field=$KEY secret/$TEAM/general/$BASE
+        return
+    fi
+}
+
+CONSUL_TOKEN=$(vault_key consul_token)
+VAULT_ROLE=$(vault_key vault_role_id)
+VAULT_SECRET=$(vault_key vault_secret_id)
+
+if [ $SCRIPT == "help" ]; then
+    #ls k8/deployment/${ENVIRONMENT}*.json
+    MIN=$( pcregrep '"name": "[A-Z_]+"' k8/deployment/${ENVIRONMENT}*.json \
+            | cut -d: -f2 | sed 's/^.*"\(.*\)".*$/\1/' )
+    echo -e "\nMinimal ENV variables needed:\n${MIN}\n"
+    exit 0
+fi
+
+ENVIRONMENT=$ENVIRONMENT \
+REGION=$REGION \
+CONSUL_URL=$CONSUL_URL \
+CONSUL_TOKEN=$CONSUL_TOKEN \
+VAULT_URL=$VAULT_URL \
+VAULT_ROLE_ID=$VAULT_ROLE \
+VAULT_SECRET_ID=$VAULT_SECRET \
+go test $SCRIPT
+
