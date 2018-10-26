@@ -34,12 +34,12 @@ is not operationally efficient, try to build a letter node tree:
       H
        \
         E
-         \
+       /|\  (potentially 26 children)
       X A L - is_word = false
-       /    \
-      D      L - is_word = true
-              \ 
-               O - is_word = true
+       /   \
+      D     L - is_word = true
+             \ 
+              O - is_word = true
 
 '''
     
@@ -78,6 +78,7 @@ def suggest(p):
        if c in t:
             t = t[c] 
     #print json.dumps(t, sort_keys=True, indent=2)
+    print '%s:' % p,
     print recurse(p, t, [])
     
 def recurse(p, t, out=[]):
@@ -95,3 +96,4 @@ suggest('h')
 suggest('pi')
 suggest('hel')
 suggest('pie')
+
