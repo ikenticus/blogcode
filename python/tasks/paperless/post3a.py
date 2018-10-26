@@ -46,6 +46,9 @@ words = [
 ]
 
 def suggest(p):
+    print [ w for w in words if w.startswith(p) and len(w) > len(p) ]
+
+def suggestful(p):
     out = []
     for w in words:
         if w.startswith(p) and len(w) > len(p):
