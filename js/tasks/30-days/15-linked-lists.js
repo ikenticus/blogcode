@@ -21,7 +21,7 @@ function Node(data){
     this.next=null;
 }
 function Solution(){
-	this.insert=function(head,data){
+    this.insert=function(head,data){
         //complete this method
         if (!head) {
             return new Node(data);
@@ -33,12 +33,12 @@ function Solution(){
         return head;
     };
 
-	this.display=function(head){
+    this.display=function(head){
         var start=head;
-            while(start){
-                process.stdout.write(start.data+" ");
-                start=start.next;
-            }
+        while(start){
+            process.stdout.write(start.data+" ");
+            start=start.next;
+        }
     };
 }
 function main(){
@@ -52,4 +52,4 @@ function main(){
     mylist.display(head);
     console.log(mylist);
     console.log(JSON.stringify(mylist));
-}		
+}        

@@ -36,7 +36,7 @@ function Solution(){
         return head;
     };
 
-	this.insert=function(head,data){
+    this.insert=function(head,data){
         var p=new Node(data);
         if(head==null){
             head=p;
@@ -52,15 +52,14 @@ function Solution(){
             start.next=p;
         }
         return head;
-        
     };
 
-	this.display=function(head){
+    this.display=function(head){
         var start=head;
-            while(start){
-                process.stdout.write(start.data+" ");
-                start=start.next;
-            }
+        while(start){
+            process.stdout.write(start.data+" ");
+            start=start.next;
+        }
     };
 }
 function main(){
@@ -77,4 +76,4 @@ function main(){
     //console.log(JSON.stringify(head, null, 4));
 
     mylist.display(head);
-}		
+}        
