@@ -18,6 +18,7 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"github.com/golang/snappy"
+	"google.golang.org/api/iterator"
 )
 
 const datastoreMaxPropertyBytes = 1048487
@@ -53,6 +54,33 @@ func listKinds(ctx context.Context, client *datastore.Client, limit int) {
 		//fmt.Printf("RAW: %+v\n", k)
 		listKeys(ctx, client, k.KindName, limit)
 	}
+}
+
+func filter(ctx context.Context, client *datastore.Client, key string, filter string) {
+	//query := datastore.NewQuery(key).Filter("DataType =", "teams").Order("-DataType")
+	query := datastore.NewQuery(key)
+    regex := *regexp.MustCompile(`^(\w+\W+)(\w+)$`)
+    for _, pair := range strings.Split(filter, ",") {
+        res := regex.FindAllStringSubmatch(pair, -1)
+        for i := range res {
+            //fmt.Printf("Pair: %s -> %s\n", res[i][1], res[i][2])
+            query = query.Filter(res[i][1], res[i][2])
+        }
+    }
+	//query := datastore.NewQuery(key).Filter("DataType=", "teams")
+    it := client.Run(ctx, query)
+    for {
+	    var entity DatastoreEntity
+        id, err := it.Next(&entity)
+        if err == iterator.Done {
+            break
+        }
+        if err != nil {
+            log.Fatalf("Error fetching next entity: %v", err)
+        }
+        fmt.Printf("Entity %s: %s %s/%s (%s) %s\n", entity.DataType, entity.Season, entity.Sport, entity.League, entity.LastModified, id)
+        //fmt.Printf("Value %+v\n", string(entity.Value))
+    }
 }
 
 func findKeys(ctx context.Context, client *datastore.Client, key string, filter string) {
@@ -143,7 +171,15 @@ func listTasks(ctx context.Context, client *datastore.Client) {
 }
 
 type DatastoreEntity struct {
-	Value []byte `datastore:",noindex"`
+	Value         []byte `datastore:",noindex"`
+
+    // sportEntity
+	Sport         string
+	League        string
+	Season        string
+	DataType      string
+	SchemaVersion string
+	LastModified  string
 }
 
 type BatchError struct {
@@ -363,6 +399,8 @@ func main() {
 		switch os.Args[2] {
 		case "delete":
 			deleteKey(ctx, client, os.Args[3], os.Args[4])
+		case "filter":
+			filter(ctx, client, os.Args[3], os.Args[4])
 		case "find":
 			findKeys(ctx, client, os.Args[3], os.Args[4])
 		case "list":
