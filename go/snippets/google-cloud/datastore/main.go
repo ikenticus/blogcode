@@ -59,11 +59,13 @@ func listKinds(ctx context.Context, client *datastore.Client, limit int) {
 func filter(ctx context.Context, client *datastore.Client, key string, filter string) {
 	//query := datastore.NewQuery(key).Filter("DataType =", "teams").Order("-DataType")
 	query := datastore.NewQuery(key)
-    regex := *regexp.MustCompile(`^(\w+\W+)(\w+)$`)
+    //regex := *regexp.MustCompile(`^(\w+\W+)(\w+)$`)
+    regex := *regexp.MustCompile(`^(.+[<=>]+)(.+)$`)
     for _, pair := range strings.Split(filter, ",") {
-        res := regex.FindAllStringSubmatch(pair, -1)
+        //fmt.Printf("Pair: %s\n", pair)
+        res := regex.FindAllStringSubmatch(pair, 2)
         for i := range res {
-            //fmt.Printf("Pair: %s -> %s\n", res[i][1], res[i][2])
+            //fmt.Printf("Filter: %s -> %s\n", res[i][1], res[i][2])
             query = query.Filter(res[i][1], res[i][2])
         }
     }
