@@ -59,30 +59,39 @@ func listKinds(ctx context.Context, client *datastore.Client, limit int) {
 func filter(ctx context.Context, client *datastore.Client, key string, filter string) {
 	//query := datastore.NewQuery(key).Filter("DataType =", "teams").Order("-DataType")
 	query := datastore.NewQuery(key)
-    //regex := *regexp.MustCompile(`^(\w+\W+)(\w+)$`)
-    regex := *regexp.MustCompile(`^(.+[<=>]+)(.+)$`)
-    for _, pair := range strings.Split(filter, ",") {
-        //fmt.Printf("Pair: %s\n", pair)
-        res := regex.FindAllStringSubmatch(pair, 2)
-        for i := range res {
-            //fmt.Printf("Filter: %s -> %s\n", res[i][1], res[i][2])
-            query = query.Filter(res[i][1], res[i][2])
-        }
-    }
+	//regex := *regexp.MustCompile(`^(\w+\W+)(\w+)$`)
+	regex := *regexp.MustCompile(`^(.+[<=>]+)(.+)$`)
+	for _, pair := range strings.Split(filter, ",") {
+		//fmt.Printf("Pair: %s\n", pair)
+		res := regex.FindAllStringSubmatch(pair, 2)
+		for i := range res {
+			//fmt.Printf("Filter: %s -> %s\n", res[i][1], res[i][2])
+			if strings.Contains(res[i][1], "Id") {
+				iValue, err := strconv.Atoi(res[i][2])
+				if err != nil {
+					fmt.Errorf("failed Id conversion to int64: %v", err)
+				}
+				query = query.Filter(res[i][1], iValue)
+			} else {
+				query = query.Filter(res[i][1], res[i][2])
+			}
+		}
+	}
 	//query := datastore.NewQuery(key).Filter("DataType=", "teams")
-    it := client.Run(ctx, query)
-    for {
-	    var entity DatastoreEntity
-        id, err := it.Next(&entity)
-        if err == iterator.Done {
-            break
-        }
-        if err != nil {
-            log.Fatalf("Error fetching next entity: %v", err)
-        }
-        fmt.Printf("Entity %s: %s %s/%s (%s) %s\n", entity.DataType, entity.Season, entity.Sport, entity.League, entity.LastModified, id)
-        //fmt.Printf("Value %+v\n", string(entity.Value))
-    }
+	it := client.Run(ctx, query)
+	for {
+		var entity DatastoreEntity
+		id, err := it.Next(&entity)
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			log.Fatalf("Error fetching next entity: %v", err)
+		}
+		fmt.Printf("Entity %s: %s %s/%s (%s) %s\n", entity.DataType, entity.Season, entity.Sport, entity.League, entity.LastModified, id)
+		fmt.Printf("\tEvent: %d, Team: %d, Player: %d\n", entity.EventId, entity.TeamId, entity.PlayerId)
+		//fmt.Printf("Value %+v\n", string(entity.Value))
+	}
 }
 
 func findKeys(ctx context.Context, client *datastore.Client, key string, filter string) {
@@ -124,9 +133,9 @@ func listKeys(ctx context.Context, client *datastore.Client, key string, limit i
 
 	fmt.Printf("\n%s:\n", key)
 	/*
-		if len(keys) > 10 {
-			keys = keys[:10]
-		} // same as .Limit(#) above
+	   if len(keys) > 10 {
+	       keys = keys[:10]
+	   } // same as .Limit(#) above
 	*/
 	//var last string
 	for _, k := range keys {
@@ -135,10 +144,10 @@ func listKeys(ctx context.Context, client *datastore.Client, key string, limit i
 	}
 
 	/*
-		if !strings.HasPrefix(key, "__") {
-			//fmt.Printf("\nLast: %q, %q\n", last, key)
-			readKey(ctx, client, key, last)
-		}
+	   if !strings.HasPrefix(key, "__") {
+	       //fmt.Printf("\nLast: %q, %q\n", last, key)
+	       readKey(ctx, client, key, last)
+	   }
 	*/
 	if limit < 0 {
 		fmt.Printf("\n%s contains %d items\n", key, len(keys))
@@ -173,13 +182,16 @@ func listTasks(ctx context.Context, client *datastore.Client) {
 }
 
 type DatastoreEntity struct {
-	Value         []byte `datastore:",noindex"`
+	Value []byte `datastore:",noindex"`
 
-    // sportEntity
+	// sportEntity
 	Sport         string
 	League        string
 	Season        string
 	DataType      string
+	TeamId        int64
+	EventId       int64
+	PlayerId      int64
 	SchemaVersion string
 	LastModified  string
 }
