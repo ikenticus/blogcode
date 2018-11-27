@@ -17,6 +17,7 @@ import (
 	"unicode/utf8"
 
 	"cloud.google.com/go/datastore"
+	"github.com/cespare/xxhash"
 	"github.com/golang/snappy"
 	"google.golang.org/api/iterator"
 )
@@ -269,17 +270,25 @@ func readMultiKey(ctx context.Context, client *datastore.Client, kind string, id
 	}
 }
 
-/*
-	//fmt.Println(string(out))
-*/
+func getNameKey(kind string, id string) *datastore.Key {
+	hash := xxhash.Sum64([]byte(id))
+	return datastore.NameKey(kind, fmt.Sprintf("%d%s", hash, id), nil)
+}
 
 func readKey(ctx context.Context, client *datastore.Client, kind string, id string) {
-	key := datastore.NameKey(kind, id, nil)
-
 	var entity DatastoreEntity
+
+	key := datastore.NameKey(kind, id, nil)
 	if err := client.Get(ctx, key, &entity); err != nil {
 		if err == datastore.ErrNoSuchEntity {
-			fmt.Errorf("\nEntity not found: %s\n", id)
+			fmt.Printf("\nEntity not found: %s\n", id)
+			key := getNameKey(kind, id)
+			if err := client.Get(ctx, key, &entity); err != nil {
+				if err == datastore.ErrNoSuchEntity {
+					fmt.Printf("\nHashed Entity not found: %s\n", id)
+					return
+				}
+			}
 		}
 	}
 
