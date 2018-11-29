@@ -37,6 +37,7 @@ echo Scanning for $type from $sport/$subsport $season $base on $host
 temp=/tmp/$type
 curl ${host}/feed/process/sdi_${sport}_${subsport}_${base}_${season} 2> /dev/null | sed 's/"/\
 /g' | grep "/$key:" | cut -d: -f2 | gtac | while read each; do
+    # gtac = GNU tac => tail -r
     echo Reprocessing $type for $season $key $each on $host
     if [ "$base" == "results" ]; then
         curl -o $temp ${host}/feed/process/sdi_${sport}_${subsport}_${type}_${each} 2> /dev/null
