@@ -67,6 +67,7 @@ func filter(ctx context.Context, client *datastore.Client, key string, filter st
 		res := regex.FindAllStringSubmatch(pair, 2)
 		for i := range res {
 			//fmt.Printf("Filter: %s -> %s\n", res[i][1], res[i][2])
+			/*  // int64 ID indices:
 			if strings.Contains(res[i][1], "Id") {
 				iValue, err := strconv.Atoi(res[i][2])
 				if err != nil {
@@ -76,6 +77,10 @@ func filter(ctx context.Context, client *datastore.Client, key string, filter st
 			} else {
 				query = query.Filter(res[i][1], res[i][2])
 			}
+			*/
+
+			// pure string indices:
+			query = query.Filter(res[i][1], res[i][2])
 		}
 	}
 	//query := datastore.NewQuery(key).Filter("DataType=", "teams")
@@ -90,7 +95,7 @@ func filter(ctx context.Context, client *datastore.Client, key string, filter st
 			log.Fatalf("Error fetching next entity: %v", err)
 		}
 		fmt.Printf("Entity %s: %s %s/%s (%s) %s\n", entity.DataType, entity.Season, entity.Sport, entity.League, entity.LastModified, id)
-		fmt.Printf("\tEvent: %d, Team: %d, Player: %d\n", entity.EventId, entity.TeamId, entity.PlayerId)
+		fmt.Printf("\tEvent: %s, Team: %s, Player: %s\n", entity.EventId, entity.TeamId, entity.PlayerId)
 		//fmt.Printf("Value %+v\n", string(entity.Value))
 	}
 }
@@ -186,13 +191,16 @@ type DatastoreEntity struct {
 	Value []byte `datastore:",noindex"`
 
 	// sportEntity
+	Date          string // deprecated for EventDate
 	Sport         string
 	League        string
 	Season        string
 	DataType      string
-	TeamId        int64
-	EventId       int64
-	PlayerId      int64
+	PlayerId      string
+	TeamId        string //EventTeam   []string   // in anticipation of dual TeamIds
+	EventId       string
+	EventDate     string
+	EventType     string
 	SchemaVersion string
 	LastModified  string
 }
@@ -438,6 +446,8 @@ func main() {
 			} else {
 				readKey(ctx, client, os.Args[3], os.Args[4])
 			}
+		case "reproc":
+			reprocess(ctx, client, os.Args[3], os.Args[4])
 		case "write":
 			writeKey(ctx, client, os.Args[3], os.Args[4], os.Args[5])
 		}
@@ -455,3 +465,58 @@ func main() {
 		listTasks(ctx, client)
 	}
 }
+
+// BEGIN TEMPORARY FEATURES
+
+type DatastoreEntityInt struct {
+	Value []byte `datastore:",noindex"`
+
+	// sportEntity
+	Date          string // deprecated for EventDate
+	Sport         string
+	League        string
+	Season        string
+	DataType      string
+	PlayerId      int64
+	TeamId        int64
+	EventId       int64
+	EventDate     string
+	EventType     string
+	SchemaVersion string
+	LastModified  string
+}
+
+func reprocess(ctx context.Context, client *datastore.Client, kind string, id string) {
+	var entity DatastoreEntityInt
+
+	key := datastore.NameKey(kind, id, nil)
+	if err := client.Get(ctx, key, &entity); err != nil {
+		if err == datastore.ErrNoSuchEntity {
+			fmt.Printf("\nEntity not found: %s\n", id)
+			key := getNameKey(kind, id)
+			if err := client.Get(ctx, key, &entity); err != nil {
+				if err == datastore.ErrNoSuchEntity {
+					fmt.Printf("\nHashed Entity not found: %s\n", id)
+					return
+				}
+			}
+		}
+	}
+
+	snap, err := snappy.Decode(nil, entity.Value)
+	if err != nil {
+		fmt.Errorf("error with snappy decoding: %v", err)
+	} else {
+		fmt.Printf("SNAP: %q\n", string(snap))
+		regex := *regexp.MustCompile(`^.+(Base).+$`)
+		res := regex.FindStringSubmatch("\x89\xa4Base\x87\xa6DataId\xd9'playerstats_ncaab_2018-2019_2533_767662\xa8DataType\xabplayerStats\xacLastModified\xa0\xa6League\x83\xa2Id\a\xa4Name\xafNCAA Basketball\xa8NickName\xa5NCAAB\xadSchemaVersion\xa0\xa6Season\x84\xa7EndDate\xaa2019-04-30\xa2Id\xd2\x00\n$,\xa4Name\xa92018-2019\xa9StartDate\xaa2018-11-01\xa5Sport\xaabasketball\xa4City\xaaMidlothian\xa7Country\xa3USA\xa9FirstName\xa4Zane\xa2Id\xd2\x00\v\xb6\xae\xa8LastName\xa7Najdawi\xabPlayerStats\x91\xde\x00\x18\xa7Assists\x01\xa6Blocks\v\xb1Disqualifications\x00\xb3FieldGoalsAttempted$\xaeFieldGoalsMade\x10\xadFoulsPersonal\x0f\xaeFoulsTechnical\x00\xb3FreeThrowsAttempted\x1e\xaeFreeThrowsMade\x18\xabGamesPlayed\x05\xacGamesStarted\x00\xa3Key\xb4regular-season-stats\xa9PlusMinus\x00\xa6Points9\xadPointsHighest\x12\xb1ReboundsDefensive\x11\xb1ReboundsOffensive\t\xafSeasonPhaseFrom\xaeRegular Season\xadSeasonPhaseTo\xaeRegular Season\xadSecondsPlayed\xd1\x1a\x04\xa6Steals\x04\xbdThreePointFieldGoalsAttempted\x05\xb8ThreePointFieldGoalsMade\x01\xa9Turnovers\a\xa5State\xa8Virginia\xa4Team\x83\xa2Id\xd1\t\xe5\xb7LastPlayedCompetitionId\xd2\x00\x0f-\x10\xa4Name\xabThe Citadel")
+		fmt.Printf("/input?Sport=%s&League=%s&Season=%s&DataType=%s&FeedURL=http://xml.sportsdirectinc.com/sport/v2/%s/%s/%s/%s/%s.xml\n",
+			entity.Sport, entity.League, entity.Season, entity.DataType,
+			entity.Sport, entity.League, entity.Season, entity.DataType, res,
+		)
+		//http://localhost:8080/input?Sport=baseball&League=MLB&DataType=teams&Season=2018
+		//&FeedURL=http://xml.sportsdirectinc.com/sport/v2/baseball/MLB/teams/2018/teams_MLB.xml?apiKey=EF9ADB80-0E0F-40D3-973F-1E89BB5335D8
+	}
+}
+
+// END TEMPORARY FEATURES
