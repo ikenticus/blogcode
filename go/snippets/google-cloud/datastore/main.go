@@ -405,6 +405,7 @@ func main() {
 			path.Base(os.Args[0]), path.Base(os.Args[0]))
 		fmt.Println(`Actions:
 	delete <kind> <id>
+	filter <kind> <filter1,...,filterN>
 	find <kind> <pattern>
 	list <kind> <count>
 	read <kind> <id | id1,..,idN>
@@ -453,8 +454,6 @@ func main() {
 			} else {
 				readKey(ctx, client, os.Args[3], os.Args[4])
 			}
-		case "reproc":
-			reprocess(ctx, client, os.Args[3], os.Args[4])
 		case "write":
 			writeKey(ctx, client, os.Args[3], os.Args[4], os.Args[5])
 		}
