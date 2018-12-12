@@ -25,7 +25,7 @@ for line in $(cat list3); do
     fi
     url="http://localhost:8080/input?Sport=$sport&League=$league&DataType=$dtype&Season=$season"
     url="$url&FeedURL=http://xml.sportsdirectinc.com/sport/v2/$sport/$league/$dtype/$season/$file.xml"
-    url="$url?apiKey=EF9ADB80-0E0F-40D3-973F-1E89BB5335D8"
+    url="$url?apiKey=$APIKEY"
     echo URL: $url
     curl $url
     sleep 300
