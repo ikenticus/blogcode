@@ -57,7 +57,7 @@ func listKinds(ctx context.Context, client *datastore.Client, limit int) {
 	}
 }
 
-func filter(ctx context.Context, client *datastore.Client, key string, filter string) {
+func filter(ctx context.Context, client *datastore.Client, key string, filter string, order string) {
 	//query := datastore.NewQuery(key).Filter("DataType =", "teams").Order("-DataType")
 	query := datastore.NewQuery(key)
 	//regex := *regexp.MustCompile(`^(\w+\W+)(\w+)$`)
@@ -84,6 +84,10 @@ func filter(ctx context.Context, client *datastore.Client, key string, filter st
 		}
 	}
 	//query := datastore.NewQuery(key).Filter("DataType=", "teams")
+	if len(order) > 0 { // only seems to work for DataType currently ??
+		fmt.Println("Ordering on", order)
+		query = query.Order(order)
+	}
 	it := client.Run(ctx, query)
 	for {
 		var entity DatastoreEntity
@@ -92,14 +96,15 @@ func filter(ctx context.Context, client *datastore.Client, key string, filter st
 			break
 		}
 		if err != nil {
-			//log.Fatalf("Error fetching next entity %s: %v", id, err)
+			log.Fatalf("Error fetching next entity %s: %v", id, err)
+			continue
 
-            // Delete int64 entities during string migration
-            // filter sport LastModified\<=$(date +%Y-%m-%d)
+			// Delete int64 entities during string migration
+			// filter sport LastModified\<=$(date +%Y-%m-%d)
 			fmt.Printf("Deleting bad entity %s: %v\n", id, err)
-            hashed := strings.Split(fmt.Sprintf("%s", id), ",")[1]
+			hashed := strings.Split(fmt.Sprintf("%s", id), ",")[1]
 			deleteKey(ctx, client, key, hashed)
-            continue
+			continue
 		}
 		fmt.Printf("Entity %s: %s %s/%s (%s) %s\n", entity.DataType, entity.Season, entity.Sport, entity.League, entity.LastModified, id)
 		fmt.Printf("\tEvent: %s, Team: %s, Player: %s\n", entity.EventId, entity.TeamId, entity.PlayerId)
@@ -405,7 +410,7 @@ func main() {
 			path.Base(os.Args[0]), path.Base(os.Args[0]))
 		fmt.Println(`Actions:
 	delete <kind> <id>
-	filter <kind> <filter1,...,filterN>
+	filter <kind> <filter1,...,filterN> [<order>]
 	find <kind> <pattern>
 	list <kind> <count>
 	read <kind> <id | id1,..,idN>
@@ -439,7 +444,11 @@ func main() {
 		case "delete":
 			deleteKey(ctx, client, os.Args[3], os.Args[4])
 		case "filter":
-			filter(ctx, client, os.Args[3], os.Args[4])
+			if len(os.Args) > 5 {
+				filter(ctx, client, os.Args[3], os.Args[4], os.Args[5])
+			} else {
+				filter(ctx, client, os.Args[3], os.Args[4], "")
+			}
 		case "find":
 			findKeys(ctx, client, os.Args[3], os.Args[4])
 		case "list":
@@ -471,4 +480,3 @@ func main() {
 		listTasks(ctx, client)
 	}
 }
-
