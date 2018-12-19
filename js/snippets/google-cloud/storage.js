@@ -38,7 +38,7 @@ let write = (bucket, filename) => {
     console.log('TODO');
 }
 
-let delete = (bucket, filename) => {
+let remove = (bucket, filename) => {
     console.log('TODO');
 }
 
@@ -75,6 +75,6 @@ switch (process.argv[3]) {
         write(bucket, process.argv[5]);
         break;
     case "delete":
-        delete(bucket, process.argv[5]);
+        remove(bucket, process.argv[5]);
         break;
 }
