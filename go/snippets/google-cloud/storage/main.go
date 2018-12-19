@@ -16,110 +16,6 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-/*
-const Storage = require('@google-cloud/storage');
-// authenticate using ONE (not ALL) of the following methods:
-
-// setting environment variable GOOGLE_APPLICATION_CREDENTIALS=/path/to/service_account.json
-const storage = new Storage();
-
-// explicitly specifying service_account credentials file
-const storage = new Storage({
-    keyFilename: '/path/to/service_account.json'
-});
-
-// passing in credentials as JSON
-const storage = new Storage({
-    credentials: {
-        type: "service_account",
-        project_id: process.env.PROJECT_ID,
-        private_key_id: process.env.PRIVATE_KEY_ID,
-        private_key: process.env.PRIVATE_KEY,
-        client_email: "{USER}@{PROJECT}.iam.gserviceaccount.com",
-        client_id: process.env.CLIENT_ID,
-        auth_uri: "https://accounts.google.com/o/oauth2/auth",
-        token_uri: "https://accounts.google.com/o/oauth2/token",
-        auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-        client_x509_cert_url: "https://www.googleapis.com/robot/v1/metadata/x509/{USER}%40{PROJECT}.iam.gserviceaccount.com"
-    }
-});
-
-
-var bucket = storage.bucket(process.env.BUCKET_NAME);
-bucket.getFiles((err, files) => {
-    if (err) {
-        console.log('ERROR', err);
-    } else {
-        files.forEach((f) => {
-            var data = '';
-            var remoteReadStream = bucket.file(f.name).createReadStream();
-            remoteReadStream
-                .on('data', function (chunk) {
-                    data += chunk.toString();
-                    //console.log('CHUNK:', chunk);
-                })
-                .on('end', function () {
-                    console.log('\nFILE:', f.name)
-                    console.log(data)
-                });
-        });
-    }
-});
-*/
-
-/*
-ctx := context.Background()
-client, err := storage.NewClient(ctx)
-if err != nil {
-    // TODO: Handle error.
-}
-
-client, err := storage.NewClient(ctx, option.WithoutAuthentication())
-
-bkt := client.Bucket(bucketName)
-
-if err := bkt.Create(ctx, projectID, nil); err != nil {
-    // TODO: Handle error.
-}
-
-attrs, err := bkt.Attrs(ctx)
-if err != nil {
-    // TODO: Handle error.
-}
-fmt.Printf("bucket %s, created at %s, is located in %s with storage class %s\n",
-    attrs.Name, attrs.Created, attrs.Location, attrs.StorageClass)
-
-obj := bkt.Object("data")
-// Write something to obj.
-// w implements io.Writer.
-w := obj.NewWriter(ctx)
-// Write some text to obj. This will either create the object or overwrite whatever is there already.
-if _, err := fmt.Fprintf(w, "This object contains text.\n"); err != nil {
-    // TODO: Handle error.
-}
-// Close, just like writing a file.
-if err := w.Close(); err != nil {
-    // TODO: Handle error.
-}
-
-// Read it back.
-r, err := obj.NewReader(ctx)
-if err != nil {
-    // TODO: Handle error.
-}
-defer r.Close()
-if _, err := io.Copy(os.Stdout, r); err != nil {
-    // TODO: Handle error.
-}
-// Prints "This object contains text."
-
-objAttrs, err := obj.Attrs(ctx)
-if err != nil {
-    // TODO: Handle error.
-}
-fmt.Printf("object %s has size %d and can be read using %s\n",
-    objAttrs.Name, objAttrs.Size, objAttrs.MediaLink)
-*/
 func create(ctx context.Context, client *storage.Client, projectID string, bucketName string) {
 	bkt := client.Bucket(bucketName)
 	if err := bkt.Create(ctx, projectID, nil); err != nil {
@@ -268,8 +164,7 @@ func delete(ctx context.Context, client *storage.Client, bucketName string, obje
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Printf("\nUsage:\n\t%s key.json [limit]\n\t%s key.json <action> <object...>\n\n",
-			path.Base(os.Args[0]), path.Base(os.Args[0]))
+		fmt.Printf("\nUsage: %s key.json <action> <params>\n\n", path.Base(os.Args[0]))
 		fmt.Println(`Actions:
 	create <bucket>
 	list <bucket>
