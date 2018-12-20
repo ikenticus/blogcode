@@ -4,6 +4,7 @@ const Datastore = require('@google-cloud/datastore');
 let _ = require('lodash'),
     format = require('string-format'),
     moment = require('moment'),
+    msgpack = require('msgpack'),
     path = require('path'),
     snappy = require('snappy');
 
@@ -74,16 +75,18 @@ let listKinds = (ds, limit) => {
 }
 
 // https://github.com/GoogleCloudPlatform/nodejs-getting-started/blob/master/2-structured-data/books/model-datastore.js#L140
-let readKey = (ds, kind, id) => {
+let readKey = (ds, kind, id, value) => {
     const key = ds.key([kind, id]);
     ds.get(key, (err, entity) => {
         if (!err && !entity) {
             console.log(format('\nEntity not found: {}', id));
         } else {
             console.log(entity);
-            snappy.uncompress(entity.Value, { asBuffer: false }, (err, data) => {
-                console.log('msgp:', data);
-            });
+            if (value) {
+                snappy.uncompress(entity.Value, { asBuffer: true }, (err, data) => {
+                    console.log('Value:', msgpack.unpack(data));
+                });
+            }
         }
     });
 }
@@ -98,7 +101,7 @@ let deleteKey = (ds, kind, id) => {
 let writeKey = (ds, kind, id, dataPath) => {
     const key = ds.key([kind, id]);
     const data = require(dataPath);
-    snappy.compress(JSON.stringify(data), (err, compressed) => {
+    snappy.compress(msgpack.pack(data), (err, compressed) => {
         let payload = {
             LastModified: moment().format('YYYY-MM-DD HH:mm:ss'),
             SchemaVersion: '',
@@ -211,7 +214,7 @@ if (process.argv.length > 4) {
             listKeys(ds, process.argv[4], process.argv[5]);
             break;
         case "read":
-            readKey(ds, process.argv[4], process.argv[5]);
+            readKey(ds, process.argv[4], process.argv[5], process.argv[6]);
             break;
         case "write":
             writeKey(ds, process.argv[4], process.argv[5], process.argv[6]);
