@@ -166,8 +166,9 @@ let filter = (ds, kind, filter, order) => {
         let parts = f.match(/^(\w+)(\W+)(\w+)$/);
         query = query.filter(parts[1], parts[2], parts[3]);
     });
+    if (order) // order works for TeamId but not Season
+        query = query.order(order);
     ds.runQuery(query, (err, entities, nextQuery) => {
-        console.log(entities)
         if (err) {
             console.log('\nFailed to run Filter query');
             return;
