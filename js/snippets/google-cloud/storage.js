@@ -42,6 +42,7 @@ let remove = (bucket, filename) => {
     console.log('TODO');
 }
 
+// MAIN
 if (process.argv.length < 4) {
     console.log('\nUsage: %s key.json <action> <params>', path.basename(process.argv[0]));
     console.log(`

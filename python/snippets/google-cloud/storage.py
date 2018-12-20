@@ -59,6 +59,6 @@ if __name__ == '__main__':
         'delete': delete_blob
     }
     func = switcher.get(action, 'Invalid Action')
-    blob_name = '' if len(sys.argv) < 4 else sys.argv[4]
+    blob_name = '' if len(sys.argv) < 5 else sys.argv[4]
     func(bucket_name, blob_name);
     # using python 2.7 the google-cloud credentials do NOT appear to be working
