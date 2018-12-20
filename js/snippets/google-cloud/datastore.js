@@ -6,7 +6,8 @@ let _ = require('lodash'),
     moment = require('moment'),
     msgpack = require('msgpack'),
     path = require('path'),
-    snappy = require('snappy');
+    snappy = require('snappy'),
+    xxhash = require('xxhash');
 
 // https://github.com/GoogleCloudPlatform/nodejs-getting-started/blob/master/2-structured-data/books/model-datastore.js#L42
 function fromDatastore (obj) {
@@ -74,19 +75,27 @@ let listKinds = (ds, limit) => {
     });
 }
 
+// does not produce same results as Go "github.com/cespare/xxhash"
+let getNameKey = (kind, id) => {
+    hash = xxhash.hash64(id, 8, 'hex');
+    return ds.key([kind, hash + id]);
+}
+
 // https://github.com/GoogleCloudPlatform/nodejs-getting-started/blob/master/2-structured-data/books/model-datastore.js#L140
-let readKey = (ds, kind, id, value) => {
-    const key = ds.key([kind, id]);
+let readKey = (ds, kind, id, value, hash=false) => {
+    let key = hash ? getNameKey(kind, id) : ds.key([kind, id]);
     ds.get(key, (err, entity) => {
         if (!err && !entity) {
-            console.log(format('\nEntity not found: {}', id));
-        } else {
-            console.log(entity);
-            if (value) {
-                snappy.uncompress(entity.Value, { asBuffer: true }, (err, data) => {
-                    console.log('Value:', msgpack.unpack(data));
-                });
-            }
+            let prefix = hash ? 'Hashed ' : '';
+            console.log(format('\n{}Entity not found: {}', prefix, id));
+            if (!hash) readKey(ds, kind, id, value, hash=true);
+            return;
+        }
+        console.log(entity);
+        if (value) {
+            snappy.uncompress(entity.Value, { asBuffer: true }, (err, data) => {
+                console.log('Value:', msgpack.unpack(data));
+            });
         }
     });
 }
