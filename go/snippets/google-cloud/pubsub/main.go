@@ -88,22 +88,22 @@ func putMessage(ctx context.Context, client *pubsub.Client, topic string, msgPat
 		}
 		fmt.Printf("Created subscription: %v\n", sub)
 	*/
-    msg := fmt.Sprintf("Testing %s", topic)
-    if msgPath != "" {
-	    tmp, err := ioutil.ReadFile(msgPath)
-	    if err != nil {
-		    log.Fatalf("Failed to read file %q: %v", msgPath, err)
-	    }
-        msg = string(tmp)
-        fmt.Println(msg)
-    }
-    hash := base64.StdEncoding.EncodeToString([]byte(msg))
-    check, _ := base64.StdEncoding.DecodeString(hash)
-    fmt.Println(hash, string(check))
+	msg := fmt.Sprintf("Testing %s", topic)
+	if msgPath != "" {
+		tmp, err := ioutil.ReadFile(msgPath)
+		if err != nil {
+			log.Fatalf("Failed to read file %q: %v", msgPath, err)
+		}
+		msg = string(tmp)
+		fmt.Println(msg)
+	}
+	hash := base64.StdEncoding.EncodeToString([]byte(msg))
+	check, _ := base64.StdEncoding.DecodeString(hash)
+	fmt.Println(hash, string(check))
 	res := client.Topic(topic).Publish(ctx, &pubsub.Message{
-        Data: []byte(msg),
-    })
-    fmt.Printf("Published %s to %q: %q\n", msgPath, topic, res)
+		Data: []byte(msg),
+	})
+	fmt.Printf("Published %s to %q: %q\n", msgPath, topic, res)
 }
 
 func putTopic(ctx context.Context, client *pubsub.Client, topic string) {
@@ -114,7 +114,7 @@ func putTopic(ctx context.Context, client *pubsub.Client, topic string) {
 		log.Fatalf("Failed to check %q exists: %v", topic, err)
 	}
 	if ok {
-		fmt.Println("\nTopic %s already exists!\n", topic)
+		fmt.Printf("\nTopic %s already exists!\n", topic)
 		return
 	}
 
@@ -147,18 +147,18 @@ func main() {
 	projectID := keyData.ProjectID
 	client, err := pubsub.NewClient(ctx, projectID)
 	if err != nil {
-		log.Fatalf("Failed to connect to datastore\n")
+		log.Fatalf("Failed to connect to pubsub\n")
 	}
 
 	topic := "sports-aggregation"
 	//listSubscriptions(ctx, client, topic)
 	//putTopic(ctx, client, topic)
 
-    msgPath := ""
-    if len(os.Args) > 2 {
-        msgPath = os.Args[2]
-    }
-    fmt.Println(topic, msgPath)
+	msgPath := ""
+	if len(os.Args) > 2 {
+		msgPath = os.Args[2]
+	}
+	fmt.Println(topic, msgPath)
 	putMessage(ctx, client, topic, msgPath)
 
 	//putMessage(ctx, client, topic, "")
