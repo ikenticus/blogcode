@@ -1,0 +1,17 @@
+# go run episodes.go -y -n episodes
+
+rules:
+  season: "^.*class=\"mw-headline\" id=\"(Season|Series)_([0-9]+).*$"
+  number: "^.*th scope=\"row\"(?: rowspan=\"[0-9]+\")? id=\"ep([0-9]+)\".*$"
+  episode: "^.*<td style=\"text-align:center\">([0-9]+)</td>.*(?:class=\"summary\").*$"
+  title: "^.*>[0-9]+</td><td class=\"summary\" style=\"text-align:left\">\"(.+).*</td.*$"
+  versus: "^.*td class=\"summary\" style=\"text-align:left\">.*title=\"(.+)\".+vs.+title=\"(.+)\".+</td.*$"
+  hyper: "<a href=\".+\">(.+)</a>\""
+  datum: "^.*<td style=\"text-align:center\">([A-Za-z]+)&#160;([0-9]+),&#160;([0-9]+)<span.+bday dtstart.+$"
+  alpha: "^.*<td style=\"text-align:center\">([0-9]+)&#160;([A-Za-z]+)&#160;([0-9]+)<span.+bday dtstart.+$"
+
+shows:
+  - name: black
+    wiki: Black_Lightning_(TV_series)#Season_2_(2018–19)
+  - name: doctorwho
+    wiki: List_of_Doctor_Who_episodes_(2005–present)

@@ -23,6 +23,7 @@ const (
 )
 
 func cleanWiki(clean string) string {
+	//fmt.Println("BEFORE:", clean)
 	messy := []string{"? ", ": ", "... "}
 	for _, ugly := range messy {
 		clean = strings.Replace(clean, ugly, " - ", -1)
@@ -31,11 +32,11 @@ func cleanWiki(clean string) string {
 	for _, dirt := range dirty {
 		clean = strings.Replace(clean, dirt, "", -1)
 	}
-
-	//fmt.Println("Clean:", clean)
-	if strings.Contains(clean, "\"") {
-		return strings.Split(clean, "\"")[0]
+	comma := []string{"\"", "<"}
+	for _, char := range comma {
+		clean = strings.Split(clean, char)[0]
 	}
+	//fmt.Println("AFTER:", clean)
 	return clean
 }
 
@@ -145,10 +146,11 @@ func buildList(show string) {
 	ioutil.WriteFile(show+".list", []byte(output), 0644)
 }
 
-func parseWiki(show string, uri string, textOut bool) {
+func parseWiki(show string, uri string, textOut bool, rules *Rule) {
 	var episodes = map[int]string{}
 	var schedule = map[int]string{}
 	fmt.Println("Parsing", uri)
+	//fmt.Println("Rules", rules)
 
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", wikiPath+uri, nil)
@@ -168,14 +170,14 @@ func parseWiki(show string, uri string, textOut bool) {
 	var active bool = false
 	var eis bool = false
 
-	s := regexp.MustCompile("^.*class=\"mw-headline\" id=\"(Season|Series)_([0-9]+).*$")
-	n := regexp.MustCompile("^.*th scope=\"row\" id=\"ep([0-9]+)\".*$")
-	e := regexp.MustCompile("^.*<td>([0-9]+)</td>.*$")
-	t := regexp.MustCompile("^.*td class=\"summary\" style=\"text-align:left\">\"(.+)\".*</td.*$")
-	v := regexp.MustCompile("^.*td class=\"summary\" style=\"text-align:left\">.*title=\"(.+)\".+vs.+title=\"(.+)\".+</td.*$")
-	h := regexp.MustCompile("<a href=\".+\">(.+)</a>")
-	d := regexp.MustCompile("^.*<td>([A-Za-z]+)&#160;([0-9]+),&#160;([0-9]+)<span.+bday dtstart.+$")
-	a := regexp.MustCompile("^.*<td>([0-9]+)&#160;([A-Za-z]+)&#160;([0-9]+)<span.+bday dtstart.+$")
+	s := regexp.MustCompile(rules.Season)
+	n := regexp.MustCompile(rules.Number)
+	e := regexp.MustCompile(rules.Episode)
+	t := regexp.MustCompile(rules.Title)
+	v := regexp.MustCompile(rules.Versus)
+	h := regexp.MustCompile(rules.Hyper)
+	d := regexp.MustCompile(rules.Datum)
+	a := regexp.MustCompile(rules.Alpha)
 
 	var lines []string
 	lines = strings.Split(string(data), "\n")
@@ -193,6 +195,7 @@ func parseWiki(show string, uri string, textOut bool) {
 			}
 			if s.MatchString(line) {
 				season, _ = strconv.Atoi(s.ReplaceAllString(line, "$2"))
+				//fmt.Printf("Season: %d\n", season)
 			}
 			if n.MatchString(line) {
 				episode, _ = strconv.Atoi(n.ReplaceAllString(line, "$1"))
@@ -205,16 +208,18 @@ func parseWiki(show string, uri string, textOut bool) {
 
 			if t.MatchString(line) || v.MatchString(line) {
 				if t.MatchString(line) {
+					//fmt.Println("Title")
 					title = t.ReplaceAllString(line, "$1")
 					if h.MatchString(title) {
+						//fmt.Println("Hyper")
 						title = h.ReplaceAllString(title, "$1")
 					}
 				} else if v.MatchString(line) {
+					//fmt.Println("Versus")
 					title = v.ReplaceAllString(line, "$1 vs $2")
 				}
 				if len(title) > 0 && episode > 0 {
 					key := 100*season + episode
-					//fmt.Printf("%d: %s\n", key, title)
 					episodes[key] = cleanWiki(title)
 					schedule[key] = "TBA"
 				}
@@ -259,6 +264,27 @@ func parseWiki(show string, uri string, textOut bool) {
 	}
 }
 
+type Rule struct {
+	Season string
+	Number string
+	Episode string
+	Title string
+	Versus string
+	Hyper string
+	Datum string
+	Alpha string
+}
+
+type Show struct {
+	Name string
+	Wiki string
+}
+
+type Settings struct {
+	Rules Rule
+	Shows []Show
+}
+
 func parseYaml(config string) {
 	fmt.Println("Parsing", config)
 	data, err := ioutil.ReadFile(config + ".yaml")
@@ -266,33 +292,28 @@ func parseYaml(config string) {
 		panic(err)
 	}
 
-	type Show struct {
-		Name string
-		Wiki string
-	}
-
-	var shows []Show
-	err = yaml.Unmarshal(data, &shows)
+	var settings Settings
+	err = yaml.Unmarshal(data, &settings)
 	if err != nil {
 		panic(err)
 	}
 
-	showLength := len(shows)
+	showLength := len(settings.Shows)
 	var wg sync.WaitGroup
 	wg.Add(showLength)
 	fmt.Printf("Found %d shows\n", showLength)
 
 	/*
-		    for _, show := range shows {
+		    for _, show := range settings.Shows {
 				fmt.Println("Processing", show.Name, show.Wiki)
 			}
 	*/
 	for i := 0; i < showLength; i++ {
 		go func(i int) {
 			defer wg.Done()
-			show := shows[i]
+			show := settings.Shows[i]
 			//fmt.Println("Processing", show.Name, show.Wiki)
-			parseWiki(show.Name, show.Wiki, true)
+			parseWiki(show.Name, show.Wiki, true, &settings.Rules)
 		}(i)
 	}
 	wg.Wait()
@@ -321,7 +342,17 @@ func main() {
 		} else if len(*optWiki) < 1 {
 			processWiki(*optName)
 		} else {
-			parseWiki(*optName, *optWiki, *optTime)
+			rules := &Rule {
+				Season: "^.*class=\"mw-headline\" id=\"(Season|Series)_([0-9]+).*$",
+				Number: "^.*th scope=\"row\"(?: rowspan=\"[0-9]+\")? id=\"ep([0-9]+)\".*$",
+				Episode: "^.*<td style=\"text-align:center\">([0-9]+)</td>.*(?:class=\"summary\").*$",
+				Title: "^.*>[0-9]+</td><td class=\"summary\" style=\"text-align:left\">\"(.+).*</td.*$",
+				Versus: "^.*td class=\"summary\" style=\"text-align:left\">.*title=\"(.+)\".+vs.+title=\"(.+)\".+</td.*$",
+				Hyper: "<a href=\".+\">(.+)</a>\"",
+				Datum: "^.*<td style=\"text-align:center\">([A-Za-z]+)&#160;([0-9]+),&#160;([0-9]+)<span.+bday dtstart.+$",
+				Alpha: "^.*<td style=\"text-align:center\">([0-9]+)&#160;([A-Za-z]+)&#160;([0-9]+)<span.+bday dtstart.+$",
+			}
+			parseWiki(*optName, *optWiki, *optTime, rules)
 		}
 		if *optList {
 			buildMove(*optName)
