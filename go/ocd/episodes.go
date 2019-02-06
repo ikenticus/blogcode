@@ -23,7 +23,6 @@ const (
 )
 
 func cleanWiki(clean string) string {
-	//fmt.Println("BEFORE:", clean)
 	messy := []string{"? ", ": ", "... "}
 	for _, ugly := range messy {
 		clean = strings.Replace(clean, ugly, " - ", -1)
@@ -36,7 +35,6 @@ func cleanWiki(clean string) string {
 	for _, char := range comma {
 		clean = strings.Split(clean, char)[0]
 	}
-	//fmt.Println("AFTER:", clean)
 	return clean
 }
 
@@ -146,7 +144,7 @@ func buildList(show string) {
 	ioutil.WriteFile(show+".list", []byte(output), 0644)
 }
 
-func parseWiki(show string, uri string, textOut bool, rules *Rule) {
+func parseWiki(show string, uri string, textOut bool, debug bool, rules *Rule) {
 	var episodes = map[int]string{}
 	var schedule = map[int]string{}
 	fmt.Println("Parsing", uri)
@@ -190,36 +188,56 @@ func parseWiki(show string, uri string, textOut bool, rules *Rule) {
 
 		if active {
 			//fmt.Printf("%d : %s\n", index, line)
+			if debug {
+				fmt.Printf("LINE : %s\n", line)
+			}
 			if strings.Contains(line, "class=\"mw-headline\"") {
 				season = 0 // zero Season during Movie headers
 			}
 			if s.MatchString(line) {
 				season, _ = strconv.Atoi(s.ReplaceAllString(line, "$2"))
-				//fmt.Printf("Season: %d\n", season)
+				if debug {
+					fmt.Println("SEASON:", season)
+				}
 			}
 			if n.MatchString(line) {
 				episode, _ = strconv.Atoi(n.ReplaceAllString(line, "$1"))
+				if debug {
+					fmt.Println("NUMBER:", episode)
+				}
 				eis = true // episode-in-season
 			}
 			if eis && e.MatchString(line) {
 				episode, _ = strconv.Atoi(e.ReplaceAllString(line, "$1"))
+				if debug {
+					fmt.Println("EPISODE:", episode)
+				}
 				eis = false
 			}
 
 			if t.MatchString(line) || v.MatchString(line) {
-				if t.MatchString(line) {
-					//fmt.Println("Title")
-					title = t.ReplaceAllString(line, "$1")
-					if h.MatchString(title) {
-						//fmt.Println("Hyper")
-						title = h.ReplaceAllString(title, "$1")
-					}
-				} else if v.MatchString(line) {
-					//fmt.Println("Versus")
+				if v.MatchString(line) {
 					title = v.ReplaceAllString(line, "$1 vs $2")
+					if debug {
+						fmt.Println("VERSUS:", title)
+					}
+				} else if t.MatchString(line) {
+					title = t.ReplaceAllString(line, "$1")
+					if debug {
+						fmt.Println("TITLE:", title)
+					}
+					if h.MatchString(title) {
+						title = h.ReplaceAllString(title, "$1")
+						if debug {
+							fmt.Println("HYPER:", title)
+						}
+					}
 				}
 				if len(title) > 0 && episode > 0 {
 					key := 100*season + episode
+					if key < 100 {
+						key += 100
+					}
 					episodes[key] = cleanWiki(title)
 					schedule[key] = "TBA"
 				}
@@ -231,11 +249,21 @@ func parseWiki(show string, uri string, textOut bool, rules *Rule) {
 				} else if a.MatchString(line) {
 					timestamp = a.ReplaceAllString(line, "$2 $1, $3")
 				}
-				//fmt.Printf("%s %s: %s on %s\n", season, episode, title, timestamp)
+				if debug {
+					fmt.Println("AIRING:", timestamp)
+					//fmt.Printf("%s %s: %s on %s\n", season, episode, title, timestamp)
+				}
 				if len(title) > 0 && episode > 0 {
 					key := 100*season + episode
+					if key < 100 {
+						key += 100
+					}
 					raw, _ := time.Parse("January 2, 2006", timestamp)
-					schedule[key] = fmt.Sprintf("%04d/%02d/%02d", raw.Year(), raw.Month(), raw.Day())
+					if raw.Year() == time.Now().Year() {
+						schedule[key] = fmt.Sprintf("%02d/%02d", raw.Month(), raw.Day())
+					} else {
+						schedule[key] = fmt.Sprintf("%04d/%02d/%02d", raw.Year(), raw.Month(), raw.Day())
+					}
 				}
 			}
 		}
@@ -285,7 +313,7 @@ type Settings struct {
 	Shows []Show
 }
 
-func parseYaml(config string) {
+func parseYaml(config string, debug bool) {
 	fmt.Println("Parsing", config)
 	data, err := ioutil.ReadFile(config + ".yaml")
 	if err != nil {
@@ -313,7 +341,7 @@ func parseYaml(config string) {
 			defer wg.Done()
 			show := settings.Shows[i]
 			//fmt.Println("Processing", show.Name, show.Wiki)
-			parseWiki(show.Name, show.Wiki, true, &settings.Rules)
+			parseWiki(show.Name, show.Wiki, true, debug, &settings.Rules)
 		}(i)
 	}
 	wg.Wait()
@@ -321,6 +349,7 @@ func parseYaml(config string) {
 }
 
 func main() {
+	optDbug := getopt.BoolLong("dbug", 'd', "Debug")
 	optHelp := getopt.BoolLong("help", 'h', "Help")
 	optList := getopt.BoolLong("list", 'l', "Process File List")
 	optRead := getopt.BoolLong("read", 'r', "Read Current Dir")
@@ -338,7 +367,7 @@ func main() {
 	//fmt.Printf("Name: %v, Wiki: %v, Read: %v, List: %v\n", *optName, *optWiki, *optRead, *optList)
 	if len(*optName) > 0 {
 		if *optYaml {
-			parseYaml(*optName)
+			parseYaml(*optName, *optDbug)
 		} else if len(*optWiki) < 1 {
 			processWiki(*optName)
 		} else {
@@ -352,7 +381,7 @@ func main() {
 				Datum: "^.*<td style=\"text-align:center\">([A-Za-z]+)&#160;([0-9]+),&#160;([0-9]+)<span.+bday dtstart.+$",
 				Alpha: "^.*<td style=\"text-align:center\">([0-9]+)&#160;([A-Za-z]+)&#160;([0-9]+)<span.+bday dtstart.+$",
 			}
-			parseWiki(*optName, *optWiki, *optTime, rules)
+			parseWiki(*optName, *optWiki, *optTime, *optDbug, rules)
 		}
 		if *optList {
 			buildMove(*optName)
