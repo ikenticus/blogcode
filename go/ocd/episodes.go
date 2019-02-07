@@ -164,6 +164,7 @@ func parseWiki(show string, uri string, textOut bool, debug bool, rules *Rule) {
 
 	var title string = ""
 	var season int = 1
+	var number string = ""
 	var episode int = 0
 	var active bool = false
 	var eis bool = false
@@ -192,18 +193,22 @@ func parseWiki(show string, uri string, textOut bool, debug bool, rules *Rule) {
 				fmt.Printf("LINE : %s\n", line)
 			}
 			if strings.Contains(line, "class=\"mw-headline\"") {
-				season = 0 // zero Season during Movie headers
+				season = 0 // zero Season during Movie headers and Specials
 			}
 			if s.MatchString(line) {
-				season, _ = strconv.Atoi(s.ReplaceAllString(line, "$2"))
-				if debug {
-					fmt.Println("SEASON:", season)
+				if s.ReplaceAllString(line, "$2") == "" {
+					season = 1	// Episodes
+				} else {
+					season, _ = strconv.Atoi(s.ReplaceAllString(line, "$2"))
 				}
 			}
+			if debug {
+				fmt.Println("SEASON:", season)
+			}
 			if n.MatchString(line) {
-				episode, _ = strconv.Atoi(n.ReplaceAllString(line, "$1"))
+				number = n.ReplaceAllString(line, "$1")
 				if debug {
-					fmt.Println("NUMBER:", episode)
+					fmt.Println("NUMBER:", number)
 				}
 				eis = true // episode-in-season
 			}
@@ -213,6 +218,8 @@ func parseWiki(show string, uri string, textOut bool, debug bool, rules *Rule) {
 					fmt.Println("EPISODE:", episode)
 				}
 				eis = false
+			} else {
+				episode, _ = strconv.Atoi(number)
 			}
 
 			if t.MatchString(line) || v.MatchString(line) {
@@ -235,9 +242,6 @@ func parseWiki(show string, uri string, textOut bool, debug bool, rules *Rule) {
 				}
 				if len(title) > 0 && episode > 0 {
 					key := 100*season + episode
-					if key < 100 {
-						key += 100
-					}
 					episodes[key] = cleanWiki(title)
 					schedule[key] = "TBA"
 				}
@@ -255,9 +259,6 @@ func parseWiki(show string, uri string, textOut bool, debug bool, rules *Rule) {
 				}
 				if len(title) > 0 && episode > 0 {
 					key := 100*season + episode
-					if key < 100 {
-						key += 100
-					}
 					raw, _ := time.Parse("January 2, 2006", timestamp)
 					if raw.Year() == time.Now().Year() {
 						schedule[key] = fmt.Sprintf("%02d/%02d", raw.Month(), raw.Day())
