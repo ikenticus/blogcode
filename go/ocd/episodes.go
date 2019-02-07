@@ -27,7 +27,8 @@ func cleanWiki(clean string) string {
 	for _, ugly := range messy {
 		clean = strings.Replace(clean, ugly, " - ", -1)
 	}
-	dirty := []string{"!", "?", "&", "[", "]", "'", "..."}
+	dirty := []string{"!", "?", "&", "[", "]", "'", "...",
+		"<b>", "</b>", "<i>", "</i>"}
 	for _, dirt := range dirty {
 		clean = strings.Replace(clean, dirt, "", -1)
 	}
@@ -194,6 +195,9 @@ func parseWiki(show string, uri string, textOut bool, debug bool, rules *Rule) {
 			}
 			if strings.Contains(line, "class=\"mw-headline\"") {
 				season = 0 // zero Season during Movie headers and Specials
+				if debug {
+					fmt.Println("SEASON: Movie Specials")
+				}
 			}
 			if s.MatchString(line) {
 				if s.ReplaceAllString(line, "$2") == "" {
@@ -201,9 +205,9 @@ func parseWiki(show string, uri string, textOut bool, debug bool, rules *Rule) {
 				} else {
 					season, _ = strconv.Atoi(s.ReplaceAllString(line, "$2"))
 				}
-			}
-			if debug {
-				fmt.Println("SEASON:", season)
+				if debug {
+					fmt.Println("SEASON:", season)
+				}
 			}
 			if n.MatchString(line) {
 				number = n.ReplaceAllString(line, "$1")
