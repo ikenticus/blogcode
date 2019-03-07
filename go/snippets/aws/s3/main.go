@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -23,6 +24,12 @@ func main() {
 
 	// Create an uploader with the session and default options
 	uploader := s3manager.NewUploader(sess)
+
+	text := []byte("Mary had a little Lambda\n")
+	err := ioutil.WriteFile(fileName, text, 0644)
+	if err != nil {
+		fmt.Printf("failed to write file %q, %v\n", fileName, err)
+	}
 
 	f, err := os.Open(fileName)
 	if err != nil {
