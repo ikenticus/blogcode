@@ -1,0 +1,38 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="index.css">
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <title>Redshift Charts</title>
+    </head>
+    <body>
+
+<div id="dialog-window" style="height: 200px; border: 1px black solid;">
+
+  <div id="header" style="height: 25px; background-color: green;">
+  </div>
+
+  <div id="scrollable-content" style="background-color: blue; overflow-y: scroll;">
+    <ul>
+        <li>how many lines follow me?</li>
+    </ul>
+  </div>
+
+  <div id="footer" style="height: 25px; background-color: green;">
+  </div>
+
+</div>
+<script>
+console.log('document ', $(document).height());
+console.log('window ', $(window).height());
+console.log('position ', $('#scrollable-content').position());
+
+$('#scrollable-content').height($(document).height() - $('#footer').height() - $('#scrollable-content').position().top);
+for (i = 0; i < 100; i++) { 
+    $('#scrollable-content ul').append('<li>content line ' + i + ' makes document height ' + $(document).height() + '</li>');
+}
+</script>
+
+</body>
+</html>

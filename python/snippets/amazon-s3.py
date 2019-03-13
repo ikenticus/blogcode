@@ -1,5 +1,3 @@
-import os
-
 import boto3
 s3c = boto3.client('s3')
 s3res = boto3.resource(service_name = 's3')
