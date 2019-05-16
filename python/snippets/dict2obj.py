@@ -54,6 +54,7 @@ cfg = dict2obj(settings)
 print(settings)
 print(settings.keys())
 print(cfg)
+print(cfg.keys())
 
 for k in settings.keys():
     print(k, getattr(cfg, k))
