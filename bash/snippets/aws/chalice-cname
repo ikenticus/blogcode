@@ -1,0 +1,122 @@
+#!/bin/bash
+#
+# Chalice Lambda CNAME
+#
+# Automated CNAME creation for Chalice Lambda API Gateway
+#
+
+TMP=/tmp/${0##*/}.json
+
+DEPLOYED=.chalice/deployed/dev.json
+test_deploy() {
+    if [ ! -f $DEPLOYED ]; then
+        echo Deploy the chalice application at least once before running this script
+        exit 1
+    fi
+}
+
+test_zone() {
+    local domain=${DNS#*.}
+    local zone=$(aws route53 list-hosted-zones | jq -r ".HostedZones[] | select(.Name == \"$domain.\")")
+    if [ ! -z "$zone" ]; then
+        echo Found hosted-zone for $domain
+        echo $zone
+        HZI=$(echo $zone | jq -r '.Id' | cut -d\/ -f3)
+    else
+        echo $domain hosted-zone not accessible
+        exit 2
+    fi
+}
+
+get_name() {
+    local dns=$1
+    local domain=change.me
+    if [ -z $dns ]; then
+        dns=${PWD##*/}.$domain
+    elif [ ! -z ${dns//*.*.*} ]; then
+        dns=$dns.$domain
+    fi
+    DNS=$dns
+}
+
+acm_query() {
+    local domain=$1
+    aws acm list-certificates | jq -r ".CertificateSummaryList[] | select(.DomainName | endswith(\"$domain\")) | .CertificateArn"
+}
+
+test_cert() {
+    local query=$1
+    local cert=$(acm_query $query)
+    if [ ! -z $cert ]; then
+        echo Found certificate for $query
+        CERT=$cert
+    else
+        echo No valid certificate found for $query
+    fi
+}
+
+get_cert() {
+    local domain=${DNS#*.}
+    test_cert $DNS
+    [ -z $CERT ] && test_cert $domain
+    [ -z $CERT ] && exit 2
+}
+
+api_domain() {
+    aws apigateway get-domain-name --domain-name $DNS
+    if [ $? -eq 0 ]; then
+        echo $DNS already added to API Gateway domain
+    else
+        echo Adding $DNS as API Gateway domain
+        aws apigateway create-domain-name --domain-name $DNS --certificate-arn $CERT
+    fi
+    local gateway=$(aws apigateway get-domain-name --domain-name $DNS)
+    TARGETZONE=$(echo $gateway | jq -r '.distributionHostedZoneId')
+    TARGETDNS=$(echo $gateway | jq -r '.distributionDomainName')
+}
+
+api_basepath() {
+    local base=$(aws apigateway get-base-path-mappings --domain-name $DNS)
+    if [ ! -z "$base" ]; then
+        echo $base
+        echo $DNS already has base path mappings
+    else
+        echo Adding base path mapping for $DNS
+        RAI=$(cat $DEPLOYED | jq -r '.resources[] | select(.name == "rest_api") | .rest_api_id')
+        aws apigateway create-base-path-mapping --domain-name $DNS --rest-api-id $RAI --stage api
+    fi
+}
+
+dns_domain() {
+    local domain=${DNS#*.}
+    cat << EOF > $TMP
+{
+    "Comment": "Creating API Gateway Alias",
+    "Changes": [
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "$DNS.",
+                "Type": "A",
+                "AliasTarget": {
+                    "HostedZoneId": "$TARGETZONE",
+                    "DNSName": "$TARGETDNS",
+                    "EvaluateTargetHealth": false
+                }
+            }
+        }
+    ]
+}
+EOF
+    aws route53 change-resource-record-sets --hosted-zone-id $HZI --change-batch file://$TMP
+    echo Test progress using: aws route53 get-change --id /change/
+}
+
+#####  MAIN  #####
+test_deploy
+get_name $1
+test_zone
+get_cert
+api_domain
+api_basepath
+dns_domain
