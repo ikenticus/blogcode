@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# Update Redshift CIDR for User
+#
+
+CSGN=default
+HERE=${PROFILE:-PW}
+
+if [ $# -lt 2 ]; then
+    echo "Usage: ${0##*/} username CIDR[/32]"
+    exit -1
+fi
+
+NAME=$1
+NEWCIDR=$2
+if [ ! -z "${NEWCIDR%%*/32}" ]; then
+    NEWCIDR="${NEWCIDR}/32"
+fi
+
+echo BEFORE:
+aws redshift describe-cluster-security-groups --profile $HERE | jq -r '.ClusterSecurityGroups[].IPRanges[] | "\(.CIDRIP)\t\(.Tags[0].Value)"'
+
+RULE=$(aws redshift describe-cluster-security-groups --profile $HERE | jq -r ".ClusterSecurityGroups[].IPRanges[] | select(.Tags[].Value | contains(\"$NAME\"))")
+OLDCIDR=$(echo $RULE | jq -r '.CIDRIP')
+OLDTAG=$(echo $RULE | jq -r '.Tags[0].Value')
+NEWTAG=$(echo "$(date +%Y-%m-%d) ${OLDTAG#* }")
+
+ARN=$(aws redshift describe-tags --profile $HERE | jq -r ".TaggedResources[] | select(.Tag.Value | contains(\"$NAME\")) | .ResourceName")
+PREFIX=${ARN%/*/32}
+NEWARN=${PREFIX}/${NEWCIDR}
+
+aws redshift revoke-cluster-security-group-ingress --cluster-security-group-name $CSGN --profile $HERE --cidrip $OLDCIDR > /dev/null
+aws redshift authorize-cluster-security-group-ingress --cluster-security-group-name $CSGN --profile $HERE --cidrip $NEWCIDR > /dev/null
+aws redshift create-tags --profile $HERE --resource-name $NEWARN --tags Key=Location,Value="$NEWTAG"
+
+echo AFTER:
+aws redshift describe-cluster-security-groups --profile $HERE | jq -r '.ClusterSecurityGroups[].IPRanges[] | "\(.CIDRIP)\t\(.Tags[0].Value)"'

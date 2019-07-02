@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# Clean ECR of untagged images
+# Using JSON since Shorthand failed
+#
+
+if [ -z $1 ]; then
+    echo "Usage: PROFILE=XX ${0##*/} <ecr-repository>"
+    exit 0
+fi
+
+REPO=$1
+PROFILE=${PROFILE:-VA}
+UNTAGGED=$(aws ecr list-images --repository-name $REPO --profile $PROFILE --filter tagStatus=UNTAGGED | jq -r '.imageIds[].imageDigest')
+
+for tag in $UNTAGGED; do
+    if [ -z "$IDS" ]; then
+        #IDS=imageDigest=$tag
+        IDS="[{\"imageDigest\":\"$tag\"}"
+    else
+        #IDS="$IDS,imageDigest=$tag"
+        IDS="$IDS,{\"imageDigest\":\"$tag\"}"
+    fi
+done
+IDS="$IDS]"
+echo $IDS
+aws ecr batch-delete-image --repository $REPO --profile $PROFILE --image-ids=$IDS
+
