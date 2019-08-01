@@ -1,0 +1,60 @@
+#!/bin/bash
+#
+# Chalice Lambda Log
+#
+# Automated latest log dump for Chalice Lambda
+# 
+# Usage: chalice-log [type] [lines]
+#
+#   Dump latest log stream from last matching ${PWD}-dev app
+#        chalice-log
+#
+#   Dump first 10 lines from ${PWD}-dev-crontab
+#        chalice-log crontab 10
+#
+#   Dump last 20 lines from ${PWD}-qa
+#        STAGE=qa chalice-log - -20
+#
+
+stage=${STAGE:-dev}
+
+prefix=$(cat .chalice/config.json | jq -r .app_name)
+if [ -z "$prefix" ]; then
+    echo Chalice is not configured in current directory
+    exit 1
+fi
+
+type=$1
+if [ -z "$type" ]; then
+    echo Checking ${prefix}
+    groups=$(aws logs describe-log-groups | jq -r ".logGroups[] | select(.logGroupName | startswith(\"/aws/lambda/${prefix}-${stage}\")) | .logGroupName")
+else
+    echo Checking ${prefix} ${type}
+    if [ $type == '-' ]; then
+        groups=$(aws logs describe-log-groups | jq -r ".logGroups[] | select(.logGroupName == \"/aws/lambda/${prefix}-${stage}\") | .logGroupName")
+    else
+        groups=$(aws logs describe-log-groups | jq -r ".logGroups[] | select(.logGroupName | startswith(\"/aws/lambda/${prefix}-${stage}-${type}\")) | .logGroupName")
+    fi
+fi
+
+if [ -z "$groups" ]; then
+    echo No log groups found matching ${prefix}-${stage}
+    exit 2
+elif [ $(echo "$groups" | wc -l) -gt 1 ]; then
+    echo -e "More than one log group discovered:\n${groups}*"
+    group=$(echo "$groups" | tail -1)
+else
+    group=$groups
+fi
+
+echo Pulling latest log stream for $group
+stream=$(aws logs describe-log-streams --log-group-name $group --descending --max-items 1 | jq -r '.logStreams[].logStreamName')
+
+lines=$2
+if [ -z "$lines" ]; then
+    aws logs get-log-events --log-group-name $group --log-stream-name "$stream" | jq -r '.events[] | "\(.timestamp)\t\(.message)" | rtrimstr("\n")'
+elif [ $lines -lt 0 ]; then
+    aws logs get-log-events --log-group-name $group --log-stream-name "$stream" --limit ${lines#-} | jq -r '.events[] | "\(.timestamp)\t\(.message)" | rtrimstr("\n")'
+else
+    aws logs get-log-events --log-group-name $group --log-stream-name "$stream" --limit $lines --start-from-head | jq -r '.events[] | "\(.timestamp)\t\(.message)" | rtrimstr("\n")'
+fi
