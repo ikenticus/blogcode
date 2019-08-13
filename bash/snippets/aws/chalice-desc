@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# Updating Lambda description for current Chalice directory
+#
+
+stage=${STAGE:-dev}
+
+arn=$(cat .chalice/deployed/dev.json | jq -r .resources[0].lambda_arn)
+name=${arn##*:}
+if [ -z "$name" ]; then
+    echo Chalice is not deployed in current directory
+    exit 1
+fi
+
+desc=$*
+aws lambda update-function-configuration --function-name $name --description "$desc"
