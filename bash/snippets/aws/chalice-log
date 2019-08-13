@@ -48,7 +48,10 @@ else
 fi
 
 echo Pulling latest log stream for $group
-stream=$(aws logs describe-log-streams --log-group-name $group --descending --max-items 1 | jq -r '.logStreams[].logStreamName')
+logstream=$(aws logs describe-log-streams --log-group-name $group --descending --order-by LastEventTime --max-items 1 )
+stream=$(echo $logstream | jq -r '.logStreams[].logStreamName')
+stamp=$(echo $logstream | jq -r .logStreams[].creationTime)
+echo -e "$(date -r $[stamp/1000] +'%Y/%m/%d %H:%M:%S')\t$stream"
 
 lines=$2
 if [ -z "$lines" ]; then
