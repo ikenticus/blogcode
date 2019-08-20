@@ -1,0 +1,31 @@
+#!/bin/bash
+#
+# Update existing Chalice Lambda via S3 for > 50MB zip due to drivers
+#
+
+bucket=bucket-name
+s3path=sub/dir/lambda
+
+# verify drivers
+if [ ! -d drivers ]; then
+    echo "/drivers not found!"
+    exit 1
+fi
+
+# clean up before deploying
+rm -f .chalice/deployments/*zip
+chalice deploy --no-autogen-policy
+
+# retrieve app after deploying
+arn=$(cat .chalice/deployed/dev.json | jq -r .resources[0].lambda_arn)
+name=${arn##*:}
+
+# add drivers to archive
+mv -f $(ls -1 .chalice/deployments/*zip) $name.zip
+zip -rp $name.zip drivers/
+
+# push archive to S3
+aws s3 cp $name.zip s3://$bucket/$s3path/$name.zip
+
+# update Lambda to use archive
+aws lambda update-function-code --function-name $name --region us-east-1 --s3-bucket $bucket --s3-key $s3path/$name.zip
