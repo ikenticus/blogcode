@@ -1,0 +1,43 @@
+{
+    "excludes": [
+        "localized",
+        "thumbnails"
+    ],
+    "oauth": {
+        "client": "client.json",
+        "storage": "oauth2.json",
+        "scope": "https://www.googleapis.com/auth/youtube.readonly",
+        "message": "Download client.json from https://code.google.com/apis/console#access"
+    },
+    "metrics": [
+        "annotationImpressions",
+        "annotationClickableImpressions",
+        "annotationClicks",
+        "annotationClickThroughRate",
+        "annotationClosableImpressions",
+        "annotationCloses",
+        "annotationCloseRate",
+        "averageViewDuration",
+        "averageViewPercentage",
+        "cardClickRate",
+        "cardClicks",
+        "cardImpressions",
+        "cardTeaserClickRate",
+        "cardTeaserClicks",
+        "cardTeaserImpressions",
+        "comments",
+        "dislikes",
+        "estimatedMinutesWatched",
+        "likes",
+        "shares",
+        "subscribersGained",
+        "subscribersLost",
+        "videosAddedToPlaylists",
+        "videosRemovedFromPlaylists",
+        "views"
+    ],
+    "service": {
+        "youtube": "v3",
+        "youtubeAnalytics": "v2"
+    }
+}
