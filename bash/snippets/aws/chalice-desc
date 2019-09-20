@@ -12,5 +12,10 @@ if [ -z "$name" ]; then
     exit 1
 fi
 
-desc=$*
-aws lambda update-function-configuration --function-name $name --description "$desc"
+if [ $# -eq 0 ]; then
+    echo "=== Current Lambda Descriptions"
+    aws lambda list-functions | jq -r '.Functions[].Description' | grep -v ^$ | sort
+else
+    desc=$*
+    aws lambda update-function-configuration --function-name $name --description "$desc"
+fi
