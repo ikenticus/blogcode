@@ -1,0 +1,9 @@
+*.json
+chalicelib/*.json
+.chalice/deployments/
+.chalice/venv/
+__pycache__
+*.pyc
+*.zip
+chromedriver
+headless-chromium

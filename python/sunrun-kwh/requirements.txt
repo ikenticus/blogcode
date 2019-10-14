@@ -1,0 +1,3 @@
+boto3==1.9.211
+chalice==1.10.0
+selenium==3.141.0
