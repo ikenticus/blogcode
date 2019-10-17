@@ -1,0 +1,64 @@
+#!/bin/bash
+#
+# Tool to copy and dump latest AWS logs on S3
+#
+
+TMP=/tmp/aws-logs
+[ ! -d $TMP ] && mkdir -p $TMP
+
+[ -z $BUCKET ] && BUCKET=bucket-name
+[ -z $PREFIX ] && PREFIX=prefix-path
+[ -z $EXT ] && EXT=\.gz
+[ -z $CAT ] && CAT=gzcat
+
+FILE=${1:-1}
+LINE=${2:-100}
+
+YEAR=$(date +%Y)
+MONTH=$(date +%m)
+DAY=$(date +%d)
+
+recurse() {
+    echo Checking $current
+    tail=$(aws s3 ls $current | tail)
+    if [ ! -z "$(echo $tail | grep PRE)" ]; then
+        if [ ! -z "$(echo $tail | egrep $YEAR/)" ]; then
+            echo Found current year:
+            current=$current$YEAR/
+            recurse
+        elif [ ! -z "$(echo $tail | egrep $MONTH/)" ]; then
+            echo Found current month:
+            current=$current$MONTH/
+            recurse
+        elif [ ! -z "$(echo $tail | egrep $DAY/)" ]; then
+            echo Found current day:
+            current=$current$DAY/
+            recurse
+        elif [ $(echo "$tail" | grep PRE | wc -l) -gt 1 ]; then
+            echo Found multiple subdirectories:
+            aws s3 ls $current | grep PRE
+            echo set PREFIX to one of these to continue...
+        else
+            current=$current$(echo "$tail" | grep PRE | awk '{ print $NF }')
+            recurse
+        fi
+    elif [ ! -z "$(echo $tail | egrep $EXT)" ]; then
+        echo Found logs, reading $LINE lines from file $FILE:
+        if [ $FILE -lt 0 ]; then
+            file=$(aws s3 ls $current | egrep $EXT$ | tail $FILE | head -1 | awk '{ print $NF }')
+        else
+            file=$(aws s3 ls $current 2>/dev/null | egrep $EXT$ | head -$FILE | tail -1 | awk '{ print $NF }')
+        fi
+        aws s3 cp $current$file $TMP/
+        if [ $LINE -lt 0 ]; then
+            $CAT $TMP/$file | tail $LINE
+        else
+            $CAT $TMP/$file | head -$LINE
+        fi
+    fi
+}
+
+current=s3://$BUCKET/
+[ ! -z "$PREFIX" ] && current=$current$PREFIX/
+recurse
+
