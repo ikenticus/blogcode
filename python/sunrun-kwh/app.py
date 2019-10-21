@@ -25,12 +25,12 @@ class Struct:
     def __init__(self, **entries):
         self.__dict__.update(entries)
 
-def email_alert(kwh):
+def email_alert(kwh, user):
     subject = 'Daily Production below %s kWh: %s' % (cfg.threshold, kwh)
     client = boto3.client('ses')
     response = client.send_email(
         Destination={
-            'ToAddresses': [cfg.username]
+            'ToAddresses': [user]
         },
         Message={
             'Body': {
@@ -44,7 +44,7 @@ def email_alert(kwh):
                 'Data': subject,
             },
         },
-        Source=cfg.username,
+        Source=cfg.sender,
     )
     print(response)
 
@@ -87,7 +87,9 @@ def scrape_output():
     kwh = driver.find_element_by_css_selector('div.system-production .total .ng-binding').get_attribute('innerHTML')
     print(kwh)
     if int(kwh) < int(cfg.threshold):
-        email_alert(kwh)
+        email_alert(kwh, cfg.username)
+    if int(kwh) == 0:
+        email_alert(kwh, cfg.smsphone)
 
     if driver:
         driver.quit()
