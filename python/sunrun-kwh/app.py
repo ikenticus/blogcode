@@ -118,7 +118,7 @@ def index():
 '''
 
 # cron(M H D M DoW Y)
-@app.schedule('cron(0 8,18 * * ? *)')
+@app.schedule('cron(0 12,18 * * ? *)')
 def crontab(event):
     scrape_output()
 
