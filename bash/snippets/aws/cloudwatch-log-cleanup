@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# CloudWatch Log Cleanup:
+#   Add default retention to Never Expire log groups
+#   Remove inactive log groups older than maximum
+#
+
+# default days:
+RETENT=30
+MAXDAYS=180
+CUTOFF=$(date -v-${MAXDAYS}d +%Y%m%d)
+
+set_default_retention() {
+    groups=$(aws logs describe-log-groups | jq -r ".logGroups[] | select(has(\"retentionInDays\") | not)  | .logGroupName")
+    for g in $groups; do
+        echo "Default retention of $RETENT days set for $g"
+        aws logs put-retention-policy --log-group-name $g --retention-in-days $RETENT
+    done
+}
+
+purge_inactive_groups() {
+    groups=$(aws logs describe-log-groups | jq -r ".logGroups[] | .logGroupName")
+    echo Checking for groups inactive after $CUTOFF:
+    for g in $groups; do
+        logstream=$(aws logs describe-log-streams --log-group-name $g --descending --order-by LastEventTime --max-items 1 )
+        stream=$(echo $logstream | jq -r '.logStreams[].logStreamName')
+        stamp=$(aws logs get-log-events --log-group-name $g --log-stream-name "$stream" --limit 1 --start-from-head | jq -r '.events[] | .timestamp')
+        serial=$(date -r $[stamp/1000] +%Y%m%d)
+        if [ $serial -lt $CUTOFF ]; then
+            echo Last logged $serial, removing $g 
+            aws logs delete-log-group --log-group-name $g
+        fi
+    done
+}
+
+###   MAIN
+set_default_retention
+purge_inactive_groups
