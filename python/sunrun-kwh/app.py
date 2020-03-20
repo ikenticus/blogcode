@@ -49,10 +49,15 @@ def email_alert(kwh, user):
     print(response)
 
 def login(driver):
+    driver.get(cfg.website + cfg.page['login'])
+    #driver.find_element_by_css_selector('button[data-testid="email-signin"]').click()
     driver.implicitly_wait(10)
-    driver.find_element_by_id('email').send_keys(cfg.username)
-    driver.find_element_by_id('password').send_keys(cfg.password)
-    driver.find_element_by_css_selector('input.btn').click()
+    #driver.find_element_by_id('email').send_keys(cfg.username)
+    #driver.find_element_by_id('password').send_keys(cfg.password)
+    #driver.find_element_by_css_selector('input.btn').click()
+    driver.find_element_by_css_selector('input[name="email"]').send_keys(cfg.username)
+    driver.find_element_by_css_selector('label[for="tos"] > span').click()
+    driver.find_element_by_css_selector('button[type="submit"]').click()
     driver.implicitly_wait(10)
 
 def scrape_output():
@@ -73,16 +78,19 @@ def scrape_output():
         chrome_options.binary_location = 'drivers/headless-chromium'
         driver = webdriver.Chrome(executable_path='drivers/chromedriver', options=chrome_options)
 
-    driver.get(cfg.website)
     login(driver)
     driver.implicitly_wait(1000)
 
     # click Generate then Download Report
     if sys.platform == 'darwin':
-        driver.find_element_by_css_selector('input.btn.submit').click()
-        driver.find_element_by_css_selector('a.btn').click()
+        driver.implicitly_wait(5000)
+        driver.get(cfg.page['history'])
+        driver.find_element_by_link_text('Export').click()
+        #driver.find_element_by_css_selector('input.btn.submit').click()
+        #driver.find_element_by_css_selector('a.btn').click()
         #driver.get(csv)
 
+    '''
     csv = driver.find_element_by_css_selector('a.btn').get_attribute('href')
     kwh = driver.find_element_by_css_selector('div.system-production .total .ng-binding').get_attribute('innerHTML')
     print(kwh)
@@ -90,6 +98,7 @@ def scrape_output():
         email_alert(kwh, cfg.username)
     if int(kwh) == 0:
         email_alert(kwh, cfg.smsphone)
+    '''
 
     if driver:
         driver.quit()

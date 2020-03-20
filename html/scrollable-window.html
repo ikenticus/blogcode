@@ -1,0 +1,85 @@
+<html>
+<head>
+<style>
+.square {
+  background-color: red;
+  border: 5px black dashed;
+  float: left;
+  height: 100px;
+  width: 100px;
+}
+
+#horizontal-window {
+  border: 1px black solid;
+  width: 200px;
+}
+
+#horizontal-scroll {
+  background-color: blue;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  width: 180px;
+}
+
+#vertical-window {
+  border: 1px black solid;
+  height: 200px;
+}
+
+#vertical-scroll {
+  background-color: blue;
+  height: 180px;
+  overflow: auto;
+}
+
+#footer {
+  background-color: green;
+  height: 20px;
+}
+</style>
+</head>
+<body>
+
+<div id="vertical-window">
+  <div id="vertical-scroll">
+    <ul>
+      <li>Sample</li>
+      <li>Sample</li>
+      <li>Sample</li>
+      <li>Sample</li>
+      <li>Sample</li>
+      <li>Sample</li>
+      <li>Sample</li>
+      <li>Sample</li>
+      <li>Sample</li>
+      <li>Sample</li>
+      <li>Sample</li>
+      <li>Sample</li>
+      <li>Sample</li>
+    </ul>
+  </div>
+  <div id="footer">
+  </div>
+</div>
+
+<div style="border:1px solid black;height:100px;width:140px;overflow-y:hidden;overflow-x:scroll;">
+<p style="width:250%;">
+By using overflow-x, we can create scroll bars when the contents of this div are wider than the container. By setting this paragraph to 200 percent, it is 200 percent wider than the parent container - forcing an overflow. 
+</p>
+</div>
+
+<div id="horizontal-window">
+  <div id="horizontal-scroll">
+    <ul>
+      <li><div class="square"></div></li>
+      <li><div class="square"></div></li>
+      <li><div class="square"></div></li>
+      <li><div class="square"></div></li>
+      <li><div class="square"></div></li>
+      <li><div class="square"></div></li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>
