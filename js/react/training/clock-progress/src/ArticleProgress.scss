@@ -1,0 +1,122 @@
+@import "./variables.scss";
+
+//desktop
+.article-progress {
+	position: fixed;
+	z-index: 5000;
+	.circle-background {
+	  fill: #fff;
+	  stroke: #fff;
+	}
+
+	.circle-progress {
+	  stroke: #000;
+	  stroke-linecap: butt;
+	  stroke-linejoin: butt;
+	  fill: none;
+	}
+
+	.minutes-container, .hours-container, .seconds-container {
+	  position: absolute;
+	  top: 0;
+	  right: 0;
+	  bottom: 0;
+	  left: 0;
+	}
+	.hours {
+	  background: #000;
+	  height: 25%;
+	  left: 47%;
+	  position: absolute;
+	  top: 25%;
+	  transform-origin: 50% 100%;
+	  width: 4%;
+	}
+	.minutes {
+	  background: #000;
+	  height: 30%;
+	  left: 47%;
+	  position: absolute;
+	  top: 20%;
+	  transform-origin: 50% 100%;
+	  width: 4%;
+	}
+	&.complete {
+		animation: scale .4s ease-in-out;
+  		.circle-progress {
+	  		stroke: #00986F;
+	  	}
+	  	.hours, .minutes {
+	  		background: #00986F;
+	  	}
+	}
+}
+
+//mobile
+.article-progress-track {
+	width: 100%;
+	height: 15px;
+	position: fixed;
+	top: 64px;
+	z-index: 5000;
+
+	.article-progress-bar {
+		background-color: #FF6550;
+		height: 100%;
+		position: relative;
+	}
+}
+
+.checkmark {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: block;
+  stroke-width: 4;
+  stroke: $orange;
+  stroke-miterlimit: 10;
+  box-shadow: inset 0px 0px 0px $white;
+  animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+  position: fixed;
+  top: 45px;
+  right: 25px;
+  z-index: 15000;
+
+  .checkmark__circle {
+	  stroke-dasharray: 166;
+	  stroke-dashoffset: 166;
+	  stroke-width: 4;
+	  stroke-miterlimit: 10;
+	  stroke: $orange;
+	  fill: none;
+	  animation: stroke .6s $curve forwards;
+	}
+
+	.checkmark__check {
+	  transform-origin: 50% 50%;
+	  stroke-dasharray: 48;
+	  stroke-dashoffset: 48;
+	  animation: stroke .3s $curve .8s forwards;
+	}
+}
+
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes scale {
+  0%, 100% {
+    transform: none;
+  }
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+  }
+}
+
+@keyframes fill {
+  100% {
+    box-shadow: inset 0px 0px 0px 30px $white;
+  }
+}

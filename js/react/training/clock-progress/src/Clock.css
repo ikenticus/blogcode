@@ -1,0 +1,48 @@
+.article-progress {
+    position: fixed;
+    z-index: 5000;    
+}
+
+.LongBlock {
+  height: 500px;
+}
+
+.LongBlock.Block0 {
+  background-color: #fff;
+}
+
+.LongBlock.Block1 {
+  background-color: #eee;
+}
+
+.LongBlock.Block2 {
+  background-color: #ddd;
+}
+
+.LongBlock.Block3 {
+  background-color: #ccc;
+}
+
+.LongBlock.Block4 {
+  background-color: #bbb;
+}
+
+.LongBlock.Block5 {
+  background-color: #aaa;
+}
+
+.LongBlock.Block6 {
+  background-color: #999;
+}
+
+.LongBlock.Block7 {
+  background-color: #888;
+}
+
+.LongBlock.Block8 {
+  background-color: #777;
+}
+
+.LongBlock.Block9 {
+  background-color: #666;
+}

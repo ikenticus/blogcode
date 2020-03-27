@@ -1,0 +1,155 @@
+/*********************
+VARIABLES
+*********************/
+$black: #000000;
+$white: #ffffff;
+$one-green: #00986F;
+$one-blue: #46C1D1;
+$link-grey: #9C9DA1;
+$line-grey: #979797;
+$category: #242526;
+$hairline: #D8D9DE;
+$strength: #6FC5D0;
+$grind: #00986F;
+$style: #FF6550;
+$culture: #141954;
+$gaming: #F3E838;
+$ea-bg: #000000;
+$ea-border: 8px solid #303334;
+$teal-hover: #8AFAFE;
+$green-hover: #B5FBC4;
+$orange: #FF6550;
+$orange-hover: #FFA992;
+$salmon: rgb(255, 101, 80);
+
+$header-height: 64px;
+$nav-content-padding-left: 8.5%;
+
+$desktop-width: 636px;
+$desktop-width-half: calc(#{$desktop-width}/2);
+$mobile-width: 86%;
+$mobile-width-margin: 7%;
+
+$curve: cubic-bezier(0.650, 0.000, 0.450, 1.000);
+
+/*********************
+MIXIN BREAKPOINTS
+*********************/
+
+$mobile: 375px;
+$mobile-lg: 767px;
+$tablet-portrait: 768px;
+$tablet-landscape: 1024px;
+$desktop-laptop: 1280px;
+$desktop-laptop-lg: 1600px;
+$desktop-laptop-xlg: 2100px;
+$desktop-laptop-xxlg: 3100px;
+
+$neuzeit: 'neuzeit-grotesk';
+$brandon: 'brandon-grotesque';
+$serif: 'serif';;
+
+@mixin bp($point) {
+
+    $bp-mobile-sm: "(max-width: 320px)";
+    $bp-mobile: "(max-width: 375px)";
+    $bp-mobile-lg: "(max-width: 767px)";
+    $bp-tablet-portrait: "(min-width: 768px)";
+    $bp-tablet-landscape: "(min-width: 1024px)";
+    $bp-desktop-laptop: "(min-width: 1280px)";
+    $bp-desktop-laptop-lg: "(min-width: 1600px)";
+    $bp-desktop-laptop-xlg: "(min-width: 2100px)";
+    $bp-desktop-laptop-xxlg: "(min-width: 3100px)";
+
+    @if $point == mobile-sm {
+        @media #{$bp-mobile-sm} { @content; }
+    }
+    @if $point == mobile {
+        @media #{$bp-mobile} { @content; }
+    }
+    @else if $point == mobile-lg {
+        @media #{$bp-mobile-lg} { @content; }
+    }
+    @else if $point == tablet-portrait {
+        @media #{$bp-tablet-portrait} { @content; }
+    }
+    @else if $point == tablet-landscape {
+        @media #{$bp-tablet-landscape}  { @content; }
+    }
+    @else if $point == desktop-laptop {
+        @media #{$bp-desktop-laptop}  { @content; }
+    }
+    @else if $point == desktop-laptop-lg {
+        @media #{$bp-desktop-laptop-lg}  { @content; }
+    }
+    @else if $point == desktop-laptop-xlg {
+        @media #{$bp-desktop-laptop-xlg}  { @content; }
+    }
+    @else if $point == desktop-laptop-xxlg {
+        @media #{$bp-desktop-laptop-xxlg}  { @content; }
+    }
+}
+
+@mixin prefix-transform($value) {
+    -webkit-transform: $value;
+       -moz-transform: $value;
+        -ms-transform: $value;
+            transform: $value;
+}
+
+/*********************
+MIXINS
+*********************/
+@mixin prefix-transform($value) {
+    -webkit-transform: $value;
+       -moz-transform: $value;
+        -ms-transform: $value;
+            transform: $value;
+}
+
+@mixin center-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    @include prefix-transform($value: translate(-50%,-50%));
+}
+
+@mixin uncenter-content {
+    top: 0%;
+    left: 0%;
+    @include prefix-transform($value: translate(0%,0%));
+    width: 100%;
+}
+
+@mixin center-vertically {
+    position: absolute;
+    top: 50%;
+    @include prefix-transform($value: translateY(-50%));
+}
+
+@mixin center-horizontally {
+    position: absolute;
+    left: 50%;
+    @include prefix-transform($value: translateX(-50%));
+}
+
+@mixin font-smoothing {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+@mixin clearfix {
+   &:after {
+       content: ".";
+       visibility: hidden;
+       display: block;
+       height: 0;
+       clear: both;
+   }
+}
+
+@mixin inset-box-shadow($offsetX, $offsetY, $color) {
+    -moz-box-shadow: inset $offsetX $offsetY 0 -2px $color;
+    -webkit-box-shadow: inset $offsetX $offsetY 0 -2px $color;
+    box-shadow: inset $offsetX $offsetY 0 -2px $color;
+}
