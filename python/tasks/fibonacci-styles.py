@@ -39,6 +39,8 @@ def recursive(n):
         return n
     else:
         return recursive(n-2) + recursive(n-1)
+
 for n in range(10):
-    print(recursive(n)),
+    #print(recursive(n)),
+    print(recursive(n),end=',')
 

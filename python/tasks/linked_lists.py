@@ -17,7 +17,7 @@ class linked_list:
     def list_print(self):
         node = self.cur_node # cant point to ll!
         while node:
-            print node.data
+            print(node.data)
             node = node.next
 
 
@@ -27,4 +27,4 @@ for i in range(10):
     ll.add_node(i)
 
 ll.list_print()
-print dir(ll)
+print(dir(ll))
