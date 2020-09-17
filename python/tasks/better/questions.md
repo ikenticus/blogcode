@@ -1,0 +1,91 @@
+# Peppe Landolfi @ Karat.io
+
+-----
+
+We are working on a clone of Facebook that allows users to share content with their social network. Users view posts in an infinite stream. Our product only has a few thousand users but we expect it to be as popular as Facebook very soon!
+
+We want to add a live numeric count to every post showing how many friends the post's author has. When the post is shown to a user, the author's current friend count should be shown next to their name, like this:
+
+Marie McWilliams (105 friends) 5:10pm:
+I had a great day today, feeling good!
+
+Right now, our database has two tables with information about users, 'user' and 'user_relationship'. Each friendship relation appears in the database exactly once. The database definition includes:
+
+USER
+  'id' (primary key)
+  'name'
+  'created_date'
+
+USER_RELATIONSHIP
+  'id' (primary key, unique to each relationship)
+  'user1_id' (indexed)
+  'user2_id' (indexed)
+  'start_date'
+
+Focusing on the database, how would you want to implement the live-count feature for use at a large scale?
+
+How can this be improved?
+
+----
+
+We are working on a clone of Google Docs that allows users to collaborate on documents. Many users can work on the same document at the same time.
+
+We have 100 instances of our service running on 100 different machines. Each document needs to be managed exclusively by one instance while it is in use, but one instance can handle many documents at once.
+
+We have a simple load-balancing system. Because each document has a random numeric ID found in the URL, we use the value of (id % num_instances) to route traffic. For example, with 100 instances, traffic for document # 314814196 is routed to the instance with index 96.
+
+How will this system perform as the usage grows?
+
+----
+
+Which consistency model is more appropriate for each of these applications: strong consistency, or eventual consistency? Why?
+
+- An API call that needs to respond within 20 milliseconds, used by a web service to retrieve metadata about a piece of streaming media.
+
+- A web analytics platform recording every click on the page
+
+- A banking system that makes deposits and payments to checking accounts
+
+-----
+
+We maintain a distributed system that allows users to "e-sign" legal documents. We provide a "notification" feature that sends an email to the owner when everyone who needs to sign a document has completed it. A document may have hundreds of signatures, and hundreds of millions of documents per day pass through our service.
+
+We recently had a bug in production that caused email notifications to fail (about 50% of the time) for about 48 hours last week. The logs from each of our 500 production machines record every "e-signature". The logs also record the ID of every document for which the notification was successfully sent. The notifications that failed are missing from the log.
+
+How can you use the logs and database to find and send out all the notifications that we missed, given that your solution needs to scale to handle this very large data set?
+
+-----
+
+One of our company's external vendors recently suffered a security breach. The credit card numbers of millions of their users were exposed. We know that some of our users may be affected, and we want to notify them.
+
+We built a distributed pipeline that performs operations in cascading sequence to notify the affected users. The output of each stage is used as input for all subsequent stages. The number below each stage of the graph shows how many records it can process per second.
+
+What is the maximum throughput of this pipeline, as a whole?
+
+                                 +--+
+                                 |G |
+                             +-> |25|
+                             |   +--+
++--+       +--+       +--+   |
+|A |       |B |       |C |   |
+|50| ----> |30| -+--> |30| -->
++--+       +--+  |    +--+   |   +--+       +--+
+                 |           |   |E |       |F |
+                 |    +--+   +-> |10| ----> |20|
+                 +--> |D |       +--+       +--+
+                      |90|
+                      +--+
+
+---
+
+If you wanted to reduce the total time needed to process your data set, how would you start to optimize the pipeline? The function of each step is shown below.
+
+Stage A: Read from a large third-party data source of credit card numbers
+Stage B: Check card numbers for validity
+Stage C: Look up the user ID for each credit card number in datastore 1
+Stage D: Write summary of each record to a log file
+Stage E: Look up the email address for each user ID in datastore 2
+Stage F: Send an email with user info
+Stage G: Write affected credit card number to a new MySQL database
+
+-----
