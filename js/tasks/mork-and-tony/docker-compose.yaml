@@ -1,0 +1,27 @@
+# Startup: docker-compose -p retrotv up -d
+# Destroy: docker-compose down --volumes
+# Cleanup: docker images prune -a
+
+services:
+  mork:
+    environment:
+      PING: 'Greetings from Ork!'
+      PORT: 9090
+    networks:
+      - retrotv
+    build: .
+    ports:
+      - "9090:9090"
+  tony:
+    environment:
+      PING: "Who's the Boss?"
+      PORT: 8008
+    networks:
+      - retrotv
+    build: .
+    ports:
+      - "8008:8008"
+networks:
+  retrotv:
+
+# networks are optional in this single netork use-case
