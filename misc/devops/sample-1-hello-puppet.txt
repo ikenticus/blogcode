@@ -1,0 +1,40 @@
+1. Hello Puppet
+
+Create a puppet script hellopuppet.pp in the directory /var/save/puppet_hello.
+The script when executed should write "Hello Puppet", without quotes to a file: /var/save/puppet_hello/hellopuppet.txt
+
+Note
+To install pupper run apt-get -y install puppet in ubuntu.
+You have sudo permissions.
+
+Server details
+
+To complete the DevOps questions, you'll need to login to the server per details below:
+
+Username: ubuntu
+Server: 54.167.235.120
+Password: gh00eh
+Command: ssh ubuntu@54.167.235.120
+
+-----
+
+$ ssh ubuntu@54.167.235.120
+ubuntu@54.167.235.120's password: 
+$ sudo apt-get update
+$ sudo apt-get -y install puppet
+$ cd /var/save/puppet_hello
+$ sudo vi hellopuppet.pp
+file { '/var/save/puppet_hello/hellopuppet.txt':
+  ensure => 'present',
+  content => "Hello Puppet",
+}
+$ sudo puppet apply -v --noop /var/save/puppet_hello/hellopuppet.pp
+$ sudo puppet apply -v /var/save/puppet_hello/hellopuppet.pp
+$ cat hellopuppet.txt
+Hello Puppet
+$ exit
+[exited]
+[session exited by user]
+Thank you for using HackerRankX.
+Connection to 54.167.235.120 closed.
+

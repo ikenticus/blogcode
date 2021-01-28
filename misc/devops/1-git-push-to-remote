@@ -1,0 +1,69 @@
+$ ssh ubuntu@3.93.57.145
+ubuntu@3.93.57.145's password: 
+$ cd /var/save
+$ mkdir my-remote
+$ cd my-remote
+$ sudo apt install git
+$ git init
+$ git remote add origin $PWD
+$ cat .git/config
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "origin"]
+	url = /var/save/my-remote
+	fetch = +refs/heads/*:refs/remotes/origin/*
+$ touch a.txt
+$ git add a.txt -A
+$ git config --global user.name hackerrank
+$ git config --global user.email me@hackerrank.com
+$ git commit -a -m "my first commit"
+
+$ cd /var/save
+$ git clone /var/save/my-remote my-local
+$ cd my-local
+$ git checkout -b test
+$ echo "Hello from local" > a.txt
+$ git commit -a -m "hello from local"
+$ git push --set-upstream origin test
+$ git checkout master
+$ git merge test
+$ git push
+
+$ which git
+/usr/bin/git
+$ git config --list
+user.email=me@hackerrank.com
+user.name=hackerrank
+core.repositoryformatversion=0
+core.filemode=true
+core.bare=false
+core.logallrefupdates=true
+remote.origin.url=/var/save/my-remote
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+branch.master.remote=origin
+branch.master.merge=refs/heads/master
+branch.test.remote=origin
+branch.test.merge=refs/heads/test
+$ git rev-list --date-order --abbrev-commit --reverse HEAD
+74ff08b
+3eeb771
+$ git checkout test
+Switched to branch 'test'
+Your branch is up to date with 'origin/test'.
+$ git rev-list --date-order --abbrev-commit --reverse HEAD
+74ff08b
+3eeb771
+$ git rev-list --all --remotes --oneline --reverse -- a.txt
+74ff08b my first commit
+3eeb771 hello from local
+$ git branch --remote --contains 74ff08b
+  origin/HEAD -> origin/master
+  origin/master
+  origin/test
+$ git branch --remote --contains 3eeb771
+  origin/HEAD -> origin/master
+  origin/master
+  origin/test

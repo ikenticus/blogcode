@@ -1,0 +1,89 @@
+$ ssh ubuntu@3.93.57.145
+ubuntu@3.93.57.145's password: 
+$ dpkg --get-selections | grep apache2
+$ sudo apt install apache2
+$ ls -1 /etc/apache2
+apache2.conf
+conf-available
+conf-enabled
+envvars
+magic
+mods-available
+mods-enabled
+ports.conf
+sites-available
+sites-enabled
+$ cat /var/save/mysites/hackerrank*/index.html
+<h1>It works.<h1>
+<h1>It works.<h1>
+<h1>It works.<h1>
+
+$ cd /etc/apache2/sites-available
+$ sudo cp 000-default.conf hackerrankone.com.conf
+$ sudo vi hackerrankone.com.conf
+Listen 8081
+<VirtualHost *:8081>
+    ServerName hackerrankone.com
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/save/mysites/hackerrankone
+
+    <Directory /var/save/mysites/hackerrankone>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+$ sudo cp hackerrankone.com.conf hackerranktwo.com.conf 
+$ sudo vi hackerranktwo.com.conf
+$ sudo cp hackerrankone.com.conf hackerrankthree.com.conf 
+$ sudo vi hackerrankthree.com.conf
+$ cat hackerrank*
+
+$ sudo a2dissite 000-default.conf 
+Site 000-default disabled.
+To activate the new configuration, you need to run:
+  systemctl reload apache2
+$ sudo a2ensite hackerrank*
+Enabling site hackerrankone.com.
+Enabling site hackerrankthree.com.
+Enabling site hackerranktwo.com.
+To activate the new configuration, you need to run:
+  systemctl reload apache2
+$ sudo systemctl reload apache2
+$ systemctl status apache2.service
+
+$ grep hacker /etc/hosts
+# hackerrank hosts
+127.0.0.1	hackerrankone.com hackerranktwo.com hackerrankthree.com
+$ dpkg --get-selections | grep apache2
+apache2						install
+apache2-bin					install
+apache2-data					install
+apache2-utils					install
+$ lsof -i:8081
+$ curl hackerrankone.com:8081 
+<h1>It works.<h1>
+
+### Getting it to work with different apache2ctl-hackerrank* was a doozy:
+
+$ cd /etc/apache2
+$ sudo cp apache2.conf hackerrankone.conf
+$ sudo vi hackerrankone.conf
+# replace: IncludeOptional sites-enabled/*.conf
+#    with: IncludeOptional sites-enabled/hackerrankone.com.conf
+# Comment out this line
+Include ports.conf
+# Append number to the end of this line
+PidFile ${APACHE_PID_FILE}_2
+
+$ cd /usr/sbin
+$ sudo apache2ctl stop
+$ sudo vi apache2ctl-hackerrank 
+$ sudo ln -s apache2ctl-hackerrank apache2ctl-hackerrankone
+$ sudo ln -s apache2ctl-hackerrank apache2ctl-hackerranktwo
+$ sudo ln -s apache2ctl-hackerrank apache2ctl-hackerrankthree
+
+$ cat apache2ctl-hackerrank 
+#!/bin/sh
+SITE=${0#*-}
+/usr/sbin/apache2ctl -f /etc/apache2/${SITE}.conf -k $1
+

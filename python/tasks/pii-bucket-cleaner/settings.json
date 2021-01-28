@@ -1,0 +1,5 @@
+{
+    "access": "AWSACCESSKEY",
+    "bucket": "S3BUCKETNAME",
+    "secret": "AWSSECRETKEY"
+}

@@ -1,4 +1,3 @@
-# Peppe Landolfi @ Karat.io
 
 -----
 
@@ -24,9 +23,11 @@ USER_RELATIONSHIP
 
 Focusing on the database, how would you want to implement the live-count feature for use at a large scale?
 
+---
+
 How can this be improved?
 
-----
+-----
 
 We are working on a clone of Google Docs that allows users to collaborate on documents. Many users can work on the same document at the same time.
 
@@ -36,7 +37,7 @@ We have a simple load-balancing system. Because each document has a random numer
 
 How will this system perform as the usage grows?
 
-----
+-----
 
 Which consistency model is more appropriate for each of these applications: strong consistency, or eventual consistency? Why?
 
