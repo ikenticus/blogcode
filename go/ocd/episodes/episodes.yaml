@@ -3,19 +3,228 @@
 rules:
   season: "^.*class=\"mw-headline\" id=\"(Season|Series|Episodes)_?([0-9]+)?.*$"
   number: "^.*th scope=\"row\"(?: rowspan=\"[0-9]+\")? id=\"ep([0-9ab]+)\".*$"
-  episode: "^.*<t[dh] style=\"text-align:center\">([0-9]+)</t[dh]>.*(?:class=\"summary\").*$"
-  title: "^.*>[0-9ab]+</t[dh]><td class=\"summary\" style=\"text-align:left\">\"*(.+?)\"*</td.*$"
+  episode: "^.*>([0-9ab]+)</t[dh]><td class=\"summary\".*$"
+  title: "^.*>[0-9ab]+</t[dh]><td class=\"summary\"(?: rowspan=\"[0-9]+\")? style=\"text-align:left\">\"*(.+?)\"*</td.*$"
   versus: "^.*td class=\"summary\" style=\"text-align:left\">.*?title=\"(.+?)\".+vs.+title=\"(.+?)\".+</a>"
   hyper: "<a href=\".+?\">(.+?)</a>\"*"
   datum: "^.*<td style=\"text-align:center\">([A-Za-z]+)&#160;([0-9]+),&#160;([0-9]+)<span.+bday dtstart.+$"
   alpha: "^.*<td style=\"text-align:center\">([0-9]+)&#160;([A-Za-z]+)&#160;([0-9]+)<span.+bday dtstart.+$"
 
 shows:
-  - name: black
-    wiki: Black_Lightning_(TV_series)#Season_2_(2018–19)
-  - name: deadly
-    wiki: Deadly_Class_(TV_series)
+  - name: 911
+    wiki: List_of_9-1-1_episodes
+  - name: 911star
+    wiki: 9-1-1:_Lone_Star
+
+  - name: ahs
+    wiki: List_of_American_Horror_Story_episodes
+  - name: amazing
+    wiki: Amazing_Stories_(2020_TV_series)
+  - name: another_life
+    wiki: Another_Life_(2019_TV_series)
+
+  - name: batwoman
+    wiki: Batwoman_(TV_series)
+  - name: boys
+    wiki: The_Boys_(2019_TV_series)
+  - name: brooklyn99
+    wiki: List_of_Brooklyn_Nine-Nine_episodes
+
+  - name: call_kat
+    wiki: Call_Me_Kat
+  - name: carnival
+    wiki: Carnival_Row
+  - name: cobra
+    wiki: Cobra_Kai
+  - name: crown
+    wiki: List_of_The_Crown_episodes
+  - name: cursed
+    wiki: Cursed_(2020_TV_series)
+
+  - name: dickinson
+    wiki: Dickinson_(TV_series)
+  - name: dispatches
+    wiki: Dispatches_from_Elsewhere
   - name: doctorwho
     wiki: List_of_Doctor_Who_episodes_(2005-present)
+  - name: doom
+    wiki: Doom_Patrol_(TV_series)
+
+  - name: euphoria
+    wiki: Euphoria_(American_TV_series)
+  - name: expanse
+    wiki: List_of_The_Expanse_episodes
+
+  - name: fastspy
+    wiki: Fast_%26_Furious_Spy_Racers
+  - name: finalspace
+    wiki: List_of_Final_Space_episodes
+  - name: flash
+    wiki: List_of_The_Flash_episodes
+  - name: flight
+    wiki: The_Flight_Attendant_(TV_series)
+
+  - name: genius
+    wiki: Genius_(American_TV_series)
+  - name: grace_frankie
+    wiki: List_of_Grace_and_Frankie_episodes
+
+  - name: handmaid
+    wiki: List_of_The_Handmaid%27s_Tale_episodes
+  - name: hanna
+    wiki: Hanna_(TV_series)
+  - name: harley_quinn
+    wiki: List_of_Harley_Quinn_(TV_series)_episodes
+  - name: hisdarkmats
+    wiki: His_Dark_Materials_(TV_series)
+  - name: hunters
+    wiki: Hunters_(2020_TV_series)
+
+  - name: invincible
+    wiki: Invincible_(TV_series)
+
+  - name: killingeve
+    wiki: List_of_Killing_Eve_episodes
+  - name: kungfu
+    wiki: Kung_Fu_(2021_TV_series)
+
+  - name: legends
+    wiki: List_of_Legends_of_Tomorrow_episodes
   - name: lipsync
     wiki: List_of_Lip_Sync_Battle_episodes
+  - name: locke_key
+    wiki: Locke_%26_Key_(TV_series)
+  - name: lostspace
+    wiki: Lost_in_Space_(2018_TV_series)
+  - name: lucifer
+    wiki: List_of_Lucifer_episodes
+
+  - name: macgyver
+    wiki: List_of_MacGyver_(2016_TV_series)_episodes
+  - name: made4love
+    wiki: Made_for_Love_(TV_series)
+  - name: maisel
+    wiki: The_Marvelous_Mrs._Maisel
+  - name: mandalorian
+    wiki: The_Mandalorian
+  - name: mankind
+    wiki: For_All_Mankind_(TV_series)
+  - name: masked_singer
+    wiki: List_of_The_Masked_Singer_(American_TV_series)_episodes
+  - name: masters_universe_revelation
+    wiki: Masters_of_the_Universe:_Revelation
+  - name: modernlove
+    wiki: Modern_Love_(TV_series)
+  - name: modok
+    wiki: M.O.D.O.K._(TV_series)
+  - name: moneyheist
+    wiki: List_of_Money_Heist_episodes
+  - name: monsters_work
+    wiki: Monsters_at_Work
+  - name: morningshow
+    wiki: The_Morning_Show_(American_TV_series)
+  - name: mysterious_benedict
+    wiki: The_Mysterious_Benedict_Society_(TV_series)
+  - name: mythic
+    wiki: Mythic_Quest:_Raven%27s_Banquet
+
+  - name: never
+    wiki: Never_Have_I_Ever_(TV_series)
+  - name: nevers
+    wiki: The_Nevers
+  - name: new_amsterdam
+    wiki: New_Amsterdam_(2018_TV_series)
+  - name: nora_queens
+    wiki: Awkwafina_Is_Nora_from_Queens
+
+  - name: orville
+    wiki: The_Orville
+  - name: outlander
+    wiki: List_of_Outlander_episodes
+  - name: outpost
+    wiki: The_Outpost_(TV_series)
+
+  - name: raisewolves
+    wiki: Raised_by_Wolves_(American_TV_series)
+  - name: resalien
+    wiki: Resident_Alien_(TV_series)
+  - name: rickmorty
+    wiki: List_of_Rick_and_Morty_episodes
+  - name: riverdale
+    wiki: List_of_Riverdale_episodes
+
+  - name: see
+    wiki: See_(TV_series)
+  - name: servant
+    wiki: Servant_(TV_series)
+  - name: shadowbone
+    wiki: Shadow_and_Bone_(TV_series)
+  - name: sinner
+    wiki: The_Sinner_(TV_series)
+  - name: snowpiercer
+    wiki: Snowpiercer_(TV_series)
+  - name: solar
+    wiki: Solar_Opposites
+  - name: spaceforce
+    wiki: Space_Force_(TV_series)
+  - name: stargirl
+    wiki: Stargirl_(TV_series)
+  - name: stdiscovery
+    wiki: List_of_Star_Trek:_Discovery_episodes
+  - name: stlowdecks
+    wiki: Star_Trek:_Lower_Decks
+  - name: stpicard
+    wiki: Star_Trek:_Picard
+  - name: swbadbatch
+    wiki: Star_Wars:_The_Bad_Batch
+  - name: strangerthings
+    wiki: Stranger_Things
+  - name: supergirl
+    wiki: List_of_Supergirl_episodes
+  - name: supermanlois
+    wiki: Superman_%26_Lois
+  - name: swat
+    wiki: List_of_S.W.A.T._(2017_TV_series)_episodes
+  - name: sweet_tooth
+    wiki: Sweet_Tooth_(TV_series)
+
+  - name: thisisus
+    wiki: List_of_This_Is_Us_episodes
+  - name: titans
+    wiki: Titans_(2018_TV_series)
+
+  - name: umbrella
+    wiki: The_Umbrella_Academy_(TV_series)
+  - name: upload
+    wiki: Upload_(TV_series)
+
+  - name: walkingbeyond
+    wiki: The_Walking_Dead:_World_Beyond
+  - name: walkingdead
+    wiki: List_of_The_Walking_Dead_episodes
+  - name: walkingfear
+    wiki: List_of_Fear_the_Walking_Dead_episodes
+  - name: warrior
+    wiki: Warrior_(TV_series)
+  - name: warriornun
+    wiki: Warrior_Nun_(TV_series)
+  - name: westworld
+    wiki: Westworld_(TV_series)
+  - name: what_shadows
+    wiki: What_We_Do_in_the_Shadows_(TV_series)
+  - name: wheel_time
+    wiki: The_Wheel_of_Time_(TV_series)
+  - name: winx
+    wiki: Fate:_The_Winx_Saga
+  - name: witcher
+    wiki: The_Witcher_(TV_series)
+  - name: wu
+    wiki: Wu_Assassins
+
+  - name: youngjustice
+    wiki: List_of_Young_Justice_episodes
+  - name: youngrock
+    wiki: Young_Rock
+  - name: youngsheldon
+    wiki: List_of_Young_Sheldon_episodes
+
