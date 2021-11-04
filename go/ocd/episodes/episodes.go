@@ -182,7 +182,7 @@ func parseWiki(show string, uri string, textOut bool, debug bool, rules *Rule) {
 	var lines []string
 	lines = strings.Split(string(data), "\n")
 	for _, line := range lines {
-		if strings.Contains(line, "id=\"Episodes\"") {
+		if strings.Contains(line, "id=\"Episode") {
 			active = true
 		} else if strings.Contains(line, "<h2>") {
 			active = false
@@ -201,7 +201,7 @@ func parseWiki(show string, uri string, textOut bool, debug bool, rules *Rule) {
 			}
 			if s.MatchString(line) {
 				if s.ReplaceAllString(line, "$2") == "" {
-					season = 1	// Episodes
+					season = 1 // Episodes
 				} else {
 					season, _ = strconv.Atoi(s.ReplaceAllString(line, "$2"))
 				}
@@ -298,14 +298,14 @@ func parseWiki(show string, uri string, textOut bool, debug bool, rules *Rule) {
 }
 
 type Rule struct {
-	Season string
-	Number string
+	Season  string
+	Number  string
 	Episode string
-	Title string
-	Versus string
-	Hyper string
-	Datum string
-	Alpha string
+	Title   string
+	Versus  string
+	Hyper   string
+	Datum   string
+	Alpha   string
 }
 
 type Show struct {
@@ -376,15 +376,15 @@ func main() {
 		} else if len(*optWiki) < 1 {
 			processWiki(*optName)
 		} else {
-			rules := &Rule {
-				Season: "^.*class=\"mw-headline\" id=\"(Season|Series)_([0-9]+).*$",
-				Number: "^.*th scope=\"row\"(?: rowspan=\"[0-9]+\")? id=\"ep([0-9]+)\".*$",
+			rules := &Rule{
+				Season:  "^.*class=\"mw-headline\" id=\"(Season|Series)_([0-9]+).*$",
+				Number:  "^.*th scope=\"row\"(?: rowspan=\"[0-9]+\")? id=\"ep([0-9]+)\".*$",
 				Episode: "^.*<td style=\"text-align:center\">([0-9]+)</td>.*(?:class=\"summary\").*$",
-				Title: "^.*>[0-9]+</td><td class=\"summary\" style=\"text-align:left\">\"(.+).*</td.*$",
-				Versus: "^.*td class=\"summary\" style=\"text-align:left\">.*title=\"(.+)\".+vs.+title=\"(.+)\".+</td.*$",
-				Hyper: "<a href=\".+\">(.+)</a>\"",
-				Datum: "^.*<td style=\"text-align:center\">([A-Za-z]+)&#160;([0-9]+),&#160;([0-9]+)<span.+bday dtstart.+$",
-				Alpha: "^.*<td style=\"text-align:center\">([0-9]+)&#160;([A-Za-z]+)&#160;([0-9]+)<span.+bday dtstart.+$",
+				Title:   "^.*>[0-9]+</td><td class=\"summary\" style=\"text-align:left\">\"(.+).*</td.*$",
+				Versus:  "^.*td class=\"summary\" style=\"text-align:left\">.*title=\"(.+)\".+vs.+title=\"(.+)\".+</td.*$",
+				Hyper:   "<a href=\".+\">(.+)</a>\"",
+				Datum:   "^.*<td style=\"text-align:center\">([A-Za-z]+)&#160;([0-9]+),&#160;([0-9]+)<span.+bday dtstart.+$",
+				Alpha:   "^.*<td style=\"text-align:center\">([0-9]+)&#160;([A-Za-z]+)&#160;([0-9]+)<span.+bday dtstart.+$",
 			}
 			parseWiki(*optName, *optWiki, *optTime, *optDbug, rules)
 		}
