@@ -6,6 +6,7 @@ from pprint import pprint
 
 USER='Mom'
 DUPE = re.compile(r'\(\d+\)')
+SPAN = re.compile(r'-to-')
 
 def rename_pdf (base):
     cerner = re.compile(r'^(?P<report>.+?)\s(?P<mo>\d{2})-(?P<dy>\d{2})-(?P<yr>\d{4})(\s\((?P<cnt>\d+)\))?')
@@ -21,11 +22,17 @@ def rename_pdf (base):
     os.rename('%s.pdf' % base, change)
 
 def rename_xml (base):
-    cerner = re.compile(r'^(?P<report>.+?)-(?P<mo>\d{2})(?P<dy>\d{2})(?P<yr>\d{4})(-to-\d{2}\d{2}\d{4})?(\s\((?P<cnt>\d+)\))?')
+    cerner = re.compile(r'^(?P<report>.+?)-(?P<mo>\d{2})(?P<dy>\d{2})(?P<yr>\d{4})(-to-(?P<m2>\d{2})(?P<d2>\d{2})(?P<y2>\d{4}))?(\s\((?P<cnt>\d+)\))?')
     if DUPE.search(base):
-        change = cerner.sub('\g<yr>\g<mo>\g<dy> - Care Summary\g<cnt> %s.xml' % USER, base)
+        if SPAN.search(base):
+            change = cerner.sub('\g<y2>\g<m2>\g<d2> - Care Summary\g<cnt> %s.xml' % USER, base)
+        else:
+            change = cerner.sub('\g<yr>\g<mo>\g<dy> - Care Summary\g<cnt> %s.xml' % USER, base)
     else:
-        change = cerner.sub('\g<yr>\g<mo>\g<dy> - Care Summary %s.xml' % USER, base)
+        if SPAN.search(base):
+            change = cerner.sub('\g<y2>\g<m2>\g<d2> - Care Summary %s.xml' % USER, base)
+        else:
+            change = cerner.sub('\g<yr>\g<mo>\g<dy> - Care Summary %s.xml' % USER, base)
     os.rename('%s.xml' % base, change)
 
 if __name__ == '__main__':
