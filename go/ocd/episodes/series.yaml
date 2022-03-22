@@ -1,0 +1,18 @@
+# go run episodes.go -y -n episodes
+
+rules:
+  season: "^.*class=\"mw-headline\" id=\"(Season|Series|Episodes)_?([0-9]+)?.*$"
+  number: "^.*th scope=\"row\"(?: rowspan=\"[0-9]+\")? id=\"ep([0-9ab]+)\".*$"
+  episode: "^.*>([0-9ab]+)</t[dh]><td class=\"summary\".*$"
+  title: "^.*>[0-9ab]+</t[dh]><td class=\"summary\"(?: rowspan=\"[0-9]+\")? style=\"text-align:left\">\"*(.+?)\"*</td.*$"
+  versus: "^.*td class=\"summary\" style=\"text-align:left\">.*?title=\"(.+?)\".+vs.+title=\"(.+?)\".+</a>"
+  hyper: "<a href=\".+?\">(.+?)</a>\"*"
+  datum: "^.*<td style=\"text-align:center\">([A-Za-z]+)&#160;([0-9]+),&#160;([0-9]+)<span.+bday dtstart.+$"
+  alpha: "^.*<td style=\"text-align:center\">([0-9]+)&#160;([A-Za-z]+)&#160;([0-9]+)<span.+bday dtstart.+$"
+
+shows:
+  #- name: hisdarkmats
+  #  wiki: His_Dark_Materials_(TV_series)
+  - name: youngjustice
+    wiki: List_of_Young_Justice_episodes
+
