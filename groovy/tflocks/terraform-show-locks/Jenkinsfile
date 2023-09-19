@@ -1,0 +1,37 @@
+
+PROFILE = ACCOUNT == "production" ? '--profile production-packer' : ''
+LOCK_TABLE = ""
+
+catchError {
+    node("shipper") {
+        stage ("Check Locks") {
+            locks = sh (script: """
+                aws --region $REGION $PROFILE \
+                    dynamodb execute-statement --query '*[].LockID.S' --statement \
+                    "SELECT * FROM terraform_locks WHERE begins_with(LockID, 'tf-state-') AND NOT contains(LockID, '-md5')" \
+                    | jq -r '.[]'
+            """, returnStdout: true).trim()
+            for (lock in locks.split('\n')) {
+                pick = lock.split('/')
+                LOCK_TABLE += "<tr><td>lock found for ${pick[2]} ${pick[4]}</td><td>"
+                LOCK_TABLE += "<a href='${JENKINS_URL}/job/terraform-unlock/parambuild/"
+                LOCK_TABLE += "?ACCOUNT=${ACCOUNT}&REGION=${REGION}&LOCK=${lock}'>"
+                LOCK_TABLE += "Click to unlock</a></td></tr>\n"
+            }
+            if (LOCK_TABLE == "") {
+                LOCK_TABLE = "<hr>No locks found in $ACCOUNT AWS Account<hr>"
+            } else {
+                LOCK_TABLE = "<hr><table>\n${LOCK_TABLE}</table><hr>"
+            }
+        }
+        
+        stage ("Display Locks") {
+            currentBuild.result = "SUCCESS"
+            rtp parserName: 'HTML',
+                abortedText: LOCK_TABLE,
+                failedText: LOCK_TABLE,
+                stableText: LOCK_TABLE,
+                unstableText: LOCK_TABLE
+        }
+    }
+}

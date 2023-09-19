@@ -1,0 +1,31 @@
+
+PROFILE = ACCOUNT == "production" ? '--profile production-packer' : ''
+
+catchError {
+    node("shipper") {
+        stage ("Check Lock") {
+            lock = sh (script: """
+                aws --region $REGION $PROFILE dynamodb \
+                    get-item --table-name terraform_locks \
+                    --key \"{\\"LockID\\":{\\"S\\":\\"$LOCK\\"}}\"
+            """, returnStdout: true).trim()
+            if (lock.isEmpty()) {
+                println("Lock $LOCK was not found")
+                currentBuild.result = "FAILURE"
+            } else {
+                timeout(time: 15, unit: 'MINUTES') {
+                    println("Lock $LOCK discovered")
+                    input "Delete $LOCK ?"
+                }
+            }
+        }
+        
+        stage ("Delete Lock") {
+            sh("""
+                aws --region $REGION $PROFILE dynamodb \
+                    delete-item --table-name terraform_locks \
+                    --key \"{\\"LockID\\":{\\"S\\":\\"$LOCK\\"}}\"
+            """)
+        }
+    }
+}
