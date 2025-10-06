@@ -145,7 +145,7 @@ func buildList(show string) {
 	ioutil.WriteFile(show+".list", []byte(output), 0644)
 }
 
-func parseWiki(show string, uri string, textOut bool, debug bool, rules *Rule) {
+func parseWiki(show string, uri string, textOut bool, debug bool, heads []Head, rules *Rule) {
 	var episodes = map[int]string{}
 	var schedule = map[int]string{}
 	fmt.Println("Parsing", uri)
@@ -153,6 +153,9 @@ func parseWiki(show string, uri string, textOut bool, debug bool, rules *Rule) {
 
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", wikiPath+uri, nil)
+    for _, head := range heads {
+        req.Header.Set(head.Name, head.Value)
+    }
 	resp, _ := client.Do(req)
 	defer resp.Body.Close()
 
@@ -313,8 +316,14 @@ type Show struct {
 	Wiki string
 }
 
+type Head struct {
+	Name  string
+	Value string
+}
+
 type Settings struct {
 	Rules Rule
+	Heads []Head
 	Shows []Show
 }
 
@@ -346,7 +355,7 @@ func parseYaml(config string, debug bool) {
 			defer wg.Done()
 			show := settings.Shows[i]
 			//fmt.Println("Processing", show.Name, show.Wiki)
-			parseWiki(show.Name, show.Wiki, true, debug, &settings.Rules)
+			parseWiki(show.Name, show.Wiki, true, debug, settings.Heads, &settings.Rules)
 		}(i)
 	}
 	wg.Wait()
@@ -386,7 +395,13 @@ func main() {
 				Datum:   "^.*<td style=\"text-align:center\">([A-Za-z]+)&#160;([0-9]+),&#160;([0-9]+)<span.+bday dtstart.+$",
 				Alpha:   "^.*<td style=\"text-align:center\">([0-9]+)&#160;([A-Za-z]+)&#160;([0-9]+)<span.+bday dtstart.+$",
 			}
-			parseWiki(*optName, *optWiki, *optTime, *optDbug, rules)
+            header := []Head{
+                {
+                    Name: "User-Agent",
+                    Value: "Undefined",
+                },
+            }
+			parseWiki(*optName, *optWiki, *optTime, *optDbug, header, rules)
 		}
 		if *optList {
 			buildMove(*optName)
