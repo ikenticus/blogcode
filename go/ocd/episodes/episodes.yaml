@@ -1,20 +1,47 @@
+
 # go run episodes.go -y -n episodes
 
 rules:
-  season: "^.*class=\"mw-headline\" id=\"(Season|Series|Episodes)_?([0-9]+)?.*$"
+  season: "^.*class=\"mw-heading mw-heading3\"><h3 id=\"(Book|Season|Series|Episodes|Part|Specials|Volume_I+)_?([0-9]+)?.*$"
   number: "^.*th scope=\"row\"(?: rowspan=\"[0-9]+\")? id=\"ep([0-9ab]+)\".*$"
   episode: "^.*>([0-9ab]+)</t[dh]><td class=\"summary\".*$"
   title: "^.*>[0-9ab]+</t[dh]><td class=\"summary\"(?: rowspan=\"[0-9]+\")? style=\"text-align:left\">\"*(.+?)\"*</td.*$"
   versus: "^.*td class=\"summary\" style=\"text-align:left\">.*?title=\"(.+?)\".+vs.+title=\"(.+?)\".+</a>"
   hyper: "<a href=\".+?\">(.+?)</a>\"*"
-  datum: "^.*<td style=\"text-align:center\">([A-Za-z]+)&#160;([0-9]+),&#160;([0-9]+)<span.+bday dtstart.+$"
-  alpha: "^.*<td style=\"text-align:center\">([0-9]+)&#160;([A-Za-z]+)&#160;([0-9]+)<span.+bday dtstart.+$"
+  datum: "^.*<td style=\"text-align:center\">([A-Za-z]+)<span.*mw:Entity.*span>([0-9]+),<span.*mw:Entity.*span>([0-9]+)<span.+bday dtstart.+$"
+  alpha: "^.*<td style=\"text-align:center\">([0-9]+)<span.*mw:Entity.*span>([A-Za-z]+)<span.*mw:Entity.*span>([0-9]+)<span.+bday dtstart.+$"
+
+# 2026/07/05 Wikipedia updated all date formats:
+#  datum: "^.*<td style=\"text-align:center\">([A-Za-z]+)&(?:nbsp|#160);([0-9]+),&(?:nbsp|#160);([0-9]+)<span.+bday dtstart.+$"
+# 2026/06/29 Wikipedia changed European date format:
+#  alpha: "^.*<td style=\"text-align:center\">([0-9]+)&(?:nbsp|#160);([A-Za-z]+)&(?:nbsp|#160);([0-9]+)<span.+bday dtstart.+$"
+# Parsing serial yyyy-mm-dd did not work:
+#  alpha: "^.*bday dtstart.*itvstart\">([0-9]+)-([0-9]+)-([0-9]+)</span>.*$"
+# Parsing dd Month yyyy did not work either:
+#  alpha: ^.*<td style=\"text-align:center\">([0-9]+)<span.+>([A-Za-z]+)<span.+>([0-9]+)<span.+bday dtstart.+$"
+# Back to original
+
+# 2022/01/17 Wikipedia may have changed tables globally:
+#	removed from <td>:  style=\"text-align:{left,center}\"
+
+# 2024/07/21 Refactored:
+#  season: "^.*class=\"mw-headline\" id=
+#  season: "^.*class=\"mw-heading mw-heading3\"><h3 id
+
+# 2025/06/20 Refactored (some whitespace changed and others did not, so need to accomodate both):
+#  datum: "^.*<td style=\"text-align:center\">([A-Za-z]+)&#160;([0-9]+),&#160;([0-9]+)<span.+bday dtstart.+$"
+#  alpha: "^.*<td style=\"text-align:center\">([0-9]+)&#160;([A-Za-z]+)&#160;([0-9]+)<span.+bday dtstart.+$"
+#  datum: "^.*<td style=\"text-align:center\">([A-Za-z]+)&(?:nbsp|#160);([0-9]+),&(?:nbsp|#160);([0-9]+)<span.+bday dtstart.+$"
+#  alpha: "^.*<td style=\"text-align:center\">([0-9]+)&(?:nbsp|#160);([A-Za-z]+)&(?:nbsp|#160);([0-9]+)<span.+bday dtstart.+$"
+
+# 2025/08/13 Please set a proper user-agent and respect our robot policy https://w.wiki/4wJS. See also T400119
 
 heads:
   - name: User-Agent
     value: EpisodeScan/1.0 (https://livebait2008.github.io; livebait2008@gmail.com)
 
 shows:
+
   - name: 911
     wiki: List_of_9-1-1_episodes
 
