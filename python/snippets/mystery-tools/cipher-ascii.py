@@ -17,4 +17,5 @@ else:
         if i:
             output += chr(int(i))
 
+output = output.rstrip(sep)
 print(output)

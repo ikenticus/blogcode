@@ -19,4 +19,5 @@ else:
         if i:
             output += alpha[int(i)-1]
         
+output = output.rstrip(sep)
 print(output)

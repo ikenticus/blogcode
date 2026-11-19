@@ -36,6 +36,7 @@ for i in input.split(sep):
             output += '%s%s' % (f"{d:X}", sep)
         else:
             output += '%s%s' % (encode(int(i)), sep)
+        output = output.rstrip(sep)
     else:
         if base == 16:
             if i:

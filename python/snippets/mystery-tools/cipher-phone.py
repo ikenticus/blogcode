@@ -32,7 +32,6 @@ def encode(c, p):
     else:
         return '%s ' % (str(p) * (idx+1))
     
-    
 input = ''.join(sys.argv[1:]).upper()
 #print(input)
 
